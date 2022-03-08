@@ -33,7 +33,7 @@ export class WelcomeController extends Controller{
         this.#welcomeView.querySelector("span.name").innerHTML = App.sessionManager.get("username");
 
         //for demonstration a hardcoded room id that exists in the database of the back-end
-        this.#fetchRooms(1256);
+        await this.#fetchRooms(1256);
     }
 
     /**
