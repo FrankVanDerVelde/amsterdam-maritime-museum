@@ -19,6 +19,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function co2BerekeningAuto(){
         if(document.querySelector("#vervoersmiddel") === document.querySelector("#Auto")){
+            const co2GebruikAutoDiesel = afgelegdeAfstand * co2GebruikDiesel;
+            const co2GebruikAutoBenzine = afgelegdeAfstand * co2GebruikBenzine;
+            const co2GebruikAutoLPG = afgelegdeAfstand * co2GebruikLPG;
+            const co2GebruikAutoCNGLaag = afgelegdeAfstand * co2GebruikCNGLaag;
+            const co2GebruikAutoCNGHoog = afgelegdeAfstand * co2GebruikCNGHoog;
 
         }
 
