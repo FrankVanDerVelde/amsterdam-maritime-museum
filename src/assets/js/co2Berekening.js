@@ -3,16 +3,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     let afgelegdeAfstand;
 
     //---------------------------------CO2-verbruik voor verschillende brandstoffen per km------------------------------
-    //CO2 gebruik in gram diesel per km
+    //CO2 gebruik in gram, diesel per km
     const co2GebruikDiesel = 132;
 
-    //CO2 gebruik in gram benzine per km
+    //CO2 gebruik in gram, benzine per km
     const co2GebruikBenzine = 120;
 
-    //CO2 gebruik in gram LPG per km
+    //CO2 gebruik in gram, LPG per km
     const co2GebruikLPG = 83;
 
-    //CO2 gebruik in gram CNG per km voor laag en hoog calorisch
+    //CO2 gebruik in gram, CNG per km voor laag en hoog calorisch
     const co2GebruikCNGLaag = 113;
     const co2GebruikCNGHoog = 112;
     //------------------------------------------------------------------------------------------------------------------
