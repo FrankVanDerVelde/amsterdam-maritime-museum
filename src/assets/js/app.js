@@ -12,6 +12,8 @@ import { LoginController } from "./controllers/loginController.js"
 import { NavbarController }  from "./controllers/navbarController.js"
 import { UploadController }  from "./controllers/uploadController.js"
 import { WelcomeController }  from "./controllers/welcomeController.js"
+import { CalculatorController } from "./controllers/calculatorController.js";
+import { TreeBackgroundController } from "./controllers/treeBackgroundController.js"
 
 export class App {
     //we only need one instance of the sessionManager, thus static use here
@@ -24,13 +26,15 @@ export class App {
     static CONTROLLER_LOGOUT = "logout";
     static CONTROLLER_WELCOME = "welcome";
     static CONTROLLER_UPLOAD = "upload";
+    static CONTROLLER_CALCULATOR = "calculator";
+    static CONTROLLER_TREE_BACKGROUND = "tree-background";
 
     constructor() {
         //Always load the navigation
         App.loadController(App.CONTROLLER_NAVBAR);
 
         //Attempt to load the controller from the URL, if it fails, fall back to the welcome controller.
-        App.loadControllerFromUrl(App.CONTROLLER_WELCOME );
+        App.loadControllerFromUrl(App.CONTROLLER_WELCOME);
     }
 
     /**
@@ -51,6 +55,16 @@ export class App {
         switch (name) {
             case App.CONTROLLER_NAVBAR:
                 new NavbarController();
+                break;
+
+            case App.CONTROLLER_CALCULATOR:
+                App.setCurrentController(name);
+                new CalculatorController();
+                break;
+
+            case App.CONTROLLER_TREE_BACKGROUND:
+                App.setCurrentController(name);
+                new TreeBackgroundController();
                 break;
 
             case App.CONTROLLER_LOGIN:

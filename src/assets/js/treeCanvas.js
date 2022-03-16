@@ -14,9 +14,6 @@ canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// amount of unique trees in the assets folder
-const uniqueTrees = 5;
-
 // Resize ability for canvas
 window.addEventListener('resize', resize);
 
@@ -24,6 +21,9 @@ function resize() {
     app.renderer.resize(window.innerWidth, (window.innerHeight/100)*60);
 }
 resize();
+
+// amount of unique trees in the assets folder
+const uniqueTrees = 5;
 
 function getRandomX() {
     min = Math.floor(0);
