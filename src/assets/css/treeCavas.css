@@ -1,13 +1,5 @@
-html, body {
-    margin: 0;
-    padding: 0;
+.tree-canvas-container {
     height: 100%;
-    width: 100%;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
 }
 
 .sky-box {
@@ -44,3 +36,29 @@ canvas {
     z-index: -9999;
     pointer-events: auto;
 } */
+
+.calculator-place-holder {
+    position: fixed;
+    height: 15em;
+    width: 15em;
+    left: 50%;
+    top: 45%;
+    margin-top: -7.5em;
+    margin-left: -7.5em;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.calculator-content {
+    padding: 1em;
+}
+
+.calculator-place-holder label {
+
+}
+
+.calculator-place-holder input {
+
+}

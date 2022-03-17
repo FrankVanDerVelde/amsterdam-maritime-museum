@@ -18,21 +18,25 @@ export class TreeBackgroundController extends Controller {
         this.#createTreeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
 
         await this.#setUpCanvas();
+        // await this.#createTrees();
         await this.#createTrees();
     }
 
     async #setUpCanvas() {
+        // Get the div that will hold the canvas
+        const canvasDiv = document.getElementById("canvas-box");
+
+        // Setup the pixi app
         const app = new PIXI.Application({
             transparent: true,
             autoResize: true,
-            width: window.innerHeight,
-            height: window.innerWidth,
+            width: canvasDiv.offsetWidth,
+            height: canvasDiv.offsetHeight,
             resolution: devicePixelRatio,
             autoDensity: true
         });
 
-        const canvasDiv = document.getElementById("canvas-box");
-        console.log(canvasDiv)
+        // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
 
         const canvas = app.view;
@@ -42,9 +46,11 @@ export class TreeBackgroundController extends Controller {
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
+        
 
         function resize() {
-            app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
+            // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
+            app.renderer.resize(canvasDiv.offsetWidth, canvasDiv.offsetHeight);
         }
         resize();
 
@@ -55,19 +61,47 @@ export class TreeBackgroundController extends Controller {
         // amount of unique trees in the assets folder
         const uniqueTrees = 5;
 
+        // The offset from the edges of the screen in pixels
+        const offSet = 50;
+
         function getRandomX() {
-            const min = Math.floor(0);
-            const max = Math.ceil(window.innerWidth);
+            const min = Math.floor(0) + offSet;
+            const max = Math.ceil(window.innerWidth) - offSet;
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
         function getRandomY() {
-            const min = Math.floor(0);
+            const min = Math.floor(0) + offSet;
             const max = Math.ceil(window.innerHeight / 2);
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        let treeCount = 35;
+        // const verbruikInput = document.getElementById("verbruik");
+        // const afstandInput = document.getElementById("afstand");
+
+        // verbruikInput.addEventListener("change", createTrees);
+        // afstandInput.addEventListener("change", createTrees);
+
+        // function createTrees() {
+            // console.log(verbruikInput.value);
+            let treeCount = 35;
+            for (let i = 0; i < treeCount; i++) {
+
+                let sprite = PIXI.Sprite.from(`assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
+    
+                sprite.x = getRandomX();
+                sprite.y = getRandomY();
+    
+                sprite.width = 70;
+                sprite.height = 70;
+    
+                this.#canvasApp.stage.addChild(sprite);
+            }
+        // }
+        
+        
+
+        
         // setInterval(function () {
         //     let sprite = PIXI.Sprite.from(`../assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
 
@@ -80,18 +114,7 @@ export class TreeBackgroundController extends Controller {
         //     app.stage.addChild(sprite);
         // }, 1000);
 
-        for (let i = 0; i < treeCount; i++) {
-
-            let sprite = PIXI.Sprite.from(`assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
-
-            sprite.x = getRandomX();
-            sprite.y = getRandomY();
-
-            sprite.width = 70;
-            sprite.height = 70;
-
-            this.#canvasApp.stage.addChild(sprite);
-        }
+        
 
         // A function to get the tree position, that considers the position and size of other elements to avoid clipping
         function getTreePosition() {
