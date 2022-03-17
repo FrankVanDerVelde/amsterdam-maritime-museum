@@ -5,7 +5,7 @@
 import { Controller } from "./controller.js";
 
 export class TreeBackgroundController extends Controller {
-    #createTreeBackgroundView;
+    #treeBackgroundView;
     #canvasApp;
 
     constructor() {
@@ -15,7 +15,7 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #setupView() {
-        this.#createTreeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+        this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
 
         await this.#setUpCanvas();
         // await this.#createTrees();
@@ -76,15 +76,17 @@ export class TreeBackgroundController extends Controller {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // const verbruikInput = document.getElementById("verbruik");
-        // const afstandInput = document.getElementById("afstand");
+        const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
+        const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
 
-        // verbruikInput.addEventListener("change", createTrees);
-        // afstandInput.addEventListener("change", createTrees);
+        let canvas = this.#canvasApp;
 
-        // function createTrees() {
-            // console.log(verbruikInput.value);
-            let treeCount = 35;
+        verbruikInput.addEventListener("change", createTrees);
+        afstandInput.addEventListener("change", createTrees);
+
+        function createTrees() {
+            let treeCount = verbruikInput.value + afstandInput.value;
+
             for (let i = 0; i < treeCount; i++) {
 
                 let sprite = PIXI.Sprite.from(`assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
@@ -95,14 +97,26 @@ export class TreeBackgroundController extends Controller {
                 sprite.width = 70;
                 sprite.height = 70;
     
-                this.#canvasApp.stage.addChild(sprite);
+                canvas.stage.addChild(sprite);
             }
-        // }
-        
-        
+        }
+            // console.log(verbruikInput.value);
+            let treeCount = 35;
+            // for (let i = 0; i < treeCount; i++) {
 
-        
+            //     let sprite = PIXI.Sprite.from(`assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
+    
+            //     sprite.x = getRandomX();
+            //     sprite.y = getRandomY();
+    
+            //     sprite.width = 70;
+            //     sprite.height = 70;
+    
+            //     this.#canvasApp.stage.addChild(sprite);
+            // }
+                
         // setInterval(function () {
+        //     console.log('test')
         //     let sprite = PIXI.Sprite.from(`../assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
 
         //     sprite.x = getRandomX();
@@ -111,10 +125,8 @@ export class TreeBackgroundController extends Controller {
         //     sprite.width = 70;
         //     sprite.height = 70;
 
-        //     app.stage.addChild(sprite);
+        //     this.#canvasApp.stage.addChild(sprite);
         // }, 1000);
-
-        
 
         // A function to get the tree position, that considers the position and size of other elements to avoid clipping
         function getTreePosition() {
