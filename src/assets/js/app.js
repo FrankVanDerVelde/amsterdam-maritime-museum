@@ -14,6 +14,7 @@ import { UploadController }  from "./controllers/uploadController.js"
 import { WelcomeController }  from "./controllers/welcomeController.js"
 import { CalculatorController } from "./controllers/calculatorController.js";
 import { TreeBackgroundController } from "./controllers/treeBackgroundController.js"
+import { UserLocationController } from "./controllers/UserLocationController.js"
 
 export class App {
     //we only need one instance of the sessionManager, thus static use here
@@ -27,6 +28,7 @@ export class App {
     static CONTROLLER_WELCOME = "welcome";
     static CONTROLLER_UPLOAD = "upload";
     static CONTROLLER_CALCULATOR = "calculator";
+    static CONTROLLER_USER_LOCATION = "user-location";
     static CONTROLLER_TREE_BACKGROUND = "tree-background";
 
     constructor() {
@@ -52,6 +54,7 @@ export class App {
         }
 
         //load right controller based on the passed name to this function
+        console.log(name)
         switch (name) {
             case App.CONTROLLER_NAVBAR:
                 new NavbarController();
@@ -60,6 +63,12 @@ export class App {
             case App.CONTROLLER_CALCULATOR:
                 App.setCurrentController(name);
                 new CalculatorController();
+                break;
+
+            case App.CONTROLLER_USER_LOCATION:
+                console.log(name)
+                App.setCurrentController(name);
+                new UserLocationController();
                 break;
 
             case App.CONTROLLER_TREE_BACKGROUND:

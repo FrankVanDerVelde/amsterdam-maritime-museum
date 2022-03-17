@@ -18,8 +18,6 @@ export class treeController extends Controller{
 
     #constructor() {
         super();
-
-
     }
 
     /**
