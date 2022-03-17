@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         const aantalBomenCompensatiePerMaand = aantalBomenCompensatiePerJaar * 12;
         const aantalBomenCompensatiePerDag = aantalBomenCompensatiePerJaar * 365;
 
-        document.querySelector("#aantalBomenPerJaar").innerHTML = aantalBomenCompensatiePerJaar;
-        document.querySelector("#aantalBomenPerMaand").innerHTML = aantalBomenCompensatiePerMaand;
-        document.querySelector("#aantalBomenPerDag").innerHTML = aantalBomenCompensatiePerDag;
+        document.querySelector("#amountOfTreesYear").innerHTML = aantalBomenCompensatiePerJaar;
+        document.querySelector("#amountOfTreesMonth").innerHTML = aantalBomenCompensatiePerMaand;
+        document.querySelector("#amountOfTreesDay").innerHTML = aantalBomenCompensatiePerDag;
     // }
 })
