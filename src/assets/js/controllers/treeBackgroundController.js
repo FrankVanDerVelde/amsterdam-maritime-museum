@@ -7,6 +7,7 @@ import { Controller } from "./controller.js";
 export class TreeBackgroundController extends Controller {
     #treeBackgroundView;
     #canvasApp;
+    #textureSheet;
 
     constructor() {
         super();
@@ -22,9 +23,9 @@ export class TreeBackgroundController extends Controller {
         await this.#createTrees();
     }
 
-    async #setUpCanvas() {
+     async #setUpCanvas() {
         // Get the div that will hold the canvas
-        const canvasDiv = document.getElementById("canvas-box");
+        const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
 
         // Setup the pixi app
         const app = new PIXI.Application({
@@ -35,6 +36,18 @@ export class TreeBackgroundController extends Controller {
             resolution: devicePixelRatio,
             autoDensity: true
         });
+            
+        // Promise to make sure the spritesheet is loaded before putting it into #textureSheet.
+        const spriteSheetLoaderPromise = new Promise(function(myResolve, myReject) {
+            try {
+                PIXI.Loader.shared.add("assets/images/trees/treespritesheet.json").load(myResolve);
+            } catch {
+                console.log('Error while loading spritesheet');
+                myReject();
+            }
+        });
+        await spriteSheetLoaderPromise;
+        this.#textureSheet = PIXI.Loader.shared.resources["assets/images/trees/treespritesheet.json"].spritesheet;
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
@@ -58,6 +71,7 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #createTrees() {
+        const sheet = this.#textureSheet;
         // amount of unique trees in the assets folder
         const uniqueTrees = 5;
 
@@ -81,6 +95,18 @@ export class TreeBackgroundController extends Controller {
 
         let canvas = this.#canvasApp;
 
+        console.log('tree function')
+        console.log(this.#textureSheet);
+
+        let test = new PIXI.Sprite();
+        test.x = getRandomX();
+        test.y = getRandomY();
+    
+        test.width = 70;
+        test.height = 70;
+
+        canvas.stage.addChild(test);
+    
         verbruikInput.addEventListener("change", createTrees);
         afstandInput.addEventListener("change", createTrees);
 
@@ -88,8 +114,7 @@ export class TreeBackgroundController extends Controller {
             let treeCount = verbruikInput.value + afstandInput.value;
 
             for (let i = 0; i < treeCount; i++) {
-
-                let sprite = PIXI.Sprite.from(`assets/images/trees/tree${Math.floor(Math.random() * (6))}.png`);
+                let sprite = PIXI.Sprite.from(sheet.textures[`tree${Math.floor(Math.random() * (6))}.png`]);
     
                 sprite.x = getRandomX();
                 sprite.y = getRandomY();
