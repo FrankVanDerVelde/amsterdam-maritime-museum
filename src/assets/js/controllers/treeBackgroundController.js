@@ -59,7 +59,6 @@ export class TreeBackgroundController extends Controller {
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
-        
 
         function resize() {
             // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
@@ -95,7 +94,7 @@ export class TreeBackgroundController extends Controller {
 
         let canvas = this.#canvasApp;
 
-        console.log('tree function')
+        console.log('tree function');
         console.log(this.#textureSheet);
 
         let test = new PIXI.Sprite();
