@@ -8,6 +8,8 @@ export class TreeBackgroundController extends Controller {
     #treeBackgroundView;
     #canvasApp;
     #textureSheet;
+    #gridSquares = [];
+    #baseTreeDimension = 70;
 
     constructor() {
         super();
@@ -56,7 +58,21 @@ export class TreeBackgroundController extends Controller {
 
         // canvas.width = canvasDiv.offsetWidth;
         // canvas.height = canvasDiv.offsetHeight;
+        const treeDimension = this.#baseTreeDimension;
 
+        const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
+        const ySquares = Math.floor(canvasDiv.offsetHeight / treeDimension)
+
+        for (let x = 0; x < xSquares; x++) {
+            for (let y = 0; y < ySquares; y++) {
+                this.#gridSquares.push({
+                    xBaseCoordinate: x * treeDimension + treeDimension,
+                    yBaseCoordinate: y * treeDimension - treeDimension,
+                    spriteReference: null,
+                })
+            }
+        }
+        console.log(this.#gridSquares);
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -73,15 +89,15 @@ export class TreeBackgroundController extends Controller {
     async #createTrees() {
         let canvas = this.#canvasApp;
         const sheet = this.#textureSheet;
-        const treeDimension = 70;
+        const treeDimension = this.#baseTreeDimension;
+        const placementGrid = this.#gridSquares;
         // amount of unique trees in the assets folder
         const uniqueTreeAssets = 5;
         // The offset from the edges of the screen in pixels
         const offSet = treeDimension / 2;
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
-        // The array that hold all the tree specials
-        const treesArray = [];
+        // The array that hold all the tree sprites
 
         function getRandomX() {
             const min = Math.floor(0);
@@ -99,8 +115,6 @@ export class TreeBackgroundController extends Controller {
         const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
         const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
 
-        
-
         verbruikInput.addEventListener("change", function () {
             totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
             updateTrees();
@@ -112,24 +126,25 @@ export class TreeBackgroundController extends Controller {
         });
 
         function updateTrees() {
-            if (treesArray.length < totalTrees) {
-                while (treesArray.length < totalTrees) {
-                    createTree()
+            // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
+            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
+            if (visibleTrees.length < totalTrees) {
+                while (visibleTrees.length < totalTrees) {
+                    createTree();
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
                 }
-            } else if (treesArray.length > totalTrees) {
-                while (treesArray.length > totalTrees) {
-                    treesArray[treesArray.length - 1].destroy();
-                    treesArray.pop()
-                }
+            } else if (visibleTrees.length > totalTrees) {
+                // while (visibleTrees.length > totalTrees) {
+                //     visibleTrees[treesArray.length - 1].destroy();
+                //     visibleTrees.pop()
+                // }
             }
         }
 
+        
         function createTree() {
             let sprite = PIXI.Sprite.from(sheet.textures[`tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`]);
-
-            let position;
-            console.log("x: ", getRandomX(), "y: ",  getRandomY());
-            treesArray.length < 15 ? position = { x: getRandomX(), y: getRandomY() } : position = getEmptyPosition((canvas.renderer.height / 2.5));
+            
             // if (treesArray.length < 15) {
             //     position = {x: getRandomX(), y: getRandomY()}
             //     console.log(treesArray[0])
@@ -143,10 +158,21 @@ export class TreeBackgroundController extends Controller {
             //     position = getEmptyPosition(canvas.renderer.height, canvas.renderer.width);
             // }
 
-            // console.log(position);
+            // Check for all the possible empty grid spaces
+            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
 
-            sprite.x = position.x;
-            sprite.y = position.y;
+            // Randomly choose a random grid space to use
+            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * placementGrid.length)];
+            console.log(targetEmptySpace);
+
+            // Get the index of the selected space in the original array
+            const getIndexOfSelectedSpace = (gridSpace) => gridSpace.xBaseCoordinate == targetEmptySpace.xBaseCoordinate && gridSpace.yBaseCoordinate == targetEmptySpace.yBaseCoordinate;
+            console.log(placementGrid);
+            const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
+            
+
+            sprite.x = targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2);
+            sprite.y = targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2);
 
             const min = Math.floor(treeDimension - ((treeDimension/100)*30));
             const max = Math.ceil(treeDimension + ((treeDimension/100)*30));
@@ -161,89 +187,7 @@ export class TreeBackgroundController extends Controller {
             canvas.stage.addChild(sprite);
 
             // Add the reference to the sprite to an array
-            treesArray.push(sprite);
-        }
-
-        // A function to get the tree position, that considers the position and size of other elements to avoid clipping
-        function getEmptyPosition(canvasHeight) {
-            const gridWidth = 48; // We will caculate gridHeight based on window size 48
-
-            const cellSize = window.innerWidth / gridWidth;
-            const gridHeight = Math.ceil(canvasHeight - 35 / cellSize); // calculate gridHeight
-
-            // cache border coords array since it's never changed
-            // console.log(gridWidth, gridHeight)
-            const borderCoords = getBorderCoords(gridWidth, gridHeight);
-
-            const start = new Date();
-
-            // Perform a BFS from all stars to find distance of each rect from closest star
-            // After BFS visitedCoords will be an array of all grid rect, with distance-from-star (weight) sorted in ascending order
-            // console.log(borderCoords);
-
-            var bfsFrontier = borderCoords.concat(
-                getGridCoordinateOfTrees(treesArray, cellSize).map(coord => ({ ...coord, weight: 0 }))
-            );
-
-            var visitedCoords = [...bfsFrontier];
-
-            while (bfsFrontier.length > 0) {
-                const current = bfsFrontier.shift();
-                const neighbors = getNeighbors(current, gridWidth, gridHeight);
-
-                for (let neighbor of neighbors) {
-                    if (visitedCoords.findIndex(weightedCoord => coordsEqual(weightedCoord, neighbor)) === -1) {
-                        visitedCoords.push(neighbor);
-                        bfsFrontier.push(neighbor);
-                    }
-                }
-            }
-
-            const emptiestCoord = visitedCoords[visitedCoords.length - 1];
-            const emptiestPosition = {
-                x: (emptiestCoord.x + 0.5) * cellSize,
-                y: (emptiestCoord.y + 0.5) * cellSize
-            }
-            // console.log(emptiestPosition);
-            return emptiestPosition;
-        }
-
-        const getBorderCoords = (gridWidth, gridHeight) => {
-            var borderCoords = [];
-            for (var x = 0; x < gridWidth; x++) {
-                for (var y = 0; y < gridHeight; y++) {
-                    if (x === 0 || y === 0 || x === gridWidth - 1 || y === gridHeight - 1) borderCoords.push({ x, y, weight: 0 })
-                }
-            }
-
-            return borderCoords;
-        }
-
-        // Convert tree position to grid coordinate and filter out duplicates
-        const getGridCoordinateOfTrees = (trees, cellSize) => trees.map(tree => (
-            {
-                x: Math.floor(tree.x / cellSize),
-                y: Math.floor(tree.y / cellSize)
-            }
-        ))
-        
-
-        const uniqueCoord = (arr) => arr.filter((candidate, index) => arr.findIndex(item => coordsEqual(item, candidate)) === index);
-
-        const coordsEqual = (coord1, coord2) => coord1.x === coord2.x && coord1.y === coord2.y;
-
-        const getNeighbors = (weightedCoord, gridWidth, gridHeight) => {
-            var result = [];
-            if (weightedCoord.x > 0) result.push({ x: weightedCoord.x - 1, y: weightedCoord.y, weight: weightedCoord.weight + 1 })
-            if (weightedCoord.x < gridWidth - 1) result.push({ x: weightedCoord.x + 1, y: weightedCoord.y, weight: weightedCoord.weight + 1 })
-
-            if (weightedCoord.y > 0) result.push({ x: weightedCoord.x, y: weightedCoord.y - 1, weight: weightedCoord.weight + 1 })
-            if (weightedCoord.y < gridHeight - 1) result.push({ x: weightedCoord.x, y: weightedCoord.y + 1, weight: weightedCoord.weight + 1 })
-
-            return result;
-
+            placementGrid[gridSpaceIndex].spriteReference = sprite;
         }
     }
-
-
 }
