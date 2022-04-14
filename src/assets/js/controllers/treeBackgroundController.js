@@ -66,22 +66,49 @@ export class TreeBackgroundController extends Controller {
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
                 this.#gridSquares.push({
-                    xBaseCoordinate: x * treeDimension + treeDimension,
-                    yBaseCoordinate: y * treeDimension - treeDimension,
+                    xBaseCoordinate: x * treeDimension + (treeDimension / 2),
+                    yBaseCoordinate: y * treeDimension - (treeDimension / 2),
                     spriteReference: null,
                 })
             }
         }
-        console.log(this.#gridSquares);
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
 
+        function getCssValuePrefix() {
+            var rtrnVal = ''; //default to standard syntax
+            var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
+
+            // Create a temporary DOM object for testing
+            var dom = document.createElement('div');
+
+            for (var i = 0; i < prefixes.length; i++) {
+                // Attempt to set the style
+                dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
+
+                // Detect if the style was successfully set
+                if (dom.style.background) {
+                    rtrnVal = prefixes[i];
+                }
+            }
+
+            dom = null;
+
+            return rtrnVal;
+        }
+
+        function setBackGroundVisuals() {
+            canvasDiv.style.backgroundImage = getCssValuePrefix() +  `linear-gradient(90deg, rgb(118, 193, 118) 60%, #368d8d 60%, cyan 65%, rgb(192, 245, 252) 65%, rgb(192, 245, 252) 100%)`;
+        }
+
         function resize() {
             // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
             app.renderer.resize(canvasDiv.offsetWidth, canvasDiv.offsetHeight);
+            setBackGroundVisuals()
         }
         resize();
+        setBackGroundVisuals();
 
         this.#canvasApp = app;
     }
@@ -128,16 +155,33 @@ export class TreeBackgroundController extends Controller {
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
             let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
+            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
-                    createTree();
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
+                    // If disabled trees exist enable those first, else create a new one
+                    if (disabledTrees > 0) {
+                        disabledTrees[0].spriteReference.visible = true;
+                    } else {
+                        if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
+                            createTree();
+                        } else {
+                            break;
+                        }
+                        // createTree();
+                    }
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
                 }
             } else if (visibleTrees.length > totalTrees) {
-                // while (visibleTrees.length > totalTrees) {
-                //     visibleTrees[treesArray.length - 1].destroy();
-                //     visibleTrees.pop()
-                // }
+                while (visibleTrees.length > totalTrees) {
+                    visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
+                    
+                    // visibleTrees[treesArray.length - 1].destroy();
+                    // visibleTrees.pop()
+
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
+                }
             }
         }
 
@@ -162,15 +206,12 @@ export class TreeBackgroundController extends Controller {
             const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
 
             // Randomly choose a random grid space to use
-            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * placementGrid.length)];
-            console.log(targetEmptySpace);
+            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * emptyGridSpaces.length)];
 
             // Get the index of the selected space in the original array
-            const getIndexOfSelectedSpace = (gridSpace) => gridSpace.xBaseCoordinate == targetEmptySpace.xBaseCoordinate && gridSpace.yBaseCoordinate == targetEmptySpace.yBaseCoordinate;
-            console.log(placementGrid);
+            const getIndexOfSelectedSpace = (gridSpace) => gridSpace == targetEmptySpace;
+               
             const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
-            
-
             sprite.x = targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2);
             sprite.y = targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2);
 

@@ -2,18 +2,19 @@
     height: 100%;
 }
 
-.sky-box {
+/* .sky-box {
     background-image: url('../images/clouds.png');
     background-size: cover;
     background-repeat: no-repeat;
     height: 40%;
     width: 100%;
-}
+} */
 
 .canvas-box {
-    height: 60%;
+    height: 100%;
     width: 100%;
-    background-color: #76c176;
+    /* background-color: #76c176; */
+    /* background: linear-gradient(0deg, #76c176 95%, cyan 55%); */
 }
 
 /* body {
