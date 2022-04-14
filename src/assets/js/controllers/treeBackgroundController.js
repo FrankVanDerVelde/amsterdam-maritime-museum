@@ -7,9 +7,14 @@ import { Controller } from "./controller.js";
 export class TreeBackgroundController extends Controller {
     #treeBackgroundView;
     #canvasApp;
-    #textureSheet;
+    // Sprite sheet with trees
+    #treeSheet;
+    // Sprite sheet with boats
+    #boatSheet;
     #gridSquares = [];
     #baseTreeDimension = 70;
+    // Division of the background in percentages
+    #backgroundDivision = [60, 5, 35];
 
     constructor() {
         super();
@@ -26,6 +31,8 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #setUpCanvas() {
+        const backgroundDivison = this.#backgroundDivision;
+        
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
 
@@ -40,16 +47,29 @@ export class TreeBackgroundController extends Controller {
         });
 
         // Promise to make sure the spritesheet is loaded before putting it into #textureSheet.
-        const spriteSheetLoaderPromise = new Promise(function (myResolve, myReject) {
+        const treeLoaderPromise = new Promise(function (myResolve, myReject) {
             try {
-                PIXI.Loader.shared.add("assets/images/trees/treespritesheet.json").load(myResolve);
+                PIXI.Loader.shared.add("assets/images/sprites/treespritesheet.json").load(myResolve);
             } catch {
                 console.log('Error while loading spritesheet');
                 myReject();
             }
         });
-        await spriteSheetLoaderPromise;
-        this.#textureSheet = PIXI.Loader.shared.resources["assets/images/trees/treespritesheet.json"].spritesheet;
+        await treeLoaderPromise;
+        this.#treeSheet = PIXI.Loader.shared.resources["assets/images/sprites/treespritesheet.json"].spritesheet;
+
+
+        
+        const boatLoaderPromise = new Promise(function (myResolve, myReject) {
+            try {
+                PIXI.Loader.shared.add("assets/images/sprites/boatsheet.json").load(myResolve);
+            } catch {
+                console.log('Error while loading spritesheet');
+                myReject();
+            }
+        });
+        await boatLoaderPromise;
+        this.#boatSheet = PIXI.Loader.shared.resources["assets/images/sprites/boatsheet.json"].spritesheet;
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
@@ -60,18 +80,53 @@ export class TreeBackgroundController extends Controller {
         // canvas.height = canvasDiv.offsetHeight;
         const treeDimension = this.#baseTreeDimension;
 
+        
+
         const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
-        const ySquares = Math.floor(canvasDiv.offsetHeight / treeDimension)
+        const treeAreaStartingPoint = canvasDiv.offsetHeight - (canvasDiv.offsetHeight * backgroundDivison[0]) / 100;
+        const ySquares = Math.floor(treeAreaStartingPoint / treeDimension)
 
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
                 this.#gridSquares.push({
                     xBaseCoordinate: x * treeDimension + (treeDimension / 2),
-                    yBaseCoordinate: y * treeDimension - (treeDimension / 2),
+                    yBaseCoordinate: (y * treeDimension) - (treeDimension / 2) + treeAreaStartingPoint,
                     spriteReference: null,
                 })
             }
         }
+
+        const boatSheet = this.#boatSheet;
+        function createBoats() {
+            const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+            console.log(canvasDiv.offsetHeight);
+            console.log(canvasDiv.offsetHeight * (backgroundDivison[0]) / 100);
+            console.log(canvasDiv.offsetHeight * (backgroundDivison[1]) / 100);
+            console.log(canvasDiv.offsetHeight * (backgroundDivison[2]) / 100);
+
+            console.log(boatArea)
+            let boatSprite = PIXI.Sprite.from(boatSheet.textures[`boat1.png`]);
+
+            boatSprite.x = -60;
+            boatSprite.y = boatArea;
+
+            boatSprite.width = 60;
+            boatSprite.height = 60;
+
+            // Sets the sprites anchor to bottom, center
+            boatSprite.anchor.set(0.5, 1); 
+
+            app.stage.addChild(boatSprite);
+
+            app.ticker.add((delta) => {
+                // just for fun, let's rotate mr rabbit a little
+                // delta is 1 if running at 100% performance
+                // creates frame-independent transformation
+                boatSprite.x += 0.7 * delta;
+            });
+            
+        }
+        createBoats();
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -99,7 +154,7 @@ export class TreeBackgroundController extends Controller {
         }
 
         function setBackGroundVisuals() {
-            canvasDiv.style.backgroundImage = getCssValuePrefix() +  `linear-gradient(90deg, rgb(118, 193, 118) 60%, #368d8d 60%, cyan 65%, rgb(192, 245, 252) 65%, rgb(192, 245, 252) 100%)`;
+            canvasDiv.style.backgroundImage = getCssValuePrefix() +  `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
         }
 
         function resize() {
@@ -115,7 +170,7 @@ export class TreeBackgroundController extends Controller {
 
     async #createTrees() {
         let canvas = this.#canvasApp;
-        const sheet = this.#textureSheet;
+        const sheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
         const placementGrid = this.#gridSquares;
         // amount of unique trees in the assets folder
