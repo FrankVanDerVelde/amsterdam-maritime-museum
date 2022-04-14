@@ -80,17 +80,18 @@ export class TreeBackgroundController extends Controller {
         // canvas.height = canvasDiv.offsetHeight;
         const treeDimension = this.#baseTreeDimension;
 
-        
+        // Get the height of the tree area
+        const treeAreaHeight = canvasDiv.offsetHeight * backgroundDivison[0] / 100;
 
         const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
-        const treeAreaStartingPoint = canvasDiv.offsetHeight - (canvasDiv.offsetHeight * backgroundDivison[0]) / 100;
-        const ySquares = Math.floor(treeAreaStartingPoint / treeDimension)
+        const ySquares = Math.floor(treeAreaHeight / treeDimension)
+
 
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
                 this.#gridSquares.push({
                     xBaseCoordinate: x * treeDimension + (treeDimension / 2),
-                    yBaseCoordinate: (y * treeDimension) - (treeDimension / 2) + treeAreaStartingPoint,
+                    yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
                     spriteReference: null,
                 })
             }
@@ -99,12 +100,12 @@ export class TreeBackgroundController extends Controller {
         const boatSheet = this.#boatSheet;
         function createBoats() {
             const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
-            console.log(canvasDiv.offsetHeight);
-            console.log(canvasDiv.offsetHeight * (backgroundDivison[0]) / 100);
-            console.log(canvasDiv.offsetHeight * (backgroundDivison[1]) / 100);
-            console.log(canvasDiv.offsetHeight * (backgroundDivison[2]) / 100);
+            // console.log(canvasDiv.offsetHeight);
+            // console.log(canvasDiv.offsetHeight * (backgroundDivison[0]) / 100);
+            // console.log(canvasDiv.offsetHeight * (backgroundDivison[1]) / 100);
+            // console.log(canvasDiv.offsetHeight * (backgroundDivison[2]) / 100);
 
-            console.log(boatArea)
+            // console.log(boatArea)
             let boatSprite = PIXI.Sprite.from(boatSheet.textures[`boat1.png`]);
 
             boatSprite.x = -60;
@@ -118,11 +119,50 @@ export class TreeBackgroundController extends Controller {
 
             app.stage.addChild(boatSprite);
 
+            let boatSpriteCopy = PIXI.Sprite.from(boatSheet.textures[`boat1.png`]);
+
+            boatSpriteCopy.x = -60;
+            boatSpriteCopy.y = boatArea;
+
+            boatSpriteCopy.width = 60;
+            boatSpriteCopy.height = 60;
+
+            // Sets the sprites anchor to bottom, center
+            boatSpriteCopy.anchor.set(0.5, 1); 
+
+            app.stage.addChild(boatSpriteCopy);
+
+            let boatOneRunning = true;
+            let boatTwoRunning = false;
             app.ticker.add((delta) => {
-                // just for fun, let's rotate mr rabbit a little
-                // delta is 1 if running at 100% performance
-                // creates frame-independent transformation
-                boatSprite.x += 0.7 * delta;
+                
+                // When the front of the boat touches the canvas edge
+                if (Math.floor(boatSprite.x) == canvasDiv.offsetWidth - boatSprite.width / 2) {
+                    boatTwoRunning = true;
+                }
+                
+                if (Math.floor(boatSprite.x) == canvasDiv.offsetWidth + boatSprite.width / 2) {
+                    boatOneRunning = false;
+                    boatSprite.x = -60;
+                }
+
+                if (Math.floor(boatSpriteCopy.x) == canvasDiv.offsetWidth - boatSprite.width / 2) {
+                    boatOneRunning = true;
+                }
+                
+                if (Math.floor(boatSpriteCopy.x) == canvasDiv.offsetWidth + boatSprite.width / 2) {
+                    boatTwoRunning = false;
+                    boatSpriteCopy.x = -60;
+                }
+
+
+                if (boatOneRunning == true) {
+                    boatSprite.x += 0.7 * delta;
+                }
+                
+                if (boatTwoRunning == true) {
+                    boatSpriteCopy.x += 0.7 * delta;
+                }
             });
             
         }
@@ -278,7 +318,7 @@ export class TreeBackgroundController extends Controller {
             sprite.height = variableSize;
 
             // Sets the sprites anchor to bottom, center
-            sprite.anchor.set(0.5, 0); 
+            sprite.anchor.set(0.5, 1); 
 
             canvas.stage.addChild(sprite);
 
