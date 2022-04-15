@@ -150,6 +150,7 @@ export class TreeBackgroundController extends Controller {
 
                 let spriteOneActive = true;
                 let spriteTwoActive = false;
+
                 app.ticker.add((delta) => {
                     if (spriteObject.direction == 'right') {
                         // When the front of the boat touches the canvas edge
@@ -220,7 +221,6 @@ export class TreeBackgroundController extends Controller {
         boatSprites = boatSprites.map(boat => {
             boat.direction = Math.round(Math.random()) ? 'right' : 'left';
             if (boat.direction == 'right') {
-                console.log(boat.width)
                 xNegative -= boat.width - 10;
                 boat.basePosX = xNegative;
             } else {
@@ -230,22 +230,28 @@ export class TreeBackgroundController extends Controller {
             boat.basePosY = boatArea;
             return boat;
         })
-
-
+        
+        // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
         const cloudSheet = this.#cloudSheet;
-        const cloudArea = 100;
+        // The canvas area for the sky
+        const cloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
         let cloudSprites = decorative_sprites.clouds;
         const cloudDirection = Math.round(Math.random()) ? 'right' : 'left';
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
             if (cloudDirection == 'right') {
+                xNegative -= cloud.width - (Math.random() * canvas.offsetWidth * (100 / cloudSprites.length) / 100);
+                cloud.basePosX = xNegative;
+            } else {
                 xPositive += cloud.width + 10;
                 cloud.basePosX = xPositive;
-            } else {
-                xNegative -= cloud.width - 10;
-                cloud.basePosX = xNegative;
             }
-            cloud.basePosY = cloudArea;
+            // Minimum height will be 10% of available height
+            const minYPos = cloudArea * 0.25;
+            const maxYPos = cloudArea / 2;
+            console.log(minYPos, maxYPos);
+            // Maximum height will be a third of the available space
+            cloud.basePosY = Math.random() * (maxYPos - minYPos) + minYPos;
             return cloud;
         })
 
@@ -257,7 +263,7 @@ export class TreeBackgroundController extends Controller {
         //     basePosY: cloudArea
         // }
 
-        console.log(boatSprites, cloudSprites)
+        console.log(cloudSprites)
 
         createSideScrollingSprites(boatSprites, boatSheet)
         createSideScrollingSprites(cloudSprites, cloudSheet)
