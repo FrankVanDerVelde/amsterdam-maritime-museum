@@ -151,6 +151,8 @@ export class TreeBackgroundController extends Controller {
                 let spriteOneActive = true;
                 let spriteTwoActive = false;
 
+                let speed = spriteObject.speed ? spriteObject.speed : 1;
+
                 app.ticker.add((delta) => {
                     if (spriteObject.direction == 'right') {
                         // When the front of the boat touches the canvas edge
@@ -174,11 +176,11 @@ export class TreeBackgroundController extends Controller {
 
 
                         if (spriteOneActive == true) {
-                            sprite.x += 1 * delta;
+                            sprite.x += speed * delta;
                         }
 
                         if (spriteTwoActive == true) {
-                            spriteCopy.x += 1 * delta;
+                            spriteCopy.x += speed * delta;
                         }
                     } else {
                         // When the front of the boat touches the canvas edge
@@ -201,11 +203,11 @@ export class TreeBackgroundController extends Controller {
                         }
 
                         if (spriteOneActive == true) {
-                            sprite.x -= 1 * delta;
+                            sprite.x -= speed * delta;
                         }
 
                         if (spriteTwoActive == true) {
-                            spriteCopy.x -= 1 * delta;
+                            spriteCopy.x -= speed * delta;
                         }
                     }
                 });
@@ -249,25 +251,13 @@ export class TreeBackgroundController extends Controller {
             // Minimum height will be 10% of available height
             const minYPos = cloudArea * 0.25;
             const maxYPos = cloudArea / 2;
-            console.log(minYPos, maxYPos);
             // Maximum height will be a third of the available space
             cloud.basePosY = Math.random() * (maxYPos - minYPos) + minYPos;
             return cloud;
         })
 
-        // {
-        //     width: 60,
-        //     height: 60,
-        //     img: 'cloud1.png',
-        //     basePosX: -60,
-        //     basePosY: cloudArea
-        // }
-
-        console.log(cloudSprites)
-
         createSideScrollingSprites(boatSprites, boatSheet)
         createSideScrollingSprites(cloudSprites, cloudSheet)
-
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
