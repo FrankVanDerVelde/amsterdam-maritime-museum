@@ -1,0 +1,79 @@
+{"frames": {
+
+"cloud1.png":
+{
+	"frame": {"x":0,"y":1127,"w":1342,"h":648},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1342,"h":648},
+	"sourceSize": {"w":1342,"h":648}
+},
+"cloud2.png":
+{
+	"frame": {"x":0,"y":302,"w":1192,"h":351},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1192,"h":351},
+	"sourceSize": {"w":1192,"h":351}
+},
+"cloud3.png":
+{
+	"frame": {"x":0,"y":691,"w":928,"h":392},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":928,"h":392},
+	"sourceSize": {"w":928,"h":392}
+},
+"cloud4.png":
+{
+	"frame": {"x":0,"y":0,"w":540,"h":262},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":540,"h":262},
+	"sourceSize": {"w":540,"h":262}
+},
+"cloud5.png":
+{
+	"frame": {"x":928,"y":691,"w":1056,"h":436},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1056,"h":436},
+	"sourceSize": {"w":1056,"h":436}
+},
+"cloud6.png":
+{
+	"frame": {"x":540,"y":0,"w":406,"h":268},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":406,"h":268},
+	"sourceSize": {"w":406,"h":268}
+},
+"cloud7.png":
+{
+	"frame": {"x":1192,"y":302,"w":722,"h":389},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":722,"h":389},
+	"sourceSize": {"w":722,"h":389}
+},
+"cloud8.png":
+{
+	"frame": {"x":946,"y":0,"w":704,"h":302},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":704,"h":302},
+	"sourceSize": {"w":704,"h":302}
+}},
+"animations": {
+	"cloud": ["cloud1.png","cloud2.png","cloud3.png","cloud4.png","cloud5.png","cloud6.png","cloud7.png","cloud8.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "cloudsspritesheet.png",
+	"format": "RGBA8888",
+	"size": {"w":1984,"h":1775},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:b5a9ae9caaaaa354f45870ebd5485121:ec99a4d52de65c8d6763cede4d3bc2e3:4b64df1e0a82f0644f4cf925f40f2492$"
+}
+}

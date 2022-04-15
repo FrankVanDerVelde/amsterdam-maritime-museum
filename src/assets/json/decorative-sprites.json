@@ -1,0 +1,76 @@
+{
+    "boats": [
+        {
+            "width": 70,
+            "height": "auto",
+            "img": "boat1.png",
+            "speed": 1
+        },
+        {
+            "width": 90,
+            "height": "auto",
+            "img": "boat2.png",
+            "speed": 1
+        },
+        {
+            "width": 60,
+            "height": "auto",
+            "img": "boat3.png",
+            "speed": 1
+        },
+        {
+            "width": 60,
+            "height": "auto",
+            "img": "boat4.png",
+            "speed": 1
+        },
+        {
+            "width": 130,
+            "height": "auto",
+            "img": "boat5.png",
+            "speed": 1
+        }
+    ],
+    "clouds": [
+        {
+            "width": 80,
+            "height": "auto",
+            "img": "cloud1.png"
+        },
+        {
+            "width": 40,
+            "height": "auto",
+            "img": "cloud2.png"
+        },
+        {
+            "width": 50,
+            "height": "auto",
+            "img": "cloud3.png"
+        },
+        {
+            "width": 120,
+            "height": "auto",
+            "img": "cloud4.png"
+        },
+        {
+            "width": 120,
+            "height": "auto",
+            "img": "cloud5.png"
+        },
+        {
+            "width": 120,
+            "height": "auto",
+            "img": "cloud6.png"
+        },
+        {
+            "width": 120,
+            "height": "auto",
+            "img": "cloud7.png"
+        },
+        {
+            "width": 120,
+            "height": "auto",
+            "img": "cloud8.png"
+        }
+    ]
+}

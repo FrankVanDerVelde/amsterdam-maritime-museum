@@ -2,7 +2,7 @@
 
 "boat1.png":
 {
-	"frame": {"x":604,"y":0,"w":566,"h":304},
+	"frame": {"x":0,"y":0,"w":566,"h":304},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":566,"h":304},
@@ -10,7 +10,7 @@
 },
 "boat2.png":
 {
-	"frame": {"x":1148,"y":336,"w":526,"h":660},
+	"frame": {"x":0,"y":304,"w":526,"h":660},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":526,"h":660},
@@ -18,7 +18,7 @@
 },
 "boat3.png":
 {
-	"frame": {"x":694,"y":336,"w":454,"h":378},
+	"frame": {"x":526,"y":304,"w":454,"h":378},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":454,"h":378},
@@ -26,7 +26,7 @@
 },
 "boat4.png":
 {
-	"frame": {"x":0,"y":0,"w":604,"h":220},
+	"frame": {"x":0,"y":964,"w":604,"h":220},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":604,"h":220},
@@ -34,19 +34,11 @@
 },
 "boat5.png":
 {
-	"frame": {"x":0,"y":336,"w":694,"h":362},
+	"frame": {"x":0,"y":1184,"w":694,"h":362},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":694,"h":362},
 	"sourceSize": {"w":694,"h":362}
-},
-"cloud0.png":
-{
-	"frame": {"x":1170,"y":0,"w":564,"h":336},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":564,"h":336},
-	"sourceSize": {"w":564,"h":336}
 }},
 "animations": {
 	"boat": ["boat1.png","boat2.png","boat3.png","boat4.png","boat5.png"]
@@ -54,10 +46,10 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "boatsheet.png",
+	"image": "boatspritesheet.png",
 	"format": "RGBA8888",
-	"size": {"w":1734,"h":996},
+	"size": {"w":980,"h":1546},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:6bd784d07892ca573f31a658476c00eb:b97a00650a9112eeeee495fea8ab675a:e2633051ac8a3a1dbb7f32d4a62810c8$"
+	"smartupdate": "$TexturePacker:SmartUpdate:5b23d81ee74929736238e0c80b3b934a:d25a22fc5012625cdae37d2e7c4e9fc5:d344e7d45e3a7eb986b7eb85e475cf5c$"
 }
 }

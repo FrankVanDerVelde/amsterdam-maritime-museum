@@ -3,15 +3,22 @@
  */
 
 import { Controller } from "./controller.js";
+import decorative_sprites from "../../json/decorative-sprites.json" assert { type: "json" }
 
 export class TreeBackgroundController extends Controller {
+    // The view that holds the html for the tree background
     #treeBackgroundView;
+    // The canvas app 
     #canvasApp;
     // Sprite sheet with trees
     #treeSheet;
     // Sprite sheet with boats
     #boatSheet;
+    // Sprite sheet with the boats
+    #cloudSheet;
+    // This array holds the coordinates of the grid scares and their contents
     #gridSquares = [];
+    // The base dimension for trees
     #baseTreeDimension = 70;
     // Division of the background in percentages
     #backgroundDivision = [60, 5, 35];
@@ -20,6 +27,32 @@ export class TreeBackgroundController extends Controller {
         super();
 
         this.#setupView();
+    }
+
+    #createBasicSprite(spriteObject, sheet) {
+        const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
+
+        if (!spriteObject.height || spriteObject.height === 'auto') {
+            const sizePercentageOfOriginalImage = (spriteObject.width * 100) / sprite.width;
+            sprite.height = Math.floor((sprite.height * sizePercentageOfOriginalImage) / 100);
+        } else {
+            sprite.height = spriteObject.height;
+        }
+
+        sprite.x = spriteObject.basePosX;
+        sprite.y = spriteObject.basePosY;
+
+        sprite.width = spriteObject.width;
+
+        // If the sprite is going in the opposite direction flip it
+        if (spriteObject.direction && spriteObject.direction == 'left') {
+            sprite.scale.x = -sprite.scale.x;
+        }
+
+        // Sets the sprites anchor to bottom, center
+        sprite.anchor.set(0.5, 1);
+
+        return sprite;
     }
 
     async #setupView() {
@@ -32,7 +65,7 @@ export class TreeBackgroundController extends Controller {
 
     async #setUpCanvas() {
         const backgroundDivison = this.#backgroundDivision;
-        
+
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
 
@@ -58,18 +91,27 @@ export class TreeBackgroundController extends Controller {
         await treeLoaderPromise;
         this.#treeSheet = PIXI.Loader.shared.resources["assets/images/sprites/treespritesheet.json"].spritesheet;
 
-
-        
         const boatLoaderPromise = new Promise(function (myResolve, myReject) {
             try {
-                PIXI.Loader.shared.add("assets/images/sprites/boatsheet.json").load(myResolve);
+                PIXI.Loader.shared.add("assets/images/sprites/boatspritesheet.json").load(myResolve);
             } catch {
                 console.log('Error while loading spritesheet');
                 myReject();
             }
         });
         await boatLoaderPromise;
-        this.#boatSheet = PIXI.Loader.shared.resources["assets/images/sprites/boatsheet.json"].spritesheet;
+        this.#boatSheet = PIXI.Loader.shared.resources["assets/images/sprites/boatspritesheet.json"].spritesheet;
+
+        const cloudLoaderPromise = new Promise(function (myResolve, myReject) {
+            try {
+                PIXI.Loader.shared.add("assets/images/sprites/cloudsspritesheet.json").load(myResolve);
+            } catch {
+                console.log('Error while loading spritesheet');
+                myReject();
+            }
+        });
+        await cloudLoaderPromise;
+        this.#cloudSheet = PIXI.Loader.shared.resources["assets/images/sprites/cloudsspritesheet.json"].spritesheet;
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
@@ -86,7 +128,6 @@ export class TreeBackgroundController extends Controller {
         const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
         const ySquares = Math.floor(treeAreaHeight / treeDimension)
 
-
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
                 this.#gridSquares.push({
@@ -97,76 +138,130 @@ export class TreeBackgroundController extends Controller {
             }
         }
 
-        const boatSheet = this.#boatSheet;
-        function createBoats() {
-            const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
-            // console.log(canvasDiv.offsetHeight);
-            // console.log(canvasDiv.offsetHeight * (backgroundDivison[0]) / 100);
-            // console.log(canvasDiv.offsetHeight * (backgroundDivison[1]) / 100);
-            // console.log(canvasDiv.offsetHeight * (backgroundDivison[2]) / 100);
+        const createBasicSprite = this.#createBasicSprite;
 
-            // console.log(boatArea)
-            let boatSprite = PIXI.Sprite.from(boatSheet.textures[`boat1.png`]);
+        function createSideScrollingSprites(spritesArray, sheet) {
+            spritesArray.forEach(spriteObject => {
+                const sprite = createBasicSprite(spriteObject, sheet);
+                const spriteCopy = createBasicSprite(spriteObject, sheet);
 
-            boatSprite.x = -60;
-            boatSprite.y = boatArea;
+                app.stage.addChild(sprite);
+                app.stage.addChild(spriteCopy);
 
-            boatSprite.width = 60;
-            boatSprite.height = 60;
+                let spriteOneActive = true;
+                let spriteTwoActive = false;
+                app.ticker.add((delta) => {
+                    if (spriteObject.direction == 'right') {
+                        // When the front of the boat touches the canvas edge
+                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth - sprite.width / 2) {
+                            spriteTwoActive = true;
+                        }
 
-            // Sets the sprites anchor to bottom, center
-            boatSprite.anchor.set(0.5, 1); 
+                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth + sprite.width / 2) {
+                            spriteOneActive = false;
+                            sprite.x = -spriteObject.width;
+                        }
 
-            app.stage.addChild(boatSprite);
+                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth - sprite.width / 2) {
+                            spriteOneActive = true;
+                        }
 
-            let boatSpriteCopy = PIXI.Sprite.from(boatSheet.textures[`boat1.png`]);
-
-            boatSpriteCopy.x = -60;
-            boatSpriteCopy.y = boatArea;
-
-            boatSpriteCopy.width = 60;
-            boatSpriteCopy.height = 60;
-
-            // Sets the sprites anchor to bottom, center
-            boatSpriteCopy.anchor.set(0.5, 1); 
-
-            app.stage.addChild(boatSpriteCopy);
-
-            let boatOneRunning = true;
-            let boatTwoRunning = false;
-            app.ticker.add((delta) => {
-                
-                // When the front of the boat touches the canvas edge
-                if (Math.floor(boatSprite.x) == canvasDiv.offsetWidth - boatSprite.width / 2) {
-                    boatTwoRunning = true;
-                }
-                
-                if (Math.floor(boatSprite.x) == canvasDiv.offsetWidth + boatSprite.width / 2) {
-                    boatOneRunning = false;
-                    boatSprite.x = -60;
-                }
-
-                if (Math.floor(boatSpriteCopy.x) == canvasDiv.offsetWidth - boatSprite.width / 2) {
-                    boatOneRunning = true;
-                }
-                
-                if (Math.floor(boatSpriteCopy.x) == canvasDiv.offsetWidth + boatSprite.width / 2) {
-                    boatTwoRunning = false;
-                    boatSpriteCopy.x = -60;
-                }
+                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth + sprite.width / 2) {
+                            spriteTwoActive = false;
+                            spriteCopy.x = -spriteObject.width;
+                        }
 
 
-                if (boatOneRunning == true) {
-                    boatSprite.x += 0.7 * delta;
-                }
-                
-                if (boatTwoRunning == true) {
-                    boatSpriteCopy.x += 0.7 * delta;
-                }
+                        if (spriteOneActive == true) {
+                            sprite.x += 1 * delta;
+                        }
+
+                        if (spriteTwoActive == true) {
+                            spriteCopy.x += 1 * delta;
+                        }
+                    } else {
+                        // When the front of the boat touches the canvas edge
+                        if (Math.floor(sprite.x) == sprite.width / 2) {
+                            spriteTwoActive = true;
+                        }
+
+                        if (Math.floor(sprite.x) == -(sprite.width / 2)) {
+                            spriteOneActive = false;
+                            sprite.x = canvasDiv.offsetWidth + spriteObject.width;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == sprite.width / 2) {
+                            spriteOneActive = true;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == -(sprite.width / 2)) {
+                            spriteTwoActive = false;
+                            spriteCopy.x = canvasDiv.offsetWidth + spriteObject.width;
+                        }
+
+                        if (spriteOneActive == true) {
+                            sprite.x -= 1 * delta;
+                        }
+
+                        if (spriteTwoActive == true) {
+                            spriteCopy.x -= 1 * delta;
+                        }
+                    }
+                });
             });
-            
         }
-        createBoats();
+
+        const boatSheet = this.#boatSheet;
+        const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+
+        let boatSprites = decorative_sprites.boats;
+        let xPositive = canvasDiv.offsetWidth;
+        let xNegative = 0;
+        boatSprites = boatSprites.map(boat => {
+            boat.direction = Math.round(Math.random()) ? 'right' : 'left';
+            if (boat.direction == 'right') {
+                console.log(boat.width)
+                xNegative -= boat.width - 10;
+                boat.basePosX = xNegative;
+            } else {
+                xPositive += (boat.width + 10);
+                boat.basePosX = xPositive;
+            }
+            boat.basePosY = boatArea;
+            return boat;
+        })
+
+
+        const cloudSheet = this.#cloudSheet;
+        const cloudArea = 100;
+        let cloudSprites = decorative_sprites.clouds;
+        const cloudDirection = Math.round(Math.random()) ? 'right' : 'left';
+        cloudSprites = cloudSprites.map(cloud => {
+            cloud.direction = cloudDirection;
+            if (cloudDirection == 'right') {
+                xPositive += cloud.width + 10;
+                cloud.basePosX = xPositive;
+            } else {
+                xNegative -= cloud.width - 10;
+                cloud.basePosX = xNegative;
+            }
+            cloud.basePosY = cloudArea;
+            return cloud;
+        })
+
+        // {
+        //     width: 60,
+        //     height: 60,
+        //     img: 'cloud1.png',
+        //     basePosX: -60,
+        //     basePosY: cloudArea
+        // }
+
+        console.log(boatSprites, cloudSprites)
+
+        createSideScrollingSprites(boatSprites, boatSheet)
+        createSideScrollingSprites(cloudSprites, cloudSheet)
+
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -194,7 +289,7 @@ export class TreeBackgroundController extends Controller {
         }
 
         function setBackGroundVisuals() {
-            canvasDiv.style.backgroundImage = getCssValuePrefix() +  `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
+            canvasDiv.style.backgroundImage = getCssValuePrefix() + `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
         }
 
         function resize() {
@@ -210,7 +305,7 @@ export class TreeBackgroundController extends Controller {
 
     async #createTrees() {
         let canvas = this.#canvasApp;
-        const sheet = this.#treeSheet;
+        const treeSheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
         const placementGrid = this.#gridSquares;
         // amount of unique trees in the assets folder
@@ -221,10 +316,11 @@ export class TreeBackgroundController extends Controller {
         let totalTrees = 0;
         // The array that hold all the tree sprites
 
+        const createBasicSprite = this.#createBasicSprite;
+
         function getRandomX() {
             const min = Math.floor(0);
             const max = Math.ceil(canvas.renderer.width / 2.5) + offSet;
-            console.log('x', min, max)
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
@@ -263,7 +359,6 @@ export class TreeBackgroundController extends Controller {
                         } else {
                             break;
                         }
-                        // createTree();
                     }
                     disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
                     visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
@@ -271,32 +366,12 @@ export class TreeBackgroundController extends Controller {
             } else if (visibleTrees.length > totalTrees) {
                 while (visibleTrees.length > totalTrees) {
                     visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
-                    
-                    // visibleTrees[treesArray.length - 1].destroy();
-                    // visibleTrees.pop()
-
                     visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
                 }
             }
         }
 
-        
         function createTree() {
-            let sprite = PIXI.Sprite.from(sheet.textures[`tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`]);
-            
-            // if (treesArray.length < 15) {
-            //     position = {x: getRandomX(), y: getRandomY()}
-            //     console.log(treesArray[0])
-            //     while (treesArray.every(tree => {
-            //         console.log('looping')
-            //         return (position.x > tree.x + 70 || position.x < tree.x - 70) && (position.y > tree.y + 70 || position.y < tree.y - 70)}) == false)
-            //         {
-            //         position = {x: getRandomX(), y: getRandomY()}
-            //     }
-            // } else {
-            //     position = getEmptyPosition(canvas.renderer.height, canvas.renderer.width);
-            // }
-
             // Check for all the possible empty grid spaces
             const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
 
@@ -305,20 +380,21 @@ export class TreeBackgroundController extends Controller {
 
             // Get the index of the selected space in the original array
             const getIndexOfSelectedSpace = (gridSpace) => gridSpace == targetEmptySpace;
-               
             const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
-            sprite.x = targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2);
-            sprite.y = targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2);
 
-            const min = Math.floor(treeDimension - ((treeDimension/100)*30));
-            const max = Math.ceil(treeDimension + ((treeDimension/100)*30));
+            const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+            const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
             const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
 
-            sprite.width = variableSize;
-            sprite.height = variableSize;
-
-            // Sets the sprites anchor to bottom, center
-            sprite.anchor.set(0.5, 1); 
+            const sprite = createBasicSprite(
+                {
+                    width: variableSize,
+                    height: variableSize,
+                    img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                    basePosX: targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2),
+                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2)
+                }, treeSheet
+            );
 
             canvas.stage.addChild(sprite);
 
