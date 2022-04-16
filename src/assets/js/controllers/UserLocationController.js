@@ -17,6 +17,8 @@ export class UserLocationController extends Controller {
         this.#userLocationView.querySelector("#calculate-distance-button").addEventListener("click", async () => {
             await this.#calculateClicked();
         });
+
+        this.#getLocation();
     }
 
     async #calculateClicked() {
@@ -41,5 +43,23 @@ export class UserLocationController extends Controller {
 
     #updateDistanceLabelTo(distanceInKm) {
         this.#userLocationView.querySelector("#distance-result-label").innerHTML = `Distance from museum in KM: ${distanceInKm}`;
+    }
+
+    #getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this.#showPosition, this.#showError);
+        } else {
+            div.innerHTML = "The Browser Does not Support Geolocation";
+        }
+    }
+
+    #showPosition(position) {
+        console.log(position)
+    }
+
+    #showError(error) {
+        print(error);
+        // if (error.PERMISSION_DENIED)
+        //     div.innerHTML = "The User have denied the request for Geolocation.";
     }
 }
