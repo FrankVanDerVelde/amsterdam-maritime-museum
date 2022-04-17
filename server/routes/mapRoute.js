@@ -1,4 +1,4 @@
-const MapBoxService = require("../Services/MapBox/MapBoxService");
+const MapBoxService = require("../Services/MapBox/MapBoxService.js");
 const MapBoxProfile = require("../Services/MapBox/MapBoxProfile");
 
 class MapRoute {

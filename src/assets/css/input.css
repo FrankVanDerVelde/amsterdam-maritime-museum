@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.primary-button {
+    @apply bg-primary-500 font-medium rounded-lg text-white p-2 hover:bg-primary-600;
+}
+
+.application-textField {
+    @apply shadow appearance-none rounded h-[50px] rounded rounded-[10px] px-[23px] text-gray-700 leading-tight border-[#E6E6E6] placeholder-[#CBCBCB];
+}
+
+.application-textField:hover {
+    @apply outline-none;
+}

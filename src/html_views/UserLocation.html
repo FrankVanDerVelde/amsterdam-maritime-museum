@@ -3,15 +3,33 @@
         <p class="text-primary-600 text-4xl text-semibold py-4 pl-[91px]">Bereken je CO2 uitstoot om naar ons te reizen</p>
     </div>
 
-    <div>
-        <input
-                class="m-4 shadow appearance-none rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="city-name"
-                type="text"
-                placeholder="City name"
-        >
-        <button id="calculate-distance-button" class="bg-primary-500 hover:bg-primary-600 rounded-lg text-white text-medium p-2">Calculate distance</button>
+    <div class="flex justify-center h-modal pt-[100px]">
+        <div class="flex flex-col">
 
-        <p hidden id="distance-result-label" class="p-4">Test</p>
+            <div class="flex justify-center pb-8">
+                <i class="fa-solid fa-location-dot"></i>
+                <p class="font-semibold text-primary-500 text-2xl"><i class="fa-solid fa-location-dot"></i>Kies de locatie waarvan je reist</p>
+            </div>
+
+            <button id="current-location-button" class="primary-button">Huidige locatie</button>
+
+            <div class="flex gap-3 justify-self-center my-4">
+                <div class="h-1 w-1/2 self-center rounded bg-neutral-400"></div>
+                <p class="font-medium text-neutral-500">of</p>
+                <div class="h-1 w-1/2 self-center rounded bg-neutral-400"></div>
+            </div>
+
+            <input
+                    class="application-textField"
+                    id="city-name"
+                    type="text"
+                    placeholder="Locatie zoeken"
+            >
+            <div hidden id="distance-result-container" class="flex flex-col gap-[12px] pt-[36px]">
+                <p class="text-primary-600 font-semibold">Gekozen address:</p>
+                <p id="distance-result-label" class="text-primary-600 font-medium">Test</p>
+            </div>
+
+        </div>
     </div>
 </div>

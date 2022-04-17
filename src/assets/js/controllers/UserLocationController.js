@@ -1,5 +1,6 @@
 import { Controller } from "./controller.js";
 import {NetworkManager} from "../framework/utils/networkManager.js";
+import {debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
     #userLocationView;
@@ -8,20 +9,27 @@ export class UserLocationController extends Controller {
     constructor() {
         super();
         this.#networkManager = new NetworkManager();
-        this.#setupView();
+        this.#setupView().then();
     }
 
     async #setupView() {
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
-
-        this.#userLocationView.querySelector("#calculate-distance-button").addEventListener("click", async () => {
-            await this.#calculateClicked();
-        });
-
-        this.#getLocation();
+        this.#watchForLocationChanges();
     }
 
-    async #calculateClicked() {
+    #watchForLocationChanges() {
+        const inputHandler = debounce(async (event) => {
+            if (event.target.value == null || event.target.value === '') return;
+            await this.#calculateDistance();
+        }, 500);
+
+        this.#userLocationView.querySelector('#city-name').addEventListener('input', inputHandler);
+        this.#userLocationView.querySelector('#current-location-button').addEventListener('click', () => {
+            this.#getLocation();
+        })
+    }
+
+    async #calculateDistance() {
         this.#setLoadingState();
         const cityName = this.#getCityNameInput();
         const result = await this.#getDistanceForCity(cityName);
@@ -30,7 +38,7 @@ export class UserLocationController extends Controller {
 
     #setLoadingState() {
         this.#userLocationView.querySelector("#distance-result-label").innerHTML = `Calculating...`
-        this.#userLocationView.querySelector("#distance-result-label").hidden = false;
+        this.#userLocationView.querySelectorAll("#distance-result-container").hidden = false;
     }
 
     #getCityNameInput() {
@@ -47,14 +55,17 @@ export class UserLocationController extends Controller {
 
     #getLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(this.#showPosition, this.#showError);
+            navigator.geolocation.getCurrentPosition(async  (location) => {
+                await this.#showPosition(location.coords);
+            }, this.#showError);
         } else {
             div.innerHTML = "The Browser Does not Support Geolocation";
         }
     }
 
-    #showPosition(position) {
-        console.log(position)
+    async #showPosition(position) {
+        const response = await this.#networkManager.doRequest(`/map/distance_for_city/${position.longitude},${position.latitude}`, "GET");
+        this.#updateDistanceLabelTo(response.distance_in_km);
     }
 
     #showError(error) {
