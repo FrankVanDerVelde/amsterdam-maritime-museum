@@ -1,76 +1,149 @@
-import { Controller } from "./controller.js";
-import {NetworkManager} from "../framework/utils/networkManager.js";
+import {Controller} from "./controller.js";
+import {MapRepository} from "../repositories/mapRepository.js";
 import {debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
+
     #userLocationView;
-    #networkManager
+    #mapRepository;
 
     constructor() {
         super();
-        this.#networkManager = new NetworkManager();
+        this.#mapRepository = new MapRepository();
         this.#setupView().then();
     }
 
     async #setupView() {
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
-        this.#watchForLocationChanges();
-    }
-
-    #watchForLocationChanges() {
-        const inputHandler = debounce(async (event) => {
-            if (event.target.value == null || event.target.value === '') return;
-            await this.#calculateDistance();
-        }, 500);
-
-        this.#userLocationView.querySelector('#city-name').addEventListener('input', inputHandler);
-        this.#userLocationView.querySelector('#current-location-button').addEventListener('click', () => {
+        this.#watchForLocationTextFieldChanges();
+        this.#showsActivityIndicator(false);
+        this.#showsLocationResult(false);
+        this.#showsErrorBox(false);
+        this.#getCurrentLocationButton().addEventListener('click', () => {
             this.#getLocation();
         })
     }
 
+    #watchForLocationTextFieldChanges() {
+        const inputHandler = debounce(async (event) => {
+            if (event.target.value == null || event.target.value === '')
+                return;
+            this.#showsActivityIndicator(true);
+            await this.#calculateDistance();
+            this.#showsActivityIndicator(false);
+        }, 500)
+
+        this.#getLocationNameTextField().addEventListener('input', inputHandler);
+    }
+
     async #calculateDistance() {
-        this.#setLoadingState();
-        const cityName = this.#getCityNameInput();
-        const result = await this.#getDistanceForCity(cityName);
-        this.#updateDistanceLabelTo(Number(result.distance_in_km));
+        this.#showsActivityIndicator(true);
+        const locationName = this.#getLocationNameTextField().value;
+        try {
+            const result = await this.#mapRepository.getDistanceForLocation(locationName);
+            this.#updateDistanceLabel(result.place_name, UserLocationController.#roundTo2Decimals(result.distance_in_km));
+            this.#showsLocationResult(true);
+            this.#showsErrorBox(false);
+        } catch (e) {
+            this.#showNoLocationsFoundError(locationName);
+            this.#showsLocationResult(false);
+        }
+        this.#showsActivityIndicator(false);
     }
 
-    #setLoadingState() {
-        this.#userLocationView.querySelector("#distance-result-label").innerHTML = `Calculating...`
-        this.#userLocationView.querySelectorAll("#distance-result-container").hidden = false;
+    #showsActivityIndicator(value) {
+        this.#getActivityIndicatorContainer().hidden = !value;
     }
 
-    #getCityNameInput() {
-        return this.#userLocationView.querySelector("#city-name").value;
+    #showsLocationResult(value) {
+        this.#getDistanceResultsContainer().style.display = value === true ? "inline-block" : "none";
     }
 
-    async #getDistanceForCity(city) {
-        return await this.#networkManager.doRequest(`/map/distance_for_city/${city}`, "GET");
-    }
-
-    #updateDistanceLabelTo(distanceInKm) {
-        this.#userLocationView.querySelector("#distance-result-label").innerHTML = `Distance from museum in KM: ${distanceInKm}`;
+    #updateDistanceLabel(locationName, distanceInKm) {
+        this.#getDistanceResultsLabel().innerHTML =  `${locationName} (${distanceInKm} KM)`;
     }
 
     #getLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async  (location) => {
-                await this.#showPosition(location.coords);
-            }, this.#showError);
+            this.#showsActivityIndicator(true);
+            this.#showsLocationResult(false);
+            navigator.geolocation.getCurrentPosition(async (location) => {
+                await this.#showPositionForCoords(location.coords);
+                this.#getLocationNameTextField().value = '';
+                this.#showsActivityIndicator(false);
+                this.#showsErrorBox(false);
+            }, () => {
+                this.#showLocationFetchError();
+            });
         } else {
-            div.innerHTML = "The Browser Does not Support Geolocation";
+            this.#showLocationFetchError();
         }
     }
 
-    async #showPosition(position) {
-        const response = await this.#networkManager.doRequest(`/map/distance_for_city/${position.longitude},${position.latitude}`, "GET");
-        this.#updateDistanceLabelTo(response.distance_in_km);
+    async #showPositionForCoords(coords) {
+        const response = await this.#mapRepository.getDistanceForCoords(coords);
+        this.#updateDistanceLabel(response.place_name, UserLocationController.#roundTo2Decimals(response.distance_in_km));
+        this.#showsLocationResult(true);
     }
 
-    #showError(error) {
-        print(error);
-        // if (error.PERMISSION_DENIED)
-        //     div.innerHTML = "The User have denied the request for Geolocation.";
+    #showLocationFetchError() {
+        this.#updateErrorDescription('We konden uw locatie niet bepalen, zoek de locatie handmatig in met de zoekbalk.');
+        this.#showsErrorBox(true);
+    }
+
+    #showNoLocationsFoundError(locationName) {
+        this.#updateErrorDescription(`We konden geen locatie vinden met de naan '${locationName}'`);
+        this.#showsErrorBox(true);
+    }
+
+    #updateErrorDescription(description) {
+        this.#getErrorLabelTitle().innerHTML = "Er is een fout opgetreden";
+        this.#getErrorLabelDescription().innerHTML = description;
+    }
+
+    #showsErrorBox(value) {
+        this.#getErrorContainer().hidden = !value;
+    }
+
+    /** HTML elements */
+    #getCurrentLocationButton() {
+        return this.#getElementByIdId('current-location-button');
+    }
+
+    #getDistanceResultsContainer() {
+        return this.#getElementByIdId('distance-result-container');
+    }
+
+    #getDistanceResultsLabel() {
+        return this.#getElementByIdId('distance-result-label');
+    }
+
+    #getLocationNameTextField() {
+        return this.#getElementByIdId('location-name-text-field');
+    }
+
+    #getActivityIndicatorContainer() {
+        return this.#getElementByIdId('activity-indicator');
+    }
+
+    #getErrorLabelTitle() {
+        return this.#getElementByIdId('error-title-label');
+    }
+
+    #getErrorLabelDescription() {
+        return this.#getElementByIdId('error-description-label');
+    }
+
+    #getErrorContainer() {
+        return this.#getElementByIdId('error-container')
+    }
+
+    /** Helpers **/
+    #getElementByIdId(id) {
+        return this.#userLocationView.querySelector(`#${id}`);
+    }
+
+    static #roundTo2Decimals(number) {
+        return Math.round((Number(number) + Number.EPSILON) * 100) / 100
     }
 }

@@ -4,7 +4,7 @@
     </div>
 
     <div class="flex justify-center h-modal pt-[100px]">
-        <div class="flex flex-col">
+        <div class="flex flex-col w-80">
 
             <div class="flex justify-center pb-8">
                 <i class="fa-solid fa-location-dot"></i>
@@ -19,17 +19,24 @@
                 <div class="h-1 w-1/2 self-center rounded bg-neutral-400"></div>
             </div>
 
+            <label for="location-name-text-field" class="font-medium text-neutral-500 pb-1.5">Locatie naam</label>
             <input
-                    class="application-textField"
-                    id="city-name"
+                    class="application-textField mb-10"
+                    id="location-name-text-field"
                     type="text"
                     placeholder="Locatie zoeken"
             >
-            <div hidden id="distance-result-container" class="flex flex-col gap-[12px] pt-[36px]">
-                <p class="text-primary-600 font-semibold">Gekozen address:</p>
+            <div id="distance-result-container" class="flex flex-col gap-[12px] pt-[26px]">
+                <p  class="text-primary-600 font-semibold">Gekozen address:</p>
                 <p id="distance-result-label" class="text-primary-600 font-medium">Test</p>
             </div>
 
+            <div id="activity-indicator" class="lds-ring self-center mt-8"><div></div><div></div><div></div><div></div></div>
+
+            <div id="error-container" class="p-4 bg-supporting_red-100 rounded rounded-lg border-l border-l-8 border-l-supporting_red-400">
+                <p class="font-bold text-supporting_red-500" id="error-title-label"></p>
+                <p class="text-supporting_red-500" id="error-description-label"></p>
+            </div>
         </div>
     </div>
 </div>
