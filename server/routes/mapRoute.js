@@ -20,7 +20,7 @@ class MapRoute {
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({
                     distance_in_meters: distance,
-                    distance_in_km: distance / 1000
+                    distance_in_km: distance / 1000,
                 });
             } catch (e) {
                 console.error(e);
@@ -35,12 +35,13 @@ class MapRoute {
     #getDistanceForLocationName() {
         this.#app.get("/map/distance_for_city/:city", async (req, res) => {
             try {
-                const coordinates = await this.#mapBoxService.getCoordinatesForLocation(req.params.city);
-                const distance = await this.#mapBoxService.getDistanceInMeters(coordinates, MapBoxProfile.driving.value);
+                const result = await this.#mapBoxService.getFirstPlaceForLocation(req.params.city);
+                const distance = await this.#mapBoxService.getDistanceInMeters(result.center, MapBoxProfile.driving.value);
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({
                     distance_in_meters: distance,
-                    distance_in_km: distance / 1000
+                    distance_in_km: distance / 1000,
+                    place_name: result.place_name
                 });
             } catch (e) {
                 console.error(e);
