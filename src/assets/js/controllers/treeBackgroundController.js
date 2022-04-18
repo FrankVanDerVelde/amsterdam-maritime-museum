@@ -23,6 +23,9 @@ export class TreeBackgroundController extends Controller {
     // Division of the background in percentages
     #backgroundDivision = [60, 5, 35];
 
+    #pixiTreeContainer = new PIXI.Container();
+    
+
     constructor() {
         super();
 
@@ -48,6 +51,8 @@ export class TreeBackgroundController extends Controller {
         if (spriteObject.direction && spriteObject.direction == 'left') {
             sprite.scale.x = -sprite.scale.x;
         }
+        
+        spriteObject.zIndex && (sprite.zIndex = spriteObject.zIndex);
 
         // Sets the sprites anchor to bottom, center
         sprite.anchor.set(0.5, 1);
@@ -117,6 +122,9 @@ export class TreeBackgroundController extends Controller {
         canvasDiv.appendChild(app.view);
 
         const canvas = app.view;
+        
+        this.#pixiTreeContainer.sortableChildren = true;
+        app.stage.addChild(this.#pixiTreeContainer);
 
         // canvas.width = canvasDiv.offsetWidth;
         // canvas.height = canvasDiv.offsetHeight;
@@ -134,6 +142,7 @@ export class TreeBackgroundController extends Controller {
                     xBaseCoordinate: x * treeDimension + (treeDimension / 2),
                     yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
                     spriteReference: null,
+                    row: x
                 })
             }
         }
@@ -242,10 +251,10 @@ export class TreeBackgroundController extends Controller {
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
             if (cloudDirection == 'right') {
-                xNegative -= cloud.width - (Math.random() * canvas.offsetWidth * (100 / cloudSprites.length) / 100);
+                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
                 cloud.basePosX = xNegative;
             } else {
-                xPositive += cloud.width + 10;
+                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
                 cloud.basePosX = xPositive;
             }
             // Minimum height will be 10% of available height
@@ -300,7 +309,7 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #createTrees() {
-        let canvas = this.#canvasApp;
+        const canvas = this.#canvasApp;
         const treeSheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
         const placementGrid = this.#gridSquares;
@@ -311,6 +320,9 @@ export class TreeBackgroundController extends Controller {
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
         // The array that hold all the tree sprites
+
+
+        const treeContainer = this.#pixiTreeContainer;
 
         const createBasicSprite = this.#createBasicSprite;
 
@@ -347,12 +359,13 @@ export class TreeBackgroundController extends Controller {
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
                     // If disabled trees exist enable those first, else create a new one
-                    if (disabledTrees > 0) {
+                    if (disabledTrees.length > 0) {
                         disabledTrees[0].spriteReference.visible = true;
                     } else {
                         if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
                             createTree();
                         } else {
+                            // Break
                             break;
                         }
                     }
@@ -388,11 +401,13 @@ export class TreeBackgroundController extends Controller {
                     height: variableSize,
                     img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
                     basePosX: targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2),
-                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2)
+                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2),
+                    zIndex: targetEmptySpace.row
                 }, treeSheet
             );
 
-            canvas.stage.addChild(sprite);
+            // treeContainer.addChild(sprite);
+            // treeContainer.sortChildren();
 
             // Add the reference to the sprite to an array
             placementGrid[gridSpaceIndex].spriteReference = sprite;
