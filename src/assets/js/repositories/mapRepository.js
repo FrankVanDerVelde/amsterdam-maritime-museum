@@ -18,12 +18,11 @@ export class MapRepository {
     }
 
     /**
-     * Async function to get a piece of room example data by its id via networkmanager
-     * in the back-end we define :roomId as parameter at the end of the endpoint
+     * Async function to get the distance from the provided location to museum.
+     * It returns the distance in meters and KM
      *
-     * GET requests don't send data via the body like a POST request but via the url
      * @returns {Promise<LocationDistance>}
-     * @param location
+     * @param location a string of the location query
      */
     async getDistanceForLocation(location) {
         return await this.#networkManager.doRequest(
@@ -31,6 +30,13 @@ export class MapRepository {
             "GET");
     }
 
+    /**
+     * Async function to get the distance from the provided location to museum.
+     * It returns the distance in meters and KM
+     *
+     * @returns {Promise<LocationDistance>}
+     * @param coords the longitude and latitude
+     */
     async getDistanceForCoords(coords) {
         return this.#networkManager.doRequest(
             `/map/distance_for_city/${coords.longitude},${coords.latitude}`,

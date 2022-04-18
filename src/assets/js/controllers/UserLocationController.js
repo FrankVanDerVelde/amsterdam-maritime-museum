@@ -15,62 +15,52 @@ export class UserLocationController extends Controller {
 
     async #setupView() {
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
-        this.#watchForLocationTextfieldChanges();
+        this.#watchForLocationTextFieldChanges();
         this.#showsActivityIndicator(false);
         this.#showsLocationResult(false);
         this.#showsErrorBox(false);
-    }
-
-    #watchForLocationTextfieldChanges() {
-        const inputHandler = debounce(async (event) => {
-            console.log(event)
-            if (event.target.value == null || event.target.value === '') return;
-            this.#showsActivityIndicator(true);
-            await this.#calculateDistance();
-            this.#showsActivityIndicator(false);
-        }, 500);
-
-        this.#userLocationView.querySelector('#city-name').addEventListener('input', inputHandler);
-        this.#userLocationView.querySelector('#current-location-button').addEventListener('click', () => {
+        this.#getCurrentLocationButton().addEventListener('click', () => {
             this.#getLocation();
         })
     }
 
+    #watchForLocationTextFieldChanges() {
+        const inputHandler = debounce(async (event) => {
+            if (event.target.value == null || event.target.value === '')
+                return;
+            this.#showsActivityIndicator(true);
+            await this.#calculateDistance();
+            this.#showsActivityIndicator(false);
+        }, 500)
+
+        this.#getLocationNameTextField().addEventListener('input', inputHandler);
+    }
+
     async #calculateDistance() {
         this.#showsActivityIndicator(true);
-        const cityName = this.#getLocationNameInput();
+        const locationName = this.#getLocationNameTextField().value;
         try {
-            const result = await this.#mapRepository.getDistanceForLocation(cityName);
-            this.#updateDistanceLabel(result.place_name, this.#roundTo2Decimals(result.distance_in_km));
+            const result = await this.#mapRepository.getDistanceForLocation(locationName);
+            this.#updateDistanceLabel(result.place_name, UserLocationController.#roundTo2Decimals(result.distance_in_km));
             this.#showsLocationResult(true);
+            this.#showsErrorBox(false);
         } catch (e) {
-            this.#showNoLocationsFoundError();
+            this.#showNoLocationsFoundError(locationName);
             this.#showsLocationResult(false);
-        } finally {
-            this.#showsActivityIndicator(false);
         }
+        this.#showsActivityIndicator(false);
     }
 
     #showsActivityIndicator(value) {
-        this.#userLocationView.querySelector('#activity-indicator').hidden = !value;
-    }
-
-    #getLocationNameInput() {
-        return this.#userLocationView.querySelector("#city-name").value;
-    }
-
-    #roundTo2Decimals(number) {
-        return Math.round((Number(number) + Number.EPSILON) * 100) / 100
+        this.#getActivityIndicatorContainer().hidden = !value;
     }
 
     #showsLocationResult(value) {
-        this.#userLocationView
-            .querySelector('#distance-result-container')
-            .style.display = value === true ? "inline-block" : "none";
+        this.#getDistanceResultsContainer().style.display = value === true ? "inline-block" : "none";
     }
 
     #updateDistanceLabel(locationName, distanceInKm) {
-        this.#userLocationView.querySelector("#distance-result-label").innerHTML = `${locationName} (${distanceInKm} KM)`;
+        this.#getDistanceResultsLabel().innerHTML =  `${locationName} (${distanceInKm} KM)`;
     }
 
     #getLocation() {
@@ -79,8 +69,9 @@ export class UserLocationController extends Controller {
             this.#showsLocationResult(false);
             navigator.geolocation.getCurrentPosition(async (location) => {
                 await this.#showPositionForCoords(location.coords);
-                this.#userLocationView.querySelector("#city-name").value = "";
+                this.#getLocationNameTextField().value = '';
                 this.#showsActivityIndicator(false);
+                this.#showsErrorBox(false);
             }, () => {
                 this.#showLocationFetchError();
             });
@@ -91,7 +82,7 @@ export class UserLocationController extends Controller {
 
     async #showPositionForCoords(coords) {
         const response = await this.#mapRepository.getDistanceForCoords(coords);
-        this.#updateDistanceLabel(response.place_name, this.#roundTo2Decimals(response.distance_in_km));
+        this.#updateDistanceLabel(response.place_name, UserLocationController.#roundTo2Decimals(response.distance_in_km));
         this.#showsLocationResult(true);
     }
 
@@ -106,11 +97,53 @@ export class UserLocationController extends Controller {
     }
 
     #updateErrorDescription(description) {
-        this.#userLocationView.querySelector('#error-title-label').innerHTML = "Er is een fout opgetreden";
-        this.#userLocationView.querySelector('#error-description-label').innerHTML = description;
+        this.#getErrorLabelTitle().innerHTML = "Er is een fout opgetreden";
+        this.#getErrorLabelDescription().innerHTML = description;
     }
 
     #showsErrorBox(value) {
-        this.#userLocationView.querySelector('#error-container').hidden = !value;
+        this.#getErrorContainer().hidden = !value;
+    }
+
+    /** HTML elements */
+    #getCurrentLocationButton() {
+        return this.#getElementByIdId('current-location-button');
+    }
+
+    #getDistanceResultsContainer() {
+        return this.#getElementByIdId('distance-result-container');
+    }
+
+    #getDistanceResultsLabel() {
+        return this.#getElementByIdId('distance-result-label');
+    }
+
+    #getLocationNameTextField() {
+        return this.#getElementByIdId('location-name-text-field');
+    }
+
+    #getActivityIndicatorContainer() {
+        return this.#getElementByIdId('activity-indicator');
+    }
+
+    #getErrorLabelTitle() {
+        return this.#getElementByIdId('error-title-label');
+    }
+
+    #getErrorLabelDescription() {
+        return this.#getElementByIdId('error-description-label');
+    }
+
+    #getErrorContainer() {
+        return this.#getElementByIdId('error-container')
+    }
+
+    /** Helpers **/
+    #getElementByIdId(id) {
+        return this.#userLocationView.querySelector(`#${id}`);
+    }
+
+    static #roundTo2Decimals(number) {
+        return Math.round((Number(number) + Number.EPSILON) * 100) / 100
     }
 }
