@@ -6,6 +6,7 @@ export class UserLocationController extends Controller {
 
     #userLocationView;
     #mapRepository;
+    #usersDistanceToMuseum;
 
     constructor() {
         super();
@@ -19,9 +20,9 @@ export class UserLocationController extends Controller {
         this.#showsActivityIndicator(false);
         this.#showsLocationResult(false);
         this.#showsErrorBox(false);
-        this.#getCurrentLocationButton().addEventListener('click', () => {
-            this.#getLocation();
-        })
+        this.#getCurrentLocationButton().addEventListener('click', () => { this.#getLocation(); })
+        this.#getContinueContainer().addEventListener('click', () => { this.#handleContinueButtonClicked(); })
+        this.#showsContinueButton(false);
     }
 
     #watchForLocationTextFieldChanges() {
@@ -41,7 +42,9 @@ export class UserLocationController extends Controller {
         const locationName = this.#getLocationNameTextField().value;
         try {
             const result = await this.#mapRepository.getDistanceForLocation(locationName);
-            this.#updateDistanceLabel(result.place_name, UserLocationController.#roundTo2Decimals(result.distance_in_km));
+            let distanceInKm = this.#roundTo2Decimals(result.distance_in_km)
+            this.#usersDistanceToMuseum = distanceInKm;
+            this.#updateDistanceLabel(result.place_name, distanceInKm);
             this.#showsLocationResult(true);
             this.#showsErrorBox(false);
         } catch (e) {
@@ -82,7 +85,10 @@ export class UserLocationController extends Controller {
 
     async #showPositionForCoords(coords) {
         const response = await this.#mapRepository.getDistanceForCoords(coords);
-        this.#updateDistanceLabel(response.place_name, UserLocationController.#roundTo2Decimals(response.distance_in_km));
+        let distanceInKm = this.#roundTo2Decimals(response.distance_in_km);
+        this.#usersDistanceToMuseum = distanceInKm;
+        this.#showsContinueButton(this.#canContinue());
+        this.#updateDistanceLabel(response.place_name, distanceInKm);
         this.#showsLocationResult(true);
     }
 
@@ -103,6 +109,19 @@ export class UserLocationController extends Controller {
 
     #showsErrorBox(value) {
         this.#getErrorContainer().hidden = !value;
+    }
+
+    #canContinue() {
+        console.log(this.#usersDistanceToMuseum);
+        return (this.#usersDistanceToMuseum !== undefined && !isNaN(Number(this.#usersDistanceToMuseum)))
+    }
+
+    #handleContinueButtonClicked() {
+        alert(`${this.#canContinue() === true ? `kan door gaan, afstand naar museum: ${this.#usersDistanceToMuseum}` : "Locatie is nog niet ingevuld." }`)
+    }
+
+    #showsContinueButton(canContinue) {
+        this.#getContinueContainer().style.opacity = canContinue ? "1" : "0.6";
     }
 
     /** HTML elements */
@@ -138,12 +157,16 @@ export class UserLocationController extends Controller {
         return this.#getElementByIdId('error-container')
     }
 
+    #getContinueContainer() {
+        return this.#getElementByIdId('continue-container');
+    }
+
     /** Helpers **/
     #getElementByIdId(id) {
         return this.#userLocationView.querySelector(`#${id}`);
     }
 
-    static #roundTo2Decimals(number) {
+    #roundTo2Decimals(number) {
         return Math.round((Number(number) + Number.EPSILON) * 100) / 100
     }
 }
