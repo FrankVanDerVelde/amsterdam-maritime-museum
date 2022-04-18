@@ -406,7 +406,7 @@ export class TreeBackgroundController extends Controller {
                 }, treeSheet
             );
 
-            // treeContainer.addChild(sprite);
+            treeContainer.addChild(sprite);
             // treeContainer.sortChildren();
 
             // Add the reference to the sprite to an array
