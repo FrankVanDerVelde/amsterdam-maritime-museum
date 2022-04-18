@@ -43,4 +43,11 @@ export class MapRepository {
             "GET"
         );
     }
+
+    async getPlaces(locationName) {
+        return this.#networkManager.doRequest(
+            `/map/places/${locationName}`,
+            "GET"
+        );
+    }
 }

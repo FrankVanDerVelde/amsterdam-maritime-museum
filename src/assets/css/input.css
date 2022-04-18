@@ -13,6 +13,17 @@
 .application-textField:hover {
     @apply outline-none;
 }
+.user-location-search-result-element {
+    @apply bg-neutral-50 h-[48px] rounded rounded-[8px] flex items-center px-[12px] hover:bg-neutral-100 hover:cursor-pointer;
+}
+
+.user-location-search-result-element-content {
+    @apply font-medium text-neutral-500 flex gap-3 items-center;
+}
+
+.user-location-search-container {
+    @apply bg-white shadow shadow-lg rounded rounded-[12px] p-[5px] flex flex-col gap-[4px]
+}
 
 /* Activity Indicator */
 

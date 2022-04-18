@@ -25,8 +25,15 @@ class MapBoxService {
 
         return {
             center: response.data.features[0].center,
-            place_name: response.data.features[0].place_name
+            place_name: response.data.features[0].place_name,
+            allData: response.data
         };
+    }
+
+    async getPlacesForLocation(location) {
+        let url = `${this.#baseURL}/geocoding/v5/mapbox.places/${location}.json?proximity=ip&types=place%2Cpostcode%2Caddress&${this.#accesTokenAndLanguageQueryParameters}`;
+        const result = await axios.get(url);
+        return await result.data;
     }
 }
 

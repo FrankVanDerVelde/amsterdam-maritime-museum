@@ -30,11 +30,71 @@ export class UserLocationController extends Controller {
             if (event.target.value == null || event.target.value === '')
                 return;
             this.#showsActivityIndicator(true);
-            await this.#calculateDistance();
+
+            await this.#tryShowSearchResults();
             this.#showsActivityIndicator(false);
         }, 500)
 
         this.#getLocationNameTextField().addEventListener('input', inputHandler);
+    }
+
+    async #tryShowSearchResults() {
+        let locationName = this.#getLocationNameTextField().value;
+        let results = await this.#mapRepository.getPlaces(locationName);
+        let places = await results.results
+        this.#showsSearchResultsContainer(true);
+        let resultsContainer = this.#getSearchResultsContainer();
+        this.#removeAllChildNodes(resultsContainer);
+        this.#addPlacesToResultContainer(places);
+        this.#addClickEventListenersToResultElements();
+    }
+
+    #addPlacesToResultContainer(places) {
+        let resultsContainer = this.#getSearchResultsContainer();
+        places.forEach((place) => {
+            resultsContainer.insertAdjacentHTML(
+                'beforeend',
+                this.#createSearchResultItem(place.id, place.place_type[0], place.place_name)
+            );
+        });
+    }
+
+    #createSearchResultItem(placeId, type, placeName) {
+        let iconName = type === 'address' ? 'fa-road' : 'fa-city';
+        return `
+            <div data-placename="${placeName}" class="user-location-search-result-element">
+                <div data-placename="${placeName}" class="user-location-search-result-element-content">
+                    <i data-placename="${placeName}" class="fa-solid ${iconName}"></i>
+                    <p data-placename="${placeName}">${placeName}</p>
+                </div>
+            </div>`;
+    }
+
+    #addClickEventListenersToResultElements() {
+        this.#userLocationView
+            .querySelectorAll('.user-location-search-result-element')
+            .forEach((searchElement) => {
+                searchElement.addEventListener('click', (e) => {
+                    this.#handleResultElementClicked(e.target.dataset.placename)
+                })
+            })
+    }
+
+    #handleResultElementClicked(placeName) {
+        this.#showsSearchResultsContainer(false);
+        this.#getLocationNameTextField().value = placeName;
+        this.#calculateDistance().then();
+    }
+
+    #showsSearchResultsContainer(shouldShow) {
+        let resultsContainer = this.#getSearchResultsContainer();
+        let defaultClasses = "user-location-search-container transition transition-all ease-in-out duration-300";
+        if (shouldShow) {
+            resultsContainer.classList.value = `${defaultClasses} scale-100 opacity-100`
+        } else {
+            resultsContainer.classList.value = `${defaultClasses} scale-90 opacity-0`
+            setTimeout(() => { resultsContainer.classList.value = `transition transition-all ease-in-out duration-300 scale-90 hidden`}, 350)
+        }
     }
 
     async #calculateDistance() {
@@ -112,7 +172,6 @@ export class UserLocationController extends Controller {
     }
 
     #canContinue() {
-        console.log(this.#usersDistanceToMuseum);
         return (this.#usersDistanceToMuseum !== undefined && !isNaN(Number(this.#usersDistanceToMuseum)))
     }
 
@@ -161,6 +220,10 @@ export class UserLocationController extends Controller {
         return this.#getElementByIdId('continue-container');
     }
 
+    #getSearchResultsContainer() {
+        return this.#getElementByIdId('search-results-container');
+    }
+
     /** Helpers **/
     #getElementByIdId(id) {
         return this.#userLocationView.querySelector(`#${id}`);
@@ -168,5 +231,11 @@ export class UserLocationController extends Controller {
 
     #roundTo2Decimals(number) {
         return Math.round((Number(number) + Number.EPSILON) * 100) / 100
+    }
+
+    #removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
 }

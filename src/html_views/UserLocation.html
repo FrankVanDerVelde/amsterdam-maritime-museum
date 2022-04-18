@@ -13,9 +13,9 @@
         </div>
     </div>
 
-    <!-- current location & location text field -->
+    <!-- current location button & location text field -->
     <div class="flex justify-center">
-        <div class="flex flex-col w-80">
+        <div class="flex flex-col w-[400px]">
             <button id="current-location-button" class="primary-button">
                 <i class="fa-solid fa-location-arrow mr-2"></i>
                 Huidige locatie
@@ -29,16 +29,22 @@
 
             <label for="location-name-text-field" class="font-medium text-neutral-500 pb-1.5">Locatie naam</label>
             <input
-                    class="application-textField mb-10"
+                    class="application-textField mb-2"
                     id="location-name-text-field"
                     type="text"
                     placeholder="Locatie zoeken"
             >
+
+            <div
+                    id="search-results-container"
+                    class="user-location-search-container transition transition-all ease-in-out duration-300 scale-90">
+                <!-- results are added in JS -->
+            </div>
         </div>
     </div>
 
     <!-- location results, activity indicator and error containers -->
-    <div class="flex justify-center">
+    <div class="flex justify-center transition transition-transform ease-in-out duration-300">
         <div class="flex flex-col gap-6 justify-center pb-8 w-80">
             <div id="distance-result-container" class="flex flex-col gap-[12px] pt-[16px]">
                 <p  class="text-primary-600 font-semibold">Gekozen address:</p>
@@ -54,6 +60,7 @@
         </div>
     </div>
 
+    <!-- Continue button -->
     <div class="bg-supporting_yellow-500 h-[157px] w-[313px] right-0 bottom-0 absolute flex justify-center items-center hover:bg-supporting_yellow-600 hover:cursor-pointer"
          id="continue-container"
     >

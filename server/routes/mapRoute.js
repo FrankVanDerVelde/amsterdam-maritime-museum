@@ -11,6 +11,7 @@ class MapRoute {
         this.#mapBoxService = new MapBoxService();
         this.#getDistanceForCoordinates();
         this.#getDistanceForLocationName();
+        this.#getPlaces();
     }
 
     #getDistanceForCoordinates() {
@@ -23,7 +24,6 @@ class MapRoute {
                     distance_in_km: distance / 1000,
                 });
             } catch (e) {
-                console.error(e);
                 res.status(this.#errorCodes.BAD_REQUEST_CODE).json({
                     error: e,
                     input: req.params.coordinates
@@ -33,21 +33,44 @@ class MapRoute {
     }
 
     #getDistanceForLocationName() {
-        this.#app.get("/map/distance_for_city/:city", async (req, res) => {
+        this.#app.get("/map/distance_for_city/:locationName", async (req, res) => {
             try {
-                const result = await this.#mapBoxService.getFirstPlaceForLocation(req.params.city);
+                const result = await this.#mapBoxService.getFirstPlaceForLocation(req.params.locationName);
                 const distance = await this.#mapBoxService.getDistanceInMeters(result.center, MapBoxProfile.driving.value);
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({
                     distance_in_meters: distance,
                     distance_in_km: distance / 1000,
-                    place_name: result.place_name
+                    place_name: result.place_name,
+                    allData: result.allData
                 });
             } catch (e) {
-                console.error(e);
                 res.status(this.#errorCodes.BAD_REQUEST_CODE).json({
                     error: e,
                     input: req.params.coordinates
+                });
+            }
+        })
+    }
+
+    #getPlaces() {
+        this.#app.get("/map/places/:locationName", async (req, res) => {
+            try {
+                const result = await this.#mapBoxService.getPlacesForLocation(req.params.locationName);
+                let mappedResults = result.features.map((feature) => {
+                    return {
+                        id: feature.id,
+                        place_name: feature.place_name,
+                        place_type: feature.place_type
+                    }
+                })
+                res.status(this.#errorCodes.HTTP_OK_CODE).json({
+                    results: mappedResults
+                });
+            } catch (e) {
+                res.status(this.#errorCodes.BAD_REQUEST_CODE).json({
+                    error: e,
+                    input: req.params.locationName
                 });
             }
         })
