@@ -1,17 +1,30 @@
 import {Controller} from "./controller.js";
-import {NetworkManager} from "../framework/utils/networkManager.js";
+import {DashboardRepository} from "../repositories/dashboardRepository.js";
 
 export class DashboardController extends Controller{
     #dashboardView;
-    #networkManager;
+    #dashboardRepository
+
 
     constructor() {
         super();
-        this.#networkManager = new NetworkManager();
+        this.#dashboardRepository = new DashboardRepository()
         this.#setupView();
     }
 
     async #setupView() {
         this.#dashboardView = await super.loadHtmlIntoContent("html_views/Dashboard.html");
+
+        const totalVisitor = await this.#dashboardRepository.getTotalVisitor();
+        const weeklySubmission = await this.#dashboardRepository.getWeeklySubmissions();
+        const averageEmission = await this.#dashboardRepository.getCO2AveragePerVisitor();
+        const averageDistance = await this.#dashboardRepository.getDistanceAveragePerVisitor();
+
+
+        this.#dashboardView.querySelector("#totalVisitors").innerHTML = totalVisitor[0].amount_of_visitors;
+        this.#dashboardView.querySelector("#weeklySubmissions").innerHTML = weeklySubmission[0].registrations;
+        this.#dashboardView.querySelector("#averageEmission").innerHTML = averageEmission[0].average_CO2_emission + " kg";
+        this.#dashboardView.querySelector("#averageDistance").innerHTML = averageDistance[0].average_distance_travelled + " km";
     }
+
 }
