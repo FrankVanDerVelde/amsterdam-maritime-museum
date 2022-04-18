@@ -82,8 +82,6 @@ class DashboardRoute {
             }
         });
     }
-
-
 }
 
 module.exports = DashboardRoute

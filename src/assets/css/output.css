@@ -842,21 +842,12 @@ input:checked + .toggle-bg {
   left: 0px;
 }
 
-.inset-y-0 {
-  top: 0px;
-  bottom: 0px;
-}
-
 .top-0 {
   top: 0px;
 }
 
 .left-0 {
   left: 0px;
-}
-
-.right-0 {
-  right: 0px;
 }
 
 .z-20 {
@@ -935,10 +926,6 @@ input:checked + .toggle-bg {
   height: 1rem;
 }
 
-.h-16 {
-  height: 4rem;
-}
-
 .w-full {
   width: 100%;
 }
@@ -953,10 +940,6 @@ input:checked + .toggle-bg {
 
 .w-4 {
   width: 1rem;
-}
-
-.w-16 {
-  width: 4rem;
 }
 
 .flex-1 {
