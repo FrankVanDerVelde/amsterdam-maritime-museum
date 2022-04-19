@@ -24,4 +24,8 @@ export class DashboardRepository{
     async getDistanceAveragePerVisitor(){
         return await  this.#networkManager.doRequest(`${this.#route}/getDistanceAveragePerVisitor`, "GET")
     }
+
+    async createVisitor() {
+        return await  this.#networkManager.doRequest(`${this.#route}/createVisitor`, "POST")
+    }
 }

@@ -24,6 +24,8 @@ class DashboardRoute {
 
         //method for calculating reduced emissions
         this.#getSavedEmissions()
+
+        this.#createVisitor();
     }
 
     #getVisitorTotal() {
@@ -93,6 +95,21 @@ class DashboardRoute {
             try {
                 const data = await this.#databaseHelper.handleQuery({
                     query: "SELECT (Sum(original_CO2)/Count(id)) - (Sum(final_CO2)/Count(id)) AS 'saved_emissions' FROM pad_svm_5_dev.submissions;",
+                });
+
+                //just give all data back as json, could also be empty
+                res.status(this.#errorCodes.HTTP_OK_CODE).json(data);
+            } catch(e) {
+                res.status(this.#errorCodes.BAD_REQUEST_CODE).json({reason: e})
+            }
+        });
+    }
+
+    #createVisitor() {
+        this.#app.post("/dashboard/createVisitor", async (req, res) => {
+            try {
+                const data = await this.#databaseHelper.handleQuery({
+                    query: "INSERT INTO `visitors` (`id`, `date_visited`, `submissionId`) VALUES (NULL, NOW(), NULL)"
                 });
 
                 //just give all data back as json, could also be empty
