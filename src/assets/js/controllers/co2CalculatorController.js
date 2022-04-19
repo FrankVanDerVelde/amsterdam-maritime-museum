@@ -17,7 +17,7 @@ export class Co2CalculatorController extends Controller{
     /**
      * This function returns the co2 emission of the people who travel by car
      */
-    #co2CalculatorCar() {
+    #co2CalculatorCar(car, distance) {
         //This is the amount of co2 emission for Diesel per kilometer in gram
         const co2EmissionDiesel = 132;
 
@@ -39,18 +39,25 @@ export class Co2CalculatorController extends Controller{
         const co2EmissionCarCNGHigh = this.#distance * co2EmissionCNGHigh;
         const electricCarEmission = 0;
 
-        if (car == benzineCar) {
-            this.#co2Emission = co2EmissionCarBenzine;
-        } else if (car == dieselCar) {
-            this.#co2Emission = co2EmissionCarDiesel;
-        } else if (car == lpgCar) {
-            this.#co2Emission = co2EmissionCarLPG;
-        } else if (car == cngLowCar) {
-            this.#co2Emission = co2EmissionCarCNGLow;
-        } else if (car == cngHighCar) {
-            this.#co2Emission = co2EmissionCarCNGHigh;
-        } else if (car == electricCar) {
-            this.#co2Emission = electricCarEmission;
+        switch (car) {
+            case "benzineCar":
+                return distance * co2EmissionCarBenzine;
+                break;
+            case "dieselCar":
+                this.#co2Emission = co2EmissionCarDiesel;
+                break;
+            case "lpgCar":
+                this.#co2Emission = co2EmissionCarLPG;
+                break;
+            case "cngLowCar":
+                this.#co2Emission = co2EmissionCarCNGLow;
+                break;
+            case "cngHighCar":
+                this.#co2Emission = co2EmissionCarCNGHigh;
+                break;
+            case "electricCar":
+                this.#co2Emission = electricCarEmission;
+                break;
         }
 
         //If the people travel by car we are gonna ask them with how many people they travel per car
