@@ -7,8 +7,8 @@ import {Controller} from "./controller";
 
 export class Co2CalculatorController extends Controller{
     //Attributes
-    #distance
-    #co2Emission
+    #distance;
+    #co2Emission;
 
 
     #constructor() {
@@ -40,6 +40,20 @@ export class Co2CalculatorController extends Controller{
         const co2EmissionCarCNGHigh = this.#distance * co2EmissionCNGHigh;
         const electricCarEmission = 0;
 
+        if (car == benzineCar) {
+            this.#co2Emission = co2EmissionCarBenzine;
+        } else if (car == dieselCar) {
+            this.#co2Emission = co2EmissionCarDiesel;
+        } else if (car == lpgCar) {
+            this.#co2Emission = co2EmissionCarLPG;
+        } else if (car == cngLowCar) {
+            this.#co2Emission = co2EmissionCarCNGLow;
+        } else if (car == cngHighCar) {
+            this.#co2Emission = co2EmissionCarCNGHigh;
+        } else if (car == electricCar) {
+            this.#co2Emission = electricCarEmission;
+        }
+
         //If the people travel by car we are gonna ask them with how many people they travel per car
         //If they travel with many people per car instead of with many cars we gonna put a "Thank you message on screen
         //-------
@@ -70,12 +84,13 @@ export class Co2CalculatorController extends Controller{
      * This function returns the co2 emission of the people who travel by bus
      */
     #co2CalculatorBus(){
-        //In case of the bus, we first ask if its electric because then it would have no emission.
-        if (bus == electricBus){
-            this.#co2Emission = 0;
-        } else {
 
-        }
+        //The average CO2 emission of a traveller from public transport is 116 gram per kilometer
+        const averageCo2Emission = 116
 
+        //We take the average amount of emission of public transport because there are many people that travel in
+        //the same bus etc, so its better for the environment
+        this.#co2Emission = this.#distance * averageCo2Emission;
+        
     }
 }
