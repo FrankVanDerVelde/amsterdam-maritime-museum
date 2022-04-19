@@ -1,28 +1,43 @@
 import {Controller} from "./controller.js";
 import {MapRepository} from "../repositories/mapRepository.js";
+import {DashboardRepository} from "../repositories/dashboardRepository.js";
 import {debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
 
     #userLocationView;
     #mapRepository;
+    #dashboardRepository;
     #usersDistanceToMuseum;
 
     constructor() {
         super();
         this.#mapRepository = new MapRepository();
+        this.#dashboardRepository = new DashboardRepository();
         this.#setupView().then();
     }
 
     async #setupView() {
+        console.log();
+        this.#createVisitorIfNeeded().then();
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
-        this.#watchForLocationTextFieldChanges();
+
+        this.#showsSearchResultsContainer(false);
         this.#showsActivityIndicator(false);
         this.#showsLocationResult(false);
         this.#showsErrorBox(false);
+        this.#showsContinueButton(false);
+
+        this.#watchForLocationTextFieldChanges();
         this.#getCurrentLocationButton().addEventListener('click', () => { this.#getLocation(); })
         this.#getContinueContainer().addEventListener('click', () => { this.#handleContinueButtonClicked(); })
-        this.#showsContinueButton(false);
+    }
+
+    async #createVisitorIfNeeded() {
+        if (localStorage.getItem('visitorId') !== null)
+            return;
+        let result = await this.#dashboardRepository.createVisitor()
+        localStorage.setItem('visitorId', result.insertId);
     }
 
     #watchForLocationTextFieldChanges() {
@@ -31,6 +46,7 @@ export class UserLocationController extends Controller {
                 return;
             this.#showsActivityIndicator(true);
 
+            this.#showsContinueButton(this.#canContinue());
             await this.#tryShowSearchResults();
             this.#showsActivityIndicator(false);
         }, 500)
@@ -105,6 +121,7 @@ export class UserLocationController extends Controller {
             let distanceInKm = this.#roundTo2Decimals(result.distance_in_km)
             this.#usersDistanceToMuseum = distanceInKm;
             this.#updateDistanceLabel(result.place_name, distanceInKm);
+            this.#showsContinueButton(this.#canContinue());
             this.#showsLocationResult(true);
             this.#showsErrorBox(false);
         } catch (e) {

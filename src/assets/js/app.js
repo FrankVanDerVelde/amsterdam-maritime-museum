@@ -15,6 +15,7 @@ import { WelcomeController }  from "./controllers/welcomeController.js"
 import { CalculatorController } from "./controllers/calculatorController.js";
 import { TreeBackgroundController } from "./controllers/treeBackgroundController.js"
 import { UserLocationController } from "./controllers/UserLocationController.js"
+import {DashboardController} from "./controllers/DashboardController.js";
 
 export class App {
     //we only need one instance of the sessionManager, thus static use here
@@ -30,6 +31,7 @@ export class App {
     static CONTROLLER_CALCULATOR = "calculator";
     static CONTROLLER_USER_LOCATION = "user-location";
     static CONTROLLER_TREE_BACKGROUND = "tree-background";
+    static CONTROLLER_DASHBOARD = "dashboard";
 
     constructor() {
         //Always load the navigation
@@ -93,6 +95,11 @@ export class App {
 
             case App.CONTROLLER_UPLOAD:
                 App.isLoggedIn(() => new UploadController(),() => new LoginController());
+                break;
+
+            case App.CONTROLLER_DASHBOARD:
+                App.setCurrentController(name);
+                new DashboardController();
                 break;
 
             default:
