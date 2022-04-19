@@ -10,7 +10,6 @@ export class Co2CalculatorController extends Controller{
     #distance;
     #co2Emission;
 
-
     #constructor() {
         super();
     }
@@ -91,6 +90,11 @@ export class Co2CalculatorController extends Controller{
         //We take the average amount of emission of public transport because there are many people that travel in
         //the same bus etc, so its better for the environment
         this.#co2Emission = this.#distance * averageCo2Emission;
-        
+
+    }
+
+    #co2CalculatorTram(){
+        //According to sources on the internet trams and metro's have zero emission
+        this.#co2Emission = 0;
     }
 }
