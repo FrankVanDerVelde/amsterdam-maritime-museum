@@ -1,0 +1,142 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+nav{
+    background: #C2E2FC;
+    height: 120px;
+}
+
+.title-text{
+    display: inline-block;
+    color: #2251AF;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 45px;
+    margin-left: 50px;
+    font-size: xx-large;
+}
+
+.progressbar{
+    position: absolute;
+    background: #0967D2;
+    height: 8px;
+    width: 45px;
+    left: 730px;
+    top: 185px;
+    border-radius: 7px;
+}
+
+.second_progressbar{
+    position: absolute;
+    background: #BAE3FF;
+    height: 8px;
+    width: 13px;
+    left: 780px;
+    top: 185px;
+    border-radius: 7px;
+}
+
+.question{
+    position: absolute;
+    color: #2251AF;
+    font-weight: 600;
+    text-align: center;
+    top: 220px;
+    left: 650px;
+    font-size: large;
+}
+
+body{
+    display: grid;
+    min-height: 100vh;
+}
+
+
+.fa-solid{
+    position: absolute;
+    color: #2251AF;
+    left: 140px;
+    top: 30px;
+}
+
+
+.card_title{
+    position: absolute;
+    top: 70px;
+    left: 130px;
+    color: #2251AF;
+}
+
+.walk_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    left: 300px;
+    top: 300px;
+    border-radius: 40px;
+}
+
+.bike_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    left: 615px;
+    top: 300px;
+    border-radius: 40px;
+}
+
+.car_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    right: 300px;
+    top: 300px;
+    border-radius: 40px;
+}
+
+.bus_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    left: 300px;
+    top: 420px;
+    border-radius: 40px;
+}
+
+.train_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    left: 615px;
+    top: 420px;
+    border-radius: 40px;
+}
+
+.tram_btn_card{
+    position: absolute;
+    background: #F5F7FA;
+    width: 300px;
+    height: 100px;
+    right: 300px;
+    top: 420px;
+    border-radius: 40px;
+}
+
+.select_btn{
+    position: absolute;
+    width: 300px;
+    height: 150px;
+    bottom: 0;
+    right: 0;
+    background: #F0B429;
+}
+

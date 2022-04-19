@@ -7,5 +7,6 @@
       <sourceFolder url="file://$MODULE_DIR$/server" type="java-resource" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="5d246019f9" level="application" />
   </component>
 </module>
