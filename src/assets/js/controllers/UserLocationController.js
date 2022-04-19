@@ -21,13 +21,16 @@ export class UserLocationController extends Controller {
         console.log();
         this.#createVisitorIfNeeded().then();
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
-        this.#watchForLocationTextFieldChanges();
+
+        this.#showsSearchResultsContainer(false);
         this.#showsActivityIndicator(false);
         this.#showsLocationResult(false);
         this.#showsErrorBox(false);
+        this.#showsContinueButton(false);
+
+        this.#watchForLocationTextFieldChanges();
         this.#getCurrentLocationButton().addEventListener('click', () => { this.#getLocation(); })
         this.#getContinueContainer().addEventListener('click', () => { this.#handleContinueButtonClicked(); })
-        this.#showsContinueButton(false);
     }
 
     async #createVisitorIfNeeded() {
@@ -43,6 +46,7 @@ export class UserLocationController extends Controller {
                 return;
             this.#showsActivityIndicator(true);
 
+            this.#showsContinueButton(this.#canContinue());
             await this.#tryShowSearchResults();
             this.#showsActivityIndicator(false);
         }, 500)
@@ -117,6 +121,7 @@ export class UserLocationController extends Controller {
             let distanceInKm = this.#roundTo2Decimals(result.distance_in_km)
             this.#usersDistanceToMuseum = distanceInKm;
             this.#updateDistanceLabel(result.place_name, distanceInKm);
+            this.#showsContinueButton(this.#canContinue());
             this.#showsLocationResult(true);
             this.#showsErrorBox(false);
         } catch (e) {
