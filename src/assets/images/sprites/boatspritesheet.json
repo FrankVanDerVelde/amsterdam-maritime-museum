@@ -1,0 +1,55 @@
+{"frames": {
+
+"boat1.png":
+{
+	"frame": {"x":0,"y":0,"w":566,"h":304},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":566,"h":304},
+	"sourceSize": {"w":566,"h":304}
+},
+"boat2.png":
+{
+	"frame": {"x":0,"y":304,"w":526,"h":660},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":526,"h":660},
+	"sourceSize": {"w":526,"h":660}
+},
+"boat3.png":
+{
+	"frame": {"x":526,"y":304,"w":454,"h":378},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":454,"h":378},
+	"sourceSize": {"w":454,"h":378}
+},
+"boat4.png":
+{
+	"frame": {"x":0,"y":964,"w":604,"h":220},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":604,"h":220},
+	"sourceSize": {"w":604,"h":220}
+},
+"boat5.png":
+{
+	"frame": {"x":0,"y":1184,"w":694,"h":362},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":694,"h":362},
+	"sourceSize": {"w":694,"h":362}
+}},
+"animations": {
+	"boat": ["boat1.png","boat2.png","boat3.png","boat4.png","boat5.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "boatspritesheet.png",
+	"format": "RGBA8888",
+	"size": {"w":980,"h":1546},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:5b23d81ee74929736238e0c80b3b934a:d25a22fc5012625cdae37d2e7c4e9fc5:d344e7d45e3a7eb986b7eb85e475cf5c$"
+}
+}

@@ -3,16 +3,61 @@
  */
 
 import { Controller } from "./controller.js";
+import decorative_sprites from "../../json/decorative-sprites.json" assert { type: "json" }
 
 export class TreeBackgroundController extends Controller {
+    // The view that holds the html for the tree background
     #treeBackgroundView;
+    // The canvas app 
     #canvasApp;
-    #textureSheet;
+    // Sprite sheet with trees
+    #treeSheet;
+    // Sprite sheet with boats
+    #boatSheet;
+    // Sprite sheet with the boats
+    #cloudSheet;
+    // This array holds the coordinates of the grid scares and their contents
+    #gridSquares = [];
+    // The base dimension for trees
+    #baseTreeDimension = 70;
+    // Division of the background in percentages
+    #backgroundDivision = [60, 5, 35];
+
+    #pixiTreeContainer = new PIXI.Container();
+    
 
     constructor() {
         super();
 
         this.#setupView();
+    }
+
+    #createBasicSprite(spriteObject, sheet) {
+        const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
+
+        if (!spriteObject.height || spriteObject.height === 'auto') {
+            const sizePercentageOfOriginalImage = (spriteObject.width * 100) / sprite.width;
+            sprite.height = Math.floor((sprite.height * sizePercentageOfOriginalImage) / 100);
+        } else {
+            sprite.height = spriteObject.height;
+        }
+
+        sprite.x = spriteObject.basePosX;
+        sprite.y = spriteObject.basePosY;
+
+        sprite.width = spriteObject.width;
+
+        // If the sprite is going in the opposite direction flip it
+        if (spriteObject.direction && spriteObject.direction == 'left') {
+            sprite.scale.x = -sprite.scale.x;
+        }
+        
+        spriteObject.zIndex && (sprite.zIndex = spriteObject.zIndex);
+
+        // Sets the sprites anchor to bottom, center
+        sprite.anchor.set(0.5, 1);
+
+        return sprite;
     }
 
     async #setupView() {
@@ -23,7 +68,9 @@ export class TreeBackgroundController extends Controller {
         await this.#createTrees();
     }
 
-     async #setUpCanvas() {
+    async #setUpCanvas() {
+        const backgroundDivison = this.#backgroundDivision;
+
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
 
@@ -36,203 +83,334 @@ export class TreeBackgroundController extends Controller {
             resolution: devicePixelRatio,
             autoDensity: true
         });
-            
+
         // Promise to make sure the spritesheet is loaded before putting it into #textureSheet.
-        const spriteSheetLoaderPromise = new Promise(function(myResolve, myReject) {
+        const treeLoaderPromise = new Promise(function (myResolve, myReject) {
             try {
-                PIXI.Loader.shared.add("assets/images/trees/treespritesheet.json").load(myResolve);
+                PIXI.Loader.shared.add("assets/images/sprites/treespritesheet.json").load(myResolve);
             } catch {
                 console.log('Error while loading spritesheet');
                 myReject();
             }
         });
-        await spriteSheetLoaderPromise;
-        this.#textureSheet = PIXI.Loader.shared.resources["assets/images/trees/treespritesheet.json"].spritesheet;
+        await treeLoaderPromise;
+        this.#treeSheet = PIXI.Loader.shared.resources["assets/images/sprites/treespritesheet.json"].spritesheet;
+
+        const boatLoaderPromise = new Promise(function (myResolve, myReject) {
+            try {
+                PIXI.Loader.shared.add("assets/images/sprites/boatspritesheet.json").load(myResolve);
+            } catch {
+                console.log('Error while loading spritesheet');
+                myReject();
+            }
+        });
+        await boatLoaderPromise;
+        this.#boatSheet = PIXI.Loader.shared.resources["assets/images/sprites/boatspritesheet.json"].spritesheet;
+
+        const cloudLoaderPromise = new Promise(function (myResolve, myReject) {
+            try {
+                PIXI.Loader.shared.add("assets/images/sprites/cloudsspritesheet.json").load(myResolve);
+            } catch {
+                console.log('Error while loading spritesheet');
+                myReject();
+            }
+        });
+        await cloudLoaderPromise;
+        this.#cloudSheet = PIXI.Loader.shared.resources["assets/images/sprites/cloudsspritesheet.json"].spritesheet;
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
 
         const canvas = app.view;
+        
+        this.#pixiTreeContainer.sortableChildren = true;
+        app.stage.addChild(this.#pixiTreeContainer);
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // canvas.width = canvasDiv.offsetWidth;
+        // canvas.height = canvasDiv.offsetHeight;
+        const treeDimension = this.#baseTreeDimension;
+
+        // Get the height of the tree area
+        const treeAreaHeight = canvasDiv.offsetHeight * backgroundDivison[0] / 100;
+
+        const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
+        const ySquares = Math.floor(treeAreaHeight / treeDimension)
+
+        for (let x = 0; x < xSquares; x++) {
+            for (let y = 0; y < ySquares; y++) {
+                this.#gridSquares.push({
+                    xBaseCoordinate: x * treeDimension + (treeDimension / 2),
+                    yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
+                    spriteReference: null,
+                    row: x
+                })
+            }
+        }
+
+        const createBasicSprite = this.#createBasicSprite;
+
+        function createSideScrollingSprites(spritesArray, sheet) {
+            spritesArray.forEach(spriteObject => {
+                const sprite = createBasicSprite(spriteObject, sheet);
+                const spriteCopy = createBasicSprite(spriteObject, sheet);
+
+                app.stage.addChild(sprite);
+                app.stage.addChild(spriteCopy);
+
+                let spriteOneActive = true;
+                let spriteTwoActive = false;
+
+                let speed = spriteObject.speed ? spriteObject.speed : 1;
+
+                app.ticker.add((delta) => {
+                    if (spriteObject.direction == 'right') {
+                        // When the front of the boat touches the canvas edge
+                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth - sprite.width / 2) {
+                            spriteTwoActive = true;
+                        }
+
+                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth + sprite.width / 2) {
+                            spriteOneActive = false;
+                            sprite.x = -spriteObject.width;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth - sprite.width / 2) {
+                            spriteOneActive = true;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth + sprite.width / 2) {
+                            spriteTwoActive = false;
+                            spriteCopy.x = -spriteObject.width;
+                        }
+
+
+                        if (spriteOneActive == true) {
+                            sprite.x += speed * delta;
+                        }
+
+                        if (spriteTwoActive == true) {
+                            spriteCopy.x += speed * delta;
+                        }
+                    } else {
+                        // When the front of the boat touches the canvas edge
+                        if (Math.floor(sprite.x) == sprite.width / 2) {
+                            spriteTwoActive = true;
+                        }
+
+                        if (Math.floor(sprite.x) == -(sprite.width / 2)) {
+                            spriteOneActive = false;
+                            sprite.x = canvasDiv.offsetWidth + spriteObject.width;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == sprite.width / 2) {
+                            spriteOneActive = true;
+                        }
+
+                        if (Math.floor(spriteCopy.x) == -(sprite.width / 2)) {
+                            spriteTwoActive = false;
+                            spriteCopy.x = canvasDiv.offsetWidth + spriteObject.width;
+                        }
+
+                        if (spriteOneActive == true) {
+                            sprite.x -= speed * delta;
+                        }
+
+                        if (spriteTwoActive == true) {
+                            spriteCopy.x -= speed * delta;
+                        }
+                    }
+                });
+            });
+        }
+
+        const boatSheet = this.#boatSheet;
+        const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+
+        let boatSprites = decorative_sprites.boats;
+        let xPositive = canvasDiv.offsetWidth;
+        let xNegative = 0;
+        boatSprites = boatSprites.map(boat => {
+            boat.direction = Math.round(Math.random()) ? 'right' : 'left';
+            if (boat.direction == 'right') {
+                xNegative -= boat.width - 10;
+                boat.basePosX = xNegative;
+            } else {
+                xPositive += (boat.width + 10);
+                boat.basePosX = xPositive;
+            }
+            boat.basePosY = boatArea;
+            return boat;
+        })
+        
+        // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+        const cloudSheet = this.#cloudSheet;
+        // The canvas area for the sky
+        const cloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+        let cloudSprites = decorative_sprites.clouds;
+        const cloudDirection = Math.round(Math.random()) ? 'right' : 'left';
+        cloudSprites = cloudSprites.map(cloud => {
+            cloud.direction = cloudDirection;
+            if (cloudDirection == 'right') {
+                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                cloud.basePosX = xNegative;
+            } else {
+                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                cloud.basePosX = xPositive;
+            }
+            // Minimum height will be 10% of available height
+            const minYPos = cloudArea * 0.25;
+            const maxYPos = cloudArea / 2;
+            // Maximum height will be a third of the available space
+            cloud.basePosY = Math.random() * (maxYPos - minYPos) + minYPos;
+            return cloud;
+        })
+
+        createSideScrollingSprites(boatSprites, boatSheet)
+        createSideScrollingSprites(cloudSprites, cloudSheet)
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
 
+        function getCssValuePrefix() {
+            var rtrnVal = ''; //default to standard syntax
+            var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
+
+            // Create a temporary DOM object for testing
+            var dom = document.createElement('div');
+
+            for (var i = 0; i < prefixes.length; i++) {
+                // Attempt to set the style
+                dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
+
+                // Detect if the style was successfully set
+                if (dom.style.background) {
+                    rtrnVal = prefixes[i];
+                }
+            }
+
+            dom = null;
+
+            return rtrnVal;
+        }
+
+        function setBackGroundVisuals() {
+            canvasDiv.style.backgroundImage = getCssValuePrefix() + `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
+        }
+
         function resize() {
             // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
             app.renderer.resize(canvasDiv.offsetWidth, canvasDiv.offsetHeight);
+            setBackGroundVisuals()
         }
         resize();
+        setBackGroundVisuals();
 
         this.#canvasApp = app;
     }
 
     async #createTrees() {
-        const sheet = this.#textureSheet;
+        const canvas = this.#canvasApp;
+        const treeSheet = this.#treeSheet;
+        const treeDimension = this.#baseTreeDimension;
+        const placementGrid = this.#gridSquares;
         // amount of unique trees in the assets folder
         const uniqueTreeAssets = 5;
         // The offset from the edges of the screen in pixels
-        const offSet = 50;
+        const offSet = treeDimension / 2;
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
-        // The array that hold all the tree specials
-        const treesArray = [];
+        // The array that hold all the tree sprites
+
+
+        const treeContainer = this.#pixiTreeContainer;
+
+        const createBasicSprite = this.#createBasicSprite;
 
         function getRandomX() {
-            const min = Math.floor(0) + offSet;
-            const max = Math.ceil(canvas.renderer.width) - offSet;
+            const min = Math.floor(0);
+            const max = Math.ceil(canvas.renderer.width / 2.5) + offSet;
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
         function getRandomY() {
-            const min = Math.floor(0) + offSet;
-            const max = Math.ceil(canvas.renderer.height) - offSet;
+            const min = Math.floor(0) - offSet;
+            const max = Math.ceil(canvas.renderer.height / 2.5);
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
         const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
         const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
 
-        let canvas = this.#canvasApp;
-    
-        verbruikInput.addEventListener("change", function() { 
+        verbruikInput.addEventListener("change", function () {
             totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
             updateTrees();
         });
 
-        afstandInput.addEventListener("change", function() {
+        afstandInput.addEventListener("change", function () {
             totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
             updateTrees();
         });
 
         function updateTrees() {
-            if (treesArray.length < totalTrees) {
-                while (treesArray.length < totalTrees) {
-                    createTree()
+            // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
+            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
+            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+
+            if (visibleTrees.length < totalTrees) {
+                while (visibleTrees.length < totalTrees) {
+                    // If disabled trees exist enable those first, else create a new one
+                    if (disabledTrees.length > 0) {
+                        disabledTrees[0].spriteReference.visible = true;
+                    } else {
+                        if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
+                            createTree();
+                        } else {
+                            // Break
+                            break;
+                        }
+                    }
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
                 }
-            } else if (treesArray.length > totalTrees) {
-                while (treesArray.length > totalTrees) {
-                    treesArray[treesArray.length - 1].destroy();
-                    treesArray.pop()
+            } else if (visibleTrees.length > totalTrees) {
+                while (visibleTrees.length > totalTrees) {
+                    visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
                 }
             }
         }
 
         function createTree() {
-                let sprite = PIXI.Sprite.from(sheet.textures[`tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`]);
+            // Check for all the possible empty grid spaces
+            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
 
-                let position;
+            // Randomly choose a random grid space to use
+            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * emptyGridSpaces.length)];
 
-                treesArray.length < 15 ? position = {x: getRandomX(), y: getRandomY()} : position = getEmptyPosition(canvas.renderer.height, canvas.renderer.width);
-                // if (treesArray.length < 15) {
-                //     position = {x: getRandomX(), y: getRandomY()}
-                //     console.log(treesArray[0])
-                //     while (treesArray.every(tree => {
-                //         console.log('looping')
-                //         return (position.x > tree.x + 70 || position.x < tree.x - 70) && (position.y > tree.y + 70 || position.y < tree.y - 70)}) == false)
-                //         {
-                //         position = {x: getRandomX(), y: getRandomY()}
-                //     }
-                // } else {
-                //     position = getEmptyPosition(canvas.renderer.height, canvas.renderer.width);
-                // }
+            // Get the index of the selected space in the original array
+            const getIndexOfSelectedSpace = (gridSpace) => gridSpace == targetEmptySpace;
+            const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
 
-                console.log(position);
-    
-                sprite.x = position.x;
-                sprite.y = position.y;
-    
-                sprite.width = 70;
-                sprite.height = 70;
-    
-                canvas.stage.addChild(sprite);
-                
-                // Add the reference to the sprite to an array
-                treesArray.push(sprite);
-        }
-        
-        // A function to get the tree position, that considers the position and size of other elements to avoid clipping
-        function getEmptyPosition(canvasHeight, canvasWidth) {
-                const gridWidth = 48; // We will caculate gridHeight based on window size 48
+            const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+            const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+            const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
 
-                const cellSize = window.innerWidth / gridWidth;
-                const gridHeight = Math.ceil(canvasHeight / cellSize); // calculate gridHeight
-    
-                // cache border coords array since it's never changed
-                console.log(gridWidth, gridHeight)
-                const borderCoords = getBorderCoords(gridWidth, gridHeight);
-
-                const start = new Date();
-    
-                // Perform a BFS from all stars to find distance of each rect from closest star
-                // After BFS visitedCoords will be an array of all grid rect, with distance-from-star (weight) sorted in ascending order
-                console.log(borderCoords);
-    
-                var bfsFrontier = borderCoords.concat(
-                    getGridCoordinateOfTrees(treesArray, cellSize).map(coord => ({ ...coord, weight: 0 }))
-                );
-    
-                var visitedCoords = [...bfsFrontier];
-    
-                while (bfsFrontier.length > 0) {
-                    const current = bfsFrontier.shift();
-                    const neighbors = getNeighbors(current, gridWidth, gridHeight);
- 
-                    for (let neighbor of neighbors) {
-                        if (visitedCoords.findIndex(weightedCoord => coordsEqual(weightedCoord, neighbor)) === -1) {
-                            visitedCoords.push(neighbor);
-                            bfsFrontier.push(neighbor);
-                        }
-                    }
-                }
-    
-                const emptiestCoord = visitedCoords[visitedCoords.length - 1];
-                const emptiestPosition = {
-                    x: (emptiestCoord.x + 0.5) * cellSize,
-                    y: (emptiestCoord.y + 0.5) * cellSize
-                }
-                console.log(emptiestPosition);
-                return emptiestPosition;
-            }
-    
-            const getBorderCoords = (gridWidth, gridHeight) => {
-                var borderCoords = [];
-                for (var x = 0; x < gridWidth; x++) {
-                    for (var y = 0; y < gridHeight; y++) {
-                        if (x === 0 || y === 0 || x === gridWidth - 1 || y === gridHeight - 1) borderCoords.push({ x, y, weight: 0 })
-                    }
-                }
-    
-                return borderCoords;
-            }
-    
-            // Convert star position to grid coordinate and filter out duplicates
-            const getGridCoordinateOfTrees = (trees, cellSize) => trees.map(tree => (
+            const sprite = createBasicSprite(
                 {
-                x: Math.floor(tree.x / cellSize),
-                y: Math.floor(tree.y / cellSize)
-            }
-            )
-            )
-    
-            const uniqueCoord = (arr) => arr.filter((candidate, index) => arr.findIndex(item => coordsEqual(item, candidate)) === index);
-    
-            const coordsEqual = (coord1, coord2) => coord1.x === coord2.x && coord1.y === coord2.y;
-    
-            const getNeighbors = (weightedCoord, gridWidth, gridHeight) => {
-                var result = [];
-                if (weightedCoord.x > 0) result.push({ x: weightedCoord.x - 1, y: weightedCoord.y, weight: weightedCoord.weight + 1 })
-                if (weightedCoord.x < gridWidth - 1) result.push({ x: weightedCoord.x + 1, y: weightedCoord.y, weight: weightedCoord.weight + 1 })
-    
-                if (weightedCoord.y > 0) result.push({ x: weightedCoord.x, y: weightedCoord.y - 1, weight: weightedCoord.weight + 1 })
-                if (weightedCoord.y < gridHeight - 1) result.push({ x: weightedCoord.x, y: weightedCoord.y + 1, weight: weightedCoord.weight + 1 })
-    
-                return result;
-            
+                    width: variableSize,
+                    height: variableSize,
+                    img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                    basePosX: targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2),
+                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2),
+                    zIndex: targetEmptySpace.row
+                }, treeSheet
+            );
+
+            treeContainer.addChild(sprite);
+            // treeContainer.sortChildren();
+
+            // Add the reference to the sprite to an array
+            placementGrid[gridSpaceIndex].spriteReference = sprite;
         }
     }
-
-
 }
