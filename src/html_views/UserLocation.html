@@ -1,6 +1,7 @@
 <div>
-    <div class="w-full bg-primary-100">
-        <p class="text-primary-600 text-4xl text-semibold py-4 pl-[91px]">Bereken je CO2 uitstoot om naar ons te reizen</p>
+    <div class="application-CO2-header-container">
+        <p class="application-CO2-header-title">Bereken je CO2 uitstoot om naar ons te reizen</p>
+        <button id="dashboard-button" class="primary-button">Dashboard</button>
     </div>
 
     <!-- Header -->
@@ -33,6 +34,7 @@
                     id="location-name-text-field"
                     type="text"
                     placeholder="Locatie zoeken"
+                    autocomplete="off"
             >
 
             <div
@@ -61,10 +63,8 @@
     </div>
 
     <!-- Continue button -->
-    <div class="bg-supporting_yellow-500 h-[157px] w-[313px] right-0 bottom-0 absolute flex justify-center items-center hover:bg-supporting_yellow-600 hover:cursor-pointer"
-         id="continue-container"
-    >
-        <div class="text-8xl ">
+    <div class="application-continue-container" id="continue-container">
+        <div class="application-continue-icon">
             <i class="fa-solid fa-caret-right"></i>
         </div>
     </div>

@@ -4,7 +4,7 @@
 
 /** Application **/
 .primary-button {
-    @apply bg-primary-500 font-medium rounded-lg text-white p-2 hover:bg-primary-600;
+    @apply bg-primary-500 font-medium rounded-lg text-white p-2 hover:bg-primary-600 h-fit;
 }
 
 .application-textField {
@@ -13,6 +13,22 @@
 
 .application-textField:hover {
     @apply outline-none;
+}
+
+.application-CO2-header-container {
+    @apply w-full bg-primary-100 flex justify-between px-[26px] items-center;
+}
+
+.application-CO2-header-title {
+    @apply text-primary-600 text-4xl font-medium py-4 pl-[91px];
+}
+
+.application-continue-container {
+    @apply bg-supporting_yellow-500 h-[157px] w-[313px] right-0 bottom-0 absolute flex justify-center items-center hover:bg-supporting_yellow-600 hover:cursor-pointer;
+}
+
+.application-continue-icon {
+    @apply text-8xl;
 }
 
 /** User Location **/

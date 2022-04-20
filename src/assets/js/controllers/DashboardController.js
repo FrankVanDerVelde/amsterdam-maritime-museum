@@ -1,3 +1,4 @@
+import {App} from "../app.js";
 import {Controller} from "./controller.js";
 import {DashboardRepository} from "../repositories/dashboardRepository.js";
 
@@ -25,6 +26,13 @@ export class DashboardController extends Controller{
         this.#dashboardView.querySelector("#weeklySubmissions").innerHTML = weeklySubmission[0].registrations;
         this.#dashboardView.querySelector("#averageEmission").innerHTML = averageEmission[0].average_CO2_emission + " kg";
         this.#dashboardView.querySelector("#averageDistance").innerHTML = averageDistance[0].average_distance_travelled + " km";
+        this.#addEventListenerForBackToWebsiteButton();
     }
 
+    #addEventListenerForBackToWebsiteButton() {
+        const backToWebsiteButton = document.querySelector('#back-to-website-button');
+        backToWebsiteButton.addEventListener('click', (e) => {
+            App.loadController(App.CONTROLLER_USER_LOCATION);
+        });
+    }
 }

@@ -37,10 +37,11 @@ export class App {
 
     constructor() {
         //Always load the navigation
-        App.loadController(App.CONTROLLER_NAVBAR);
+        // App.loadController(App.CONTROLLER_NAVBAR);
 
         //Attempt to load the controller from the URL, if it fails, fall back to the welcome controller.
-        App.loadControllerFromUrl(App.CONTROLLER_WELCOME);
+        App.loadControllerFromUrl(App.CONTROLLER_USER_LOCATION);
+        this.#addEventListenerForDashboardButton();
     }
 
     /**
@@ -169,6 +170,21 @@ export class App {
 
         //go to login screen
         App.loadController(App.CONTROLLER_LOGIN);
+    }
+
+    #addEventListenerForDashboardButton() {
+        setTimeout(() => {
+            const dashboardButton = document.querySelector('#dashboard-button');
+            if (dashboardButton) {
+                dashboardButton.removeEventListener('click', this.#handleDashboardButtonClicked, true);
+                dashboardButton.addEventListener('click', this.#handleDashboardButtonClicked, true);
+            }
+        }, 100)
+    }
+
+    #handleDashboardButtonClicked(e) {
+        console.log(e)
+        App.loadController(App.CONTROLLER_DASHBOARD);
     }
 }
 
