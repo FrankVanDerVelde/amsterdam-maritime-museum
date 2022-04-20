@@ -25,11 +25,17 @@ export class TreeBackgroundController extends Controller {
 
     #pixiTreeContainer = new PIXI.Container();
     
-
     constructor() {
         super();
 
         this.#setupView();
+    }
+
+    async #setupView() {
+        this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+
+        await this.#setUpCanvas();
+        await this.#manageTrees();
     }
 
     #createBasicSprite(spriteObject, sheet) {
@@ -60,12 +66,92 @@ export class TreeBackgroundController extends Controller {
         return sprite;
     }
 
-    async #setupView() {
-        this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+    #createSideScrollingSprites(spritesArray, sheet) {
+        const createBasicSprite = this.#createBasicSprite;
+        const app = this.#canvasApp;
+        const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
 
-        await this.#setUpCanvas();
-        // await this.#createTrees();
-        await this.#createTrees();
+        const spritesObjectArray = [];
+
+        spritesArray.forEach(spriteObject => {
+            const originalSprite = createBasicSprite(spriteObject, sheet);
+            const spriteCopy = createBasicSprite(spriteObject, sheet);
+
+            spritesObjectArray.push({"sprite": originalSprite, "sprite_copy": spriteCopy})
+
+            spriteCopy.visible = false;
+
+            app.stage.addChild(originalSprite);
+            app.stage.addChild(spriteCopy);
+
+            let spriteOneActive = true;
+            let spriteTwoActive = false;
+
+            let speed = spriteObject.speed ? spriteObject.speed : 1;
+
+            app.ticker.add((delta) => {
+                // Note: The sprites x pos is when checking is in the middle of the image
+                const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
+                const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
+                const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
+                let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
+                movementChange = parseFloat(movementChange.toFixed(2));
+                
+                // console.log(canvasDiv.offsetWidth)
+               
+                // [originalSprite, spriteCopy].forEach(sprite => {
+                //     if (Math.floor(sprite.x) == leavingScreenPos) {
+                //         spriteTwoActive = true;
+                //     }
+
+                //     // When the sprite touches the edge of the screen with it's back
+                //     if (Math.floor(sprite.x) == fullyLeftScreenPos) {
+                //         spriteOneActive = false;
+                //         originalSprite.x = offScreenStartPos;
+                //     }
+                // });
+
+                // [spriteOneActive, spriteTwoActive].forEach(spriteState => {
+                //     if (spriteState == true) {
+                //         originalSprite.x += movementChange;
+                //     }
+                // });
+
+                if (Math.floor(originalSprite.x) == leavingScreenPos) {
+                    spriteCopy.x = offScreenStartPos;
+                    spriteCopy.visible = true;
+                    spriteTwoActive = true;
+                }
+
+                if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
+                    spriteOneActive = false;
+                    originalSprite.visible = false;
+                }
+
+                if (Math.floor(spriteCopy.x) == leavingScreenPos) {
+                    originalSprite.x = offScreenStartPos;
+                    originalSprite.visible = true;
+                    spriteOneActive = true;
+                }
+
+                if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
+                    spriteTwoActive = false;
+                    spriteCopy.visible = true;
+                }
+                
+                if (spriteOneActive == true) {
+                    originalSprite.x += movementChange;
+                }
+
+                if (spriteTwoActive == true) {
+                    spriteCopy.x += movementChange;
+                }
+
+            });
+
+        });
+
+        return spritesObjectArray;
     }
 
     async #setUpCanvas() {
@@ -73,6 +159,8 @@ export class TreeBackgroundController extends Controller {
 
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
+
+        this.#treeBackgroundView.parentElement.classList.add('tree-app');
 
         // Setup the pixi app
         const app = new PIXI.Application({
@@ -83,6 +171,8 @@ export class TreeBackgroundController extends Controller {
             resolution: devicePixelRatio,
             autoDensity: true
         });
+
+        this.#canvasApp = app;
 
         // Function that has a promise to load the spritesheets
         async function loadSpriteSheet(spritesheetname) {
@@ -130,79 +220,7 @@ export class TreeBackgroundController extends Controller {
                     row: y
                 })
             }
-        }
-
-        const createBasicSprite = this.#createBasicSprite;
-
-        function createSideScrollingSprites(spritesArray, sheet) {
-            spritesArray.forEach(spriteObject => {
-                const originalSprite = createBasicSprite(spriteObject, sheet);
-                const spriteCopy = createBasicSprite(spriteObject, sheet);
-
-                app.stage.addChild(originalSprite);
-                app.stage.addChild(spriteCopy);
-
-                let spriteOneActive = true;
-                let spriteTwoActive = false;
-
-                let speed = spriteObject.speed ? spriteObject.speed : 1;
-
-                app.ticker.add((delta) => {
-                    // Note: The sprites x pos is when checking is in the middle of the image
-                    const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
-                    const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
-                    const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
-                    let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
-                    movementChange = parseFloat(movementChange.toFixed(2));
-                   
-                    // [originalSprite, spriteCopy].forEach(sprite => {
-                    //     if (Math.floor(sprite.x) == leavingScreenPos) {
-                    //         spriteTwoActive = true;
-                    //     }
-    
-                    //     // When the sprite touches the edge of the screen with it's back
-                    //     if (Math.floor(sprite.x) == fullyLeftScreenPos) {
-                    //         spriteOneActive = false;
-                    //         originalSprite.x = offScreenStartPos;
-                    //     }
-                    // });
-
-                    // [spriteOneActive, spriteTwoActive].forEach(spriteState => {
-                    //     if (spriteState == true) {
-                    //         originalSprite.x += movementChange;
-                    //     }
-                    // });
-
-                    if (Math.floor(originalSprite.x) == leavingScreenPos) {
-                        spriteTwoActive = true;
-                    }
-
-                    // When the sprite touches the edge of the screen with it's back
-                    if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
-                        spriteOneActive = false;
-                        originalSprite.x = offScreenStartPos;
-                    }
-
-                    if (Math.floor(spriteCopy.x) == leavingScreenPos) {
-                        spriteOneActive = true;
-                    }
-
-                    if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
-                        spriteTwoActive = false;
-                        spriteCopy.x = offScreenStartPos;
-                    }
-                    
-                    if (spriteOneActive == true) {
-                        originalSprite.x += movementChange;
-                    }
-
-                    if (spriteTwoActive == true) {
-                        spriteCopy.x += movementChange;
-                    }
-
-                });
-            });
-        }
+        }  
 
         const boatSheet = this.#boatSheet;
         const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
@@ -246,8 +264,22 @@ export class TreeBackgroundController extends Controller {
             return cloud;
         })
 
-        createSideScrollingSprites(boatSprites, boatSheet)
-        createSideScrollingSprites(cloudSprites, cloudSheet)
+        const boatSpriteReferences = this.#createSideScrollingSprites(boatSprites, boatSheet)
+        const cloudSpriteReferences = this.#createSideScrollingSprites(cloudSprites, cloudSheet)
+
+         // update y pos
+            window.addEventListener('resize', () => {
+                // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+                const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+                boatSpriteReferences.forEach(boatObject => {
+                    boatObject.sprite.y = newBoatArea;
+                    boatObject.sprite_copy.y = newBoatArea;
+                });
+    
+                // cloudSpriteReferences.forEach(cloud => {
+    
+                // })
+            });
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -274,24 +306,17 @@ export class TreeBackgroundController extends Controller {
             return rtrnVal;
         }
 
-        function setBackGroundVisuals() {
+        function resize() {
+            // Resize canvas
+            app.renderer.resize(canvasDiv.offsetWidth, window.innerHeight);
+
+            // Redraw background
             canvasDiv.style.backgroundImage = getCssValuePrefix() + `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
         }
-
-        function resize() {
-
-            console.log(app.ticker);
-            // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
-            app.renderer.resize(canvasDiv.offsetWidth, canvasDiv.offsetHeight);
-            setBackGroundVisuals()
-        }
         resize();
-        setBackGroundVisuals();
-
-        this.#canvasApp = app;
     }
 
-    async #createTrees() {
+    async #manageTrees() {
         const canvas = this.#canvasApp;
         const treeSheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
@@ -303,7 +328,6 @@ export class TreeBackgroundController extends Controller {
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
         // The array that hold all the tree sprites
-
 
         const treeContainer = this.#pixiTreeContainer;
 
