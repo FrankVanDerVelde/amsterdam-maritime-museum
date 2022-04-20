@@ -5,20 +5,21 @@ import {debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
 
+    #app;
     #userLocationView;
     #mapRepository;
     #dashboardRepository;
     #usersDistanceToMuseum;
 
-    constructor() {
+    constructor(app) {
         super();
+        this.#app = app;
         this.#mapRepository = new MapRepository();
         this.#dashboardRepository = new DashboardRepository();
         this.#setupView().then();
     }
 
     async #setupView() {
-        console.log();
         this.#createVisitorIfNeeded().then();
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
 
@@ -164,6 +165,7 @@ export class UserLocationController extends Controller {
         const response = await this.#mapRepository.getDistanceForCoords(coords);
         let distanceInKm = this.#roundTo2Decimals(response.distance_in_km);
         this.#usersDistanceToMuseum = distanceInKm;
+        localStorage.setItem('usersDistanceToMuseum', distanceInKm);
         this.#showsContinueButton(this.#canContinue());
         this.#updateDistanceLabel(response.place_name, distanceInKm);
         this.#showsLocationResult(true);
@@ -193,7 +195,8 @@ export class UserLocationController extends Controller {
     }
 
     #handleContinueButtonClicked() {
-        alert(`${this.#canContinue() === true ? `kan door gaan, afstand naar museum: ${this.#usersDistanceToMuseum}` : "Locatie is nog niet ingevuld." }`)
+        if (this.#canContinue())
+            this.#app.loadController('dashboard');
     }
 
     #showsContinueButton(canContinue) {

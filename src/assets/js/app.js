@@ -72,7 +72,7 @@ export class App {
             case App.CONTROLLER_USER_LOCATION:
                 console.log(name)
                 App.setCurrentController(name);
-                new UserLocationController();
+                new UserLocationController(this);
                 break;
 
             case App.CONTROLLER_TREE_BACKGROUND:
@@ -113,7 +113,6 @@ export class App {
             default:
                 return false;
         }
-
         return true;
     }
 
