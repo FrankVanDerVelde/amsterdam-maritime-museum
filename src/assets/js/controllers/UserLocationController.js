@@ -165,7 +165,6 @@ export class UserLocationController extends Controller {
         const response = await this.#mapRepository.getDistanceForCoords(coords);
         let distanceInKm = this.#roundTo2Decimals(response.distance_in_km);
         this.#usersDistanceToMuseum = distanceInKm;
-        localStorage.setItem('usersDistanceToMuseum', distanceInKm);
         this.#showsContinueButton(this.#canContinue());
         this.#updateDistanceLabel(response.place_name, distanceInKm);
         this.#showsLocationResult(true);
@@ -195,8 +194,10 @@ export class UserLocationController extends Controller {
     }
 
     #handleContinueButtonClicked() {
-        if (this.#canContinue())
-            this.#app.loadController('dashboard');
+        if (this.#canContinue()) {
+            window.localStorage.setItem('usersDistanceToMuseum', this.#usersDistanceToMuseum);
+            this.#app.loadController(this.#app.CONTROLLER_CHOOSE_VEHICLE);
+        }
     }
 
     #showsContinueButton(canContinue) {
