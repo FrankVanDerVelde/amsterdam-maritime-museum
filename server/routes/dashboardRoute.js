@@ -45,6 +45,7 @@ class DashboardRoute {
 
     #getWeeklySubmissions() {
         this.#app.get("/dashboard/getWeeklySubmissions", async (req, res) => {
+            let car = req.query.car;
             try {
                 const data = await this.#databaseHelper.handleQuery({
                     query: "SELECT WEEK(date_submitted) AS week, COUNT(id) AS registrations FROM submissions " +

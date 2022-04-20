@@ -7,9 +7,8 @@ import {Controller} from "./controller";
 
 export class Co2CalculatorController extends Controller{
     //Attributes
-    #distance
-    #co2Emission
-
+    #distance;
+    #co2Emission;
 
     #constructor() {
         super();
@@ -18,7 +17,7 @@ export class Co2CalculatorController extends Controller{
     /**
      * This function returns the co2 emission of the people who travel by car
      */
-    #co2CalculatorCar() {
+    #co2CalculatorCar(car, distance) {
         //This is the amount of co2 emission for Diesel per kilometer in gram
         const co2EmissionDiesel = 132;
 
@@ -39,6 +38,27 @@ export class Co2CalculatorController extends Controller{
         const co2EmissionCarCNGLow = this.#distance * co2EmissionCNGLow;
         const co2EmissionCarCNGHigh = this.#distance * co2EmissionCNGHigh;
         const electricCarEmission = 0;
+
+        switch (car) {
+            case "benzineCar":
+                return distance * co2EmissionCarBenzine;
+                break;
+            case "dieselCar":
+                this.#co2Emission = co2EmissionCarDiesel;
+                break;
+            case "lpgCar":
+                this.#co2Emission = co2EmissionCarLPG;
+                break;
+            case "cngLowCar":
+                this.#co2Emission = co2EmissionCarCNGLow;
+                break;
+            case "cngHighCar":
+                this.#co2Emission = co2EmissionCarCNGHigh;
+                break;
+            case "electricCar":
+                this.#co2Emission = electricCarEmission;
+                break;
+        }
 
         //If the people travel by car we are gonna ask them with how many people they travel per car
         //If they travel with many people per car instead of with many cars we gonna put a "Thank you message on screen
@@ -70,12 +90,18 @@ export class Co2CalculatorController extends Controller{
      * This function returns the co2 emission of the people who travel by bus
      */
     #co2CalculatorBus(){
-        //In case of the bus, we first ask if its electric because then it would have no emission.
-        if (bus == electricBus){
-            this.#co2Emission = 0;
-        } else {
 
-        }
+        //The average CO2 emission of a traveller from public transport is 116 gram per kilometer
+        const averageCo2Emission = 116
 
+        //We take the average amount of emission of public transport because there are many people that travel in
+        //the same bus etc, so its better for the environment
+        this.#co2Emission = this.#distance * averageCo2Emission;
+
+    }
+
+    #co2CalculatorTram(){
+        //According to sources on the internet trams and metro's have zero emission
+        this.#co2Emission = 0;
     }
 }

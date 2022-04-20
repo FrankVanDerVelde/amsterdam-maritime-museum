@@ -84,39 +84,24 @@ export class TreeBackgroundController extends Controller {
             autoDensity: true
         });
 
-        // Promise to make sure the spritesheet is loaded before putting it into #textureSheet.
-        const treeLoaderPromise = new Promise(function (myResolve, myReject) {
-            try {
-                PIXI.Loader.shared.add("assets/images/sprites/treespritesheet.json").load(myResolve);
-            } catch {
-                console.log('Error while loading spritesheet');
-                myReject();
-            }
-        });
-        await treeLoaderPromise;
-        this.#treeSheet = PIXI.Loader.shared.resources["assets/images/sprites/treespritesheet.json"].spritesheet;
+        // Function that has a promise to load the spritesheets
+        async function loadSpriteSheet(spritesheetname) {
+            const link = `assets/images/sprites/${spritesheetname}.json`;
+            const loaderPromise = new Promise(function (myResolve, myReject) {
+                try {
+                    PIXI.Loader.shared.add(link).load(myResolve);
+                } catch {
+                    console.log(`Error while loading spritesheet: ${spritesheetname}`);
+                    myReject();
+                }
+            })
+            await loaderPromise;
+            return PIXI.Loader.shared.resources[link].spritesheet;
+        }
 
-        const boatLoaderPromise = new Promise(function (myResolve, myReject) {
-            try {
-                PIXI.Loader.shared.add("assets/images/sprites/boatspritesheet.json").load(myResolve);
-            } catch {
-                console.log('Error while loading spritesheet');
-                myReject();
-            }
-        });
-        await boatLoaderPromise;
-        this.#boatSheet = PIXI.Loader.shared.resources["assets/images/sprites/boatspritesheet.json"].spritesheet;
-
-        const cloudLoaderPromise = new Promise(function (myResolve, myReject) {
-            try {
-                PIXI.Loader.shared.add("assets/images/sprites/cloudsspritesheet.json").load(myResolve);
-            } catch {
-                console.log('Error while loading spritesheet');
-                myReject();
-            }
-        });
-        await cloudLoaderPromise;
-        this.#cloudSheet = PIXI.Loader.shared.resources["assets/images/sprites/cloudsspritesheet.json"].spritesheet;
+        this.#treeSheet = await loadSpriteSheet('treespritesheet');
+        this.#boatSheet = await loadSpriteSheet('boatspritesheet');
+        this.#cloudSheet = await loadSpriteSheet('cloudsspritesheet');
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
@@ -142,7 +127,7 @@ export class TreeBackgroundController extends Controller {
                     xBaseCoordinate: x * treeDimension + (treeDimension / 2),
                     yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
                     spriteReference: null,
-                    row: x
+                    row: y
                 })
             }
         }
@@ -151,10 +136,10 @@ export class TreeBackgroundController extends Controller {
 
         function createSideScrollingSprites(spritesArray, sheet) {
             spritesArray.forEach(spriteObject => {
-                const sprite = createBasicSprite(spriteObject, sheet);
+                const originalSprite = createBasicSprite(spriteObject, sheet);
                 const spriteCopy = createBasicSprite(spriteObject, sheet);
 
-                app.stage.addChild(sprite);
+                app.stage.addChild(originalSprite);
                 app.stage.addChild(spriteCopy);
 
                 let spriteOneActive = true;
@@ -163,62 +148,58 @@ export class TreeBackgroundController extends Controller {
                 let speed = spriteObject.speed ? spriteObject.speed : 1;
 
                 app.ticker.add((delta) => {
-                    if (spriteObject.direction == 'right') {
-                        // When the front of the boat touches the canvas edge
-                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth - sprite.width / 2) {
-                            spriteTwoActive = true;
-                        }
+                    // Note: The sprites x pos is when checking is in the middle of the image
+                    const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
+                    const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
+                    const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
+                    let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
+                    movementChange = parseFloat(movementChange.toFixed(2));
+                   
+                    // [originalSprite, spriteCopy].forEach(sprite => {
+                    //     if (Math.floor(sprite.x) == leavingScreenPos) {
+                    //         spriteTwoActive = true;
+                    //     }
+    
+                    //     // When the sprite touches the edge of the screen with it's back
+                    //     if (Math.floor(sprite.x) == fullyLeftScreenPos) {
+                    //         spriteOneActive = false;
+                    //         originalSprite.x = offScreenStartPos;
+                    //     }
+                    // });
 
-                        if (Math.floor(sprite.x) == canvasDiv.offsetWidth + sprite.width / 2) {
-                            spriteOneActive = false;
-                            sprite.x = -spriteObject.width;
-                        }
+                    // [spriteOneActive, spriteTwoActive].forEach(spriteState => {
+                    //     if (spriteState == true) {
+                    //         originalSprite.x += movementChange;
+                    //     }
+                    // });
 
-                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth - sprite.width / 2) {
-                            spriteOneActive = true;
-                        }
-
-                        if (Math.floor(spriteCopy.x) == canvasDiv.offsetWidth + sprite.width / 2) {
-                            spriteTwoActive = false;
-                            spriteCopy.x = -spriteObject.width;
-                        }
-
-
-                        if (spriteOneActive == true) {
-                            sprite.x += speed * delta;
-                        }
-
-                        if (spriteTwoActive == true) {
-                            spriteCopy.x += speed * delta;
-                        }
-                    } else {
-                        // When the front of the boat touches the canvas edge
-                        if (Math.floor(sprite.x) == sprite.width / 2) {
-                            spriteTwoActive = true;
-                        }
-
-                        if (Math.floor(sprite.x) == -(sprite.width / 2)) {
-                            spriteOneActive = false;
-                            sprite.x = canvasDiv.offsetWidth + spriteObject.width;
-                        }
-
-                        if (Math.floor(spriteCopy.x) == sprite.width / 2) {
-                            spriteOneActive = true;
-                        }
-
-                        if (Math.floor(spriteCopy.x) == -(sprite.width / 2)) {
-                            spriteTwoActive = false;
-                            spriteCopy.x = canvasDiv.offsetWidth + spriteObject.width;
-                        }
-
-                        if (spriteOneActive == true) {
-                            sprite.x -= speed * delta;
-                        }
-
-                        if (spriteTwoActive == true) {
-                            spriteCopy.x -= speed * delta;
-                        }
+                    if (Math.floor(originalSprite.x) == leavingScreenPos) {
+                        spriteTwoActive = true;
                     }
+
+                    // When the sprite touches the edge of the screen with it's back
+                    if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
+                        spriteOneActive = false;
+                        originalSprite.x = offScreenStartPos;
+                    }
+
+                    if (Math.floor(spriteCopy.x) == leavingScreenPos) {
+                        spriteOneActive = true;
+                    }
+
+                    if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
+                        spriteTwoActive = false;
+                        spriteCopy.x = offScreenStartPos;
+                    }
+                    
+                    if (spriteOneActive == true) {
+                        originalSprite.x += movementChange;
+                    }
+
+                    if (spriteTwoActive == true) {
+                        spriteCopy.x += movementChange;
+                    }
+
                 });
             });
         }
@@ -298,6 +279,8 @@ export class TreeBackgroundController extends Controller {
         }
 
         function resize() {
+
+            console.log(app.ticker);
             // app.renderer.resize(window.innerWidth, (window.innerHeight / 100) * 60);
             app.renderer.resize(canvasDiv.offsetWidth, canvasDiv.offsetHeight);
             setBackGroundVisuals()
@@ -365,7 +348,6 @@ export class TreeBackgroundController extends Controller {
                         if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
                             createTree();
                         } else {
-                            // Break
                             break;
                         }
                     }
@@ -407,7 +389,6 @@ export class TreeBackgroundController extends Controller {
             );
 
             treeContainer.addChild(sprite);
-            // treeContainer.sortChildren();
 
             // Add the reference to the sprite to an array
             placementGrid[gridSpaceIndex].spriteReference = sprite;

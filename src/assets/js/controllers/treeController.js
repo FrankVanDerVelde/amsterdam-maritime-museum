@@ -11,6 +11,7 @@ import { Controller } from "./controller.js";
 export class treeController extends Controller{
     //Attributes
     //The amount of CO2 the user of the website uses to get to Het Scheepvaartmuseum.
+
     #co2User;
 
     //The average amount of CO2 a tree compensates per year in kilo.
