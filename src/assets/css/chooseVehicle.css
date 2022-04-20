@@ -53,14 +53,6 @@ nav{
     border-radius: 7px;
 }
 
-.question{
-    color: #2251AF;
-    font-weight: 600;
-    text-align: center;
-    font-size: large;
-    margin-top: 5px;
-}
-
 body{
     min-height: 100vh;
 }
@@ -82,7 +74,7 @@ body{
     justify-content: space-between;
     flex-wrap: wrap;
     width: 44em;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .btn_card{
