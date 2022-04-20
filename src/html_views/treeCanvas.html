@@ -1,21 +1,24 @@
 <div class="tree-canvas-container">
-	<div class="sky-box"></div>
 	<div class="canvas-box" id="canvas-box"></div>
 
 	<div id="calculator-place-holder" class="calculator-place-holder">
 		<div class="calculator-content">
-		<label for="benzine">Type brandstof</label>
-		<select name="benzine" id="benzine" style="width: 100%">
-			<option value="Benzine">Benzine</option>
-			<option value="saab">Diesel</option>
-			<option value="mercedes">LPG</option>
-			<option value="audi">Elektrisch</option>
-		  </select>
-		<label for="verbruik">Verbruik (per km)</label>
-		<input type="number" id="verbruik" value="0" min="0">
-		<label for="Afstand">Afstand (km)</label>
-		<input type="number" id="afstand" value="0" min="0">
-	</div>
+			<label for="benzine">Type brandstof</label>
+			<select name="benzine" id="benzine" style="width: 100%">
+				<option value="Benzine">Benzine</option>
+				<option value="saab">Diesel</option>
+				<option value="mercedes">LPG</option>
+				<option value="audi">Elektrisch</option>
+			</select>
+			<label for="verbruik">Verbruik (per km)</label>
+			<input type="number" id="verbruik" value="0" min="0">
+			<label for="Afstand">Afstand (km)</label>
+			<input type="number" id="afstand" value="0" min="0">
+		</div>
 	</div>
 
+	<div class="emission-div">
+		<span class="title">CO2 uitsoot:</span>
+		<span class="content negative">102 KG</span>
+	</div>
 </div>

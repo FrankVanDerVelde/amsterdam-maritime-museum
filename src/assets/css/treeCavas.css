@@ -36,3 +36,35 @@ display: initial;
 .tree-app footer {
     display: none;
 }
+
+.emission-div {
+    background: rgba(0, 0, 0, 0.4);
+    width: 150px;
+    height: 100px;
+    position: fixed;
+    border-radius: 20px;
+    left: 30px;
+    bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.emission-div .title {
+    color: white;
+}
+
+.emission-div .content {
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.emission-div .content.negative {
+    color: #FFBDBD;
+}
+
+.emission-div .content.positive {
+    color: #8EEDC7;
+}
