@@ -14,7 +14,7 @@
 
 nav{
     background: #C2E2FC;
-    height: 120px;
+    height: 100px;
 }
 
 .title-text{
@@ -22,7 +22,7 @@ nav{
     color: #2251AF;
     font-weight: 600;
     text-align: center;
-    margin-top: 45px;
+    margin-top: 25px;
     margin-left: 50px;
     font-size: xx-large;
 }
@@ -65,12 +65,11 @@ body{
     min-height: 100vh;
 }
 
-.fa-solid{
+.icon{
     font-size: 34px;
     color: #2251AF;
     text-align: center;
 }
-
 
 .card_title{
     top: 70px;
@@ -83,7 +82,7 @@ body{
     justify-content: space-between;
     flex-wrap: wrap;
     width: 44em;
-    margin-top: 80px;
+    margin-top: 50px;
 }
 
 .btn_card{
@@ -99,7 +98,8 @@ body{
 }
 
 .btn_card.active {
-    background-color: blue;
+    border-width: 5px;
+    border-color: #2251AF;
     color: white;
 }
 
@@ -110,10 +110,6 @@ body{
 
 .card_content span {
     text-align: center;
-}
-
-.btn_card.car{
-    background-color: #F5F7F;
 }
 
 .select_btn{

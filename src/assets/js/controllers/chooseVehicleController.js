@@ -23,13 +23,17 @@ export class ChooseVehicleController extends Controller {
         buttonCards.forEach(card => {
             card.addEventListener('click', function (e) {
                 const active = test.querySelector('.btn_card.active');
+
                 console.log(active);
+
                 if (active) {
                     active.classList.toggle('active');
+
                     // test.querySelector('.btn_card .active').classList.toggle('active');
                 }
 
                 card.classList.toggle('active');
+
             })
         })
     }
