@@ -5,6 +5,13 @@
     font-family: sans-serif;
 }
 
+.root_container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
 nav{
     background: #C2E2FC;
     height: 120px;
@@ -20,8 +27,15 @@ nav{
     font-size: xx-large;
 }
 
+.progress_bars {
+    width: 62px;
+    display: flex;
+    justify-content: space-between;
+    margin: 1em 0;
+    margin-top: 50px;
+}
+
 .progressbar{
-    position: absolute;
     background: #0967D2;
     height: 8px;
     width: 45px;
@@ -31,7 +45,6 @@ nav{
 }
 
 .second_progressbar{
-    position: absolute;
     background: #BAE3FF;
     height: 8px;
     width: 13px;
@@ -41,102 +54,71 @@ nav{
 }
 
 .question{
-    position: absolute;
     color: #2251AF;
     font-weight: 600;
     text-align: center;
-    top: 220px;
-    left: 650px;
     font-size: large;
+    margin-top: 5px;
 }
 
 body{
-    display: grid;
     min-height: 100vh;
 }
 
-
 .fa-solid{
-    position: absolute;
+    font-size: 34px;
     color: #2251AF;
-    left: 140px;
-    top: 30px;
+    text-align: center;
 }
 
 
 .card_title{
-    position: absolute;
     top: 70px;
     left: 130px;
     color: #2251AF;
 }
 
-.walk_btn_card{
-    position: absolute;
-    background: #F5F7FA;
-    width: 300px;
-    height: 100px;
-    left: 300px;
-    top: 300px;
-    border-radius: 40px;
+.btn_card_container{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 44em;
+    margin-top: 80px;
 }
 
-.bike_btn_card{
-    position: absolute;
+.btn_card{
     background: #F5F7FA;
     width: 300px;
     height: 100px;
-    left: 615px;
-    top: 300px;
     border-radius: 40px;
+    flex-basis: 30%;
+    margin-bottom: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.car_btn_card{
-    position: absolute;
-    background: #F5F7FA;
-    width: 300px;
-    height: 100px;
-    right: 300px;
-    top: 300px;
-    border-radius: 40px;
+.btn_card.active {
+    background-color: blue;
+    color: white;
 }
 
-.bus_btn_card{
-    position: absolute;
-    background: #F5F7FA;
-    width: 300px;
-    height: 100px;
-    left: 300px;
-    top: 420px;
-    border-radius: 40px;
+.card_content{
+    display:flex;
+    flex-direction: column;
 }
 
-.train_btn_card{
-    position: absolute;
-    background: #F5F7FA;
-    width: 300px;
-    height: 100px;
-    left: 615px;
-    top: 420px;
-    border-radius: 40px;
+.card_content span {
+    text-align: center;
 }
 
-.tram_btn_card{
-    position: absolute;
-    background: #F5F7FA;
-    width: 300px;
-    height: 100px;
-    right: 300px;
-    top: 420px;
-    border-radius: 40px;
+.btn_card.car{
+    background-color: #F5F7F;
 }
 
 .select_btn{
-    position: absolute;
     width: 300px;
     height: 150px;
-    bottom: 0;
-    right: 0;
     background: #F0B429;
 }
 
