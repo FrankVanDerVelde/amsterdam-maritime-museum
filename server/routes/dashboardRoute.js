@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 class DashboardRoute {
     #errorCodes = require("../framework/utils/httpErrorCodes")
     #databaseHelper = require("../framework/utils/databaseHelper")
@@ -45,12 +47,17 @@ class DashboardRoute {
 
     #getWeeklySubmissions() {
         this.#app.get("/dashboard/getWeeklySubmissions", async (req, res) => {
-            let car = req.query.car;
             try {
+                const weekNumber = moment().format("W");
                 const data = await this.#databaseHelper.handleQuery({
-                    query: "SELECT WEEK(date_submitted) AS week, COUNT(id) AS registrations FROM submissions " +
-                        "WHERE '20220101' <= date_submitted AND date_submitted < '20230101' " +
-                        "GROUP BY WEEK(date_submitted) ORDER BY WEEK(date_submitted);",
+                    query: `SELECT WEEK(date_submitted) AS week, COUNT(id) AS registrations
+                            FROM submissions
+                            WHERE date_submitted >= DATE_FORMAT(NOW(), '%Y-01-01')
+                              AND date_submitted < DATE_FORMAT(NOW(), '%Y-12-31')
+                              AND WEEK(date_submitted) = ?
+                            GROUP BY WEEK(date_submitted)
+                            ORDER BY WEEK(date_submitted);`,
+                    values:[weekNumber]
                 });
 
                 //just give all data back as json, could also be empty
