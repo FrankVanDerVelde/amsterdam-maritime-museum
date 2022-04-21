@@ -72,7 +72,7 @@ class DashboardRoute {
         this.#app.get("/dashboard/getCO2AveragePerVisitor", async (req, res) => {
             try {
                 const data = await this.#databaseHelper.handleQuery({
-                    query: "SELECT ROUND(SUM(original_CO2)/COUNT(id), 2) AS 'average_CO2_emission' FROM pad_svm_5_dev.submissions;",
+                    query: "SELECT ROUND(AVG(original_CO2), 2) AS 'average_CO2_emission' FROM pad_svm_5_dev.submissions;",
                 });
 
                 //just give all data back as json, could also be empty
