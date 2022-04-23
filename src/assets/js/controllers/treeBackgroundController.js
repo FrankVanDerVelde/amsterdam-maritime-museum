@@ -36,6 +36,16 @@ export class TreeBackgroundController extends Controller {
 
         await this.#setUpCanvas();
         await this.#manageTrees();
+
+
+
+
+        const carbonEmission = localStorage.getItem('usersDistanceToMuseum');
+        console.log(carbonEmission);
+        document.querySelector(".carbonEmissionView").innerHTML = carbonEmission;
+
+
+
     }
 
     #createBasicSprite(spriteObject, sheet) {
@@ -416,6 +426,8 @@ export class TreeBackgroundController extends Controller {
 
             // Add the reference to the sprite to an array
             placementGrid[gridSpaceIndex].spriteReference = sprite;
+
+
         }
     }
 }

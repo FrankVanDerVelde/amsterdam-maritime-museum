@@ -6,6 +6,7 @@ const {HTTP_OK_CODE, BAD_REQUEST_CODE} = require("../framework/utils/httpErrorCo
 
 class CalculatorRoute {
     #app;
+    #co2TreesYear = 26.635;
 
     constructor(app) {
         this.#app = app;
@@ -40,22 +41,22 @@ class CalculatorRoute {
 
             switch (req.query.car) {
                 case "benzineCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionBenzine})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionBenzine, "trees": this.#treeCalculation(distance * co2EmissionBenzine)})
                     break;
                 case "dieselCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionDiesel})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionDiesel, "trees": this.#treeCalculation(distance * co2EmissionDiesel)})
                     break;
                 case "lpgCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionLPG})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionLPG, "trees": this.#treeCalculation(distance * co2EmissionLPG)})
                     break;
                 case "cngLowCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGLow})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGLow, "trees": this.#treeCalculation(distance * co2EmissionCNGLow)})
                     break;
                 case "cngHighCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGHigh})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGHigh, "trees": this.#treeCalculation(distance * co2EmissionCNGHigh)})
                     break;
                 case "electricCar":
-                    res.status(HTTP_OK_CODE).json({"CO2": distance * electricCarEmission})
+                    res.status(HTTP_OK_CODE).json({"CO2": distance * electricCarEmission, "trees": this.#treeCalculation(distance * electricCarEmission)})
                     break;
                 default:
                     res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
@@ -66,7 +67,7 @@ class CalculatorRoute {
     #getCO2ForTrain(){
         this.#app.get("/calculator/train", (req, res) =>{
             if (req.query.train === "train"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0})
+                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
@@ -76,7 +77,7 @@ class CalculatorRoute {
     #getCO2forBike(){
         this.#app.get("/calculator/bike", (req, res) =>{
             if (req.query.bike === "bike"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0})
+                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
@@ -91,7 +92,7 @@ class CalculatorRoute {
             let distance = req.query.distance;
 
             if (req.query.bus === "bus"){
-                res.status(HTTP_OK_CODE).json({"CO2" : averageCo2Emission * distance})
+                res.status(HTTP_OK_CODE).json({"CO2" : averageCo2Emission * distance, "trees": this.#treeCalculation(distance * averageCo2Emission)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
@@ -101,7 +102,7 @@ class CalculatorRoute {
     #getCO2forTram(){
         this.#app.get("/calculator/tram", (req, res) =>{
             if (req.query.tram === "tram"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0})
+                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
@@ -111,11 +112,27 @@ class CalculatorRoute {
     #getCO2forWalking(){
         this.#app.get("/calculator/walk", (req, res) =>{
             if (req.query.walk === "walk"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0})
+                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
         })
+    }
+
+    #treeCalculation(co2User){
+
+        const co2UserInKilo = co2User / 1000;
+
+        const co2TreesYearTwoDecimal = Math.round((co2UserInKilo / this.#co2TreesYear) * 100) / 100;
+        const co2TreesMonth = co2TreesYearTwoDecimal * 12;
+        const co2TreesDay = co2TreesYearTwoDecimal * 365;
+
+        return{
+            "year": co2TreesYearTwoDecimal,
+            "month": co2TreesMonth,
+            "day": co2TreesDay
+        }
+
     }
 }
 
