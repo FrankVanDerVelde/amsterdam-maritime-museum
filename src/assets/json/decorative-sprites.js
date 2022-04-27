@@ -1,4 +1,4 @@
-{
+export default {
     "boats": [
         {
             "width": 70,

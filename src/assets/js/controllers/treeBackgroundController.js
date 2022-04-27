@@ -3,10 +3,12 @@
  */
 
 import { Controller } from "./controller.js";
-import decorative_sprites from "../../json/decorative-sprites.json" assert { type: "json" }
+import decorative_sprites from "../../json/decorative-sprites.js"
+
 
 export class TreeBackgroundController extends Controller {
     // The view that holds the html for the tree background
+
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
