@@ -39,14 +39,8 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
         await this.#manageTrees();
 
-
-
-
-        const carbonEmission = localStorage.getItem('usersDistanceToMuseum');
-        console.log(carbonEmission);
-        document.querySelector(".carbonEmissionView").innerHTML = carbonEmission;
-
-
+        const carbonEmission = localStorage.getItem('usersDistanceToMuseum') ? localStorage.getItem('usersDistanceToMuseum') : 22;
+        document.querySelector(".emission-div .content").innerHTML = carbonEmission;
 
     }
 
@@ -357,18 +351,18 @@ export class TreeBackgroundController extends Controller {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
-        const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
+        // const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
+        // const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
 
-        verbruikInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
+        // verbruikInput.addEventListener("change", function () {
+        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
+        //     updateTrees();
+        // });
 
-        afstandInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
+        // afstandInput.addEventListener("change", function () {
+        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
+        //     updateTrees();
+        // });
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
