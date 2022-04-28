@@ -17,6 +17,8 @@ import { TreeBackgroundController } from "./controllers/treeBackgroundController
 import { UserLocationController } from "./controllers/UserLocationController.js"
 import {DashboardController} from "./controllers/DashboardController.js";
 import {ChooseVehicleController} from "./controllers/chooseVehicleController.js";
+import {ChooseFuelController} from "./controllers/chooseFuelController.js";
+
 
 export class App {
     //we only need one instance of the sessionManager, thus static use here
@@ -34,6 +36,8 @@ export class App {
     static CONTROLLER_TREE_BACKGROUND = "tree-background";
     static CONTROLLER_CHOOSE_VEHICLE = "choose-vehicle";
     static CONTROLLER_DASHBOARD = "dashboard";
+    static CONTROLLER_CHOOSE_FUEL = "choose-fuel";
+
 
     constructor() {
         //Always load the navigation
@@ -86,6 +90,10 @@ export class App {
                 new ChooseVehicleController();
                 break;
 
+            case App.CONTROLLER_CHOOSE_FUEL:
+                App.setCurrentController(name);
+                new ChooseFuelController();
+                break;
 
             case App.CONTROLLER_LOGIN:
                 App.setCurrentController(name);
