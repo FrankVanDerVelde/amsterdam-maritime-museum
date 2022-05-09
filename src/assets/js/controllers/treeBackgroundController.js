@@ -3,10 +3,12 @@
  */
 
 import { Controller } from "./controller.js";
-import decorative_sprites from "../../json/decorative-sprites.json" assert { type: "json" }
+import decorative_sprites from "../../json/decorative-sprites.js"
+
 
 export class TreeBackgroundController extends Controller {
     // The view that holds the html for the tree background
+
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
@@ -37,14 +39,8 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
         await this.#manageTrees();
 
-
-
-
-        const distance = JSON.parse(window.localStorage.getItem('usersDistanceToMuseum'));
-        console.log(distance);
-        document.querySelector(".carbonEmissionView").innerHTML = distance;
-
-
+        const carbonEmission = localStorage.getItem('usersDistanceToMuseum') ? localStorage.getItem('usersDistanceToMuseum') : 22;
+        document.querySelector(".emission-div .content").innerHTML = carbonEmission;
 
     }
 
@@ -355,18 +351,18 @@ export class TreeBackgroundController extends Controller {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
-        const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
+        // const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
+        // const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
 
-        verbruikInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
+        // verbruikInput.addEventListener("change", function () {
+        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
+        //     updateTrees();
+        // });
 
-        afstandInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
+        // afstandInput.addEventListener("change", function () {
+        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
+        //     updateTrees();
+        // });
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites

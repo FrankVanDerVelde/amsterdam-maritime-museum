@@ -4,8 +4,8 @@
 import { App } from "../app.js";
 import { Controller} from "./controller.js";
 
-export class ChooseVehicleController extends Controller {
-    #chooseVehicleView;
+export class ChooseFuelController extends Controller {
+    #chooseFuelView;
 
     constructor() {
         super();
@@ -15,10 +15,10 @@ export class ChooseVehicleController extends Controller {
     }
 
     async #setupView() {
-        this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
+        this.#chooseFuelView = await super.loadHtmlIntoContent("html_views/chooseFuel.html");
 
-        const test = this.#chooseVehicleView;
-        console.log(this.#chooseVehicleView);
+        const test = this.#chooseFuelView;
+        console.log(this.#chooseFuelView);
 
         const buttonCards = test.querySelectorAll('.btn_card');
 
@@ -40,13 +40,11 @@ export class ChooseVehicleController extends Controller {
     }
 
     #addContinueButtonEventListener() {
-        let continueContainer = this.#chooseVehicleView.querySelector('.application-continue-container');
+        let continueContainer = this.#chooseFuelView.querySelector('.application-continue-container');
         continueContainer.onclick = this.#handleContinueButtonClicked;
     }
 
     #handleContinueButtonClicked() {
-        // App.loadController(App.CONTROLLER_TREE_BACKGROUND);
-        App.loadController(App.CONTROLLER_CHOOSE_FUEL);
-
+        App.loadController(App.CONTROLLER_TREE_BACKGROUND);
     }
 }
