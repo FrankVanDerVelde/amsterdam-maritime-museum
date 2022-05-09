@@ -40,9 +40,9 @@ export class TreeBackgroundController extends Controller {
 
 
 
-        const carbonEmission = localStorage.getItem('usersDistanceToMuseum');
-        console.log(carbonEmission);
-        document.querySelector(".carbonEmissionView").innerHTML = carbonEmission;
+        const distance = JSON.parse(window.localStorage.getItem('usersDistanceToMuseum'));
+        console.log(distance);
+        document.querySelector(".carbonEmissionView").innerHTML = distance;
 
 
 
