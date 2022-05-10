@@ -15,7 +15,7 @@ describe("MapBox", () => {
     });
 
     it("Get coordinates for Alkmaar", async () => {
-        const coordinates = await mapBoxService.getCoordinatesForLocation("Alkmaar");
+        const coordinates = await mapBoxService.getFirstPlaceForLocation("Alkmaar");
         console.log(coordinates);
         let isNull = coordinates === null;
         expect(isNull).to.equal(false);
