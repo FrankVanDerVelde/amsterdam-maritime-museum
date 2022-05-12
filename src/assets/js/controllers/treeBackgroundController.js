@@ -48,12 +48,12 @@ export class TreeBackgroundController extends Controller {
 
         await this.#setUpCanvas();
         await this.#manageTrees();
-
-
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
         if (chosenVehicle === 'car') {
             console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
+
+
 
 
         } else if (chosenVehicle ==='train'){
@@ -76,6 +76,7 @@ export class TreeBackgroundController extends Controller {
 
 
 
+        console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
 
 
         // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
