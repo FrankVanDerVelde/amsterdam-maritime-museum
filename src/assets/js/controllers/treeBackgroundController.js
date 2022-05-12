@@ -48,55 +48,36 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
         await this.#manageTrees();
 
-        // const userDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum') ? localStorage.getItem('usersDistanceToMuseum') : 22;
-        //
-        // const choosenVehicle = localStorage.getItem('choosenVehicle');
-        //
-        // if (choosenVehicle === 'car') {
-        //
-        //     const nextURLCar = 'http://localhost:3000/calculator/car?car=dieselCar&distance=100';
-        //     const nextTitleCar = 'Berekening van de CO2 voor auto';
-        //     const nextStateCar = {additionalInformation: 'Updated URL with JS'};
-        //
-        //
-        // } else if (choosenVehicle ==='train'){
-        //     const nextURLTrain = 'http://localhost:3000/calculator/train?train=train&distance=' + userDistanceToMuseum;
-        //     const nextTitleTrain = 'Berekening van de CO2 voor trein';
-        //     const nextStateTrain = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateTrain, nextTitleTrain, nextURLTrain);
-        //     window.history.replaceState(nextStateTrain, nextTitleTrain, nextURLTrain);
-        // } else if (choosenVehicle === 'bike'){
-        //     const nextURLBike = 'http://localhost:3000/calculator/bike?bike=bike&distance=' + userDistanceToMuseum;
-        //     const nextTitleBike = 'Berekening van de CO2 voor fiets'
-        //     const nextStateBike = {additionalInformation: 'Updated URL with JS'}
-        //
-        //     window.history.pushState(nextStateBike, nextTitleBike, nextURLBike);
-        //     window.history.replaceState(nextStateBike, nextTitleBike, nextURLBike);
-        // } else if (choosenVehicle === 'bus'){
-        //     const nextURLBus = 'http://localhost:3000/calculator/bus?bus=bus&distance=' + userDistanceToMuseum;
-        //     const nextTitleBus = 'Berekening van de CO2 voor bus';
-        //     const nextStateBus = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateBus, nextTitleBus, nextURLBus);
-        //     window.history.replaceState(nextStateBus, nextTitleBus, nextURLBus);
-        // } else if (choosenVehicle === 'tram'){
-        //     const nextURLTram = 'http://localhost:3000/calculator/tram?tram=tram&distance=' + userDistanceToMuseum;
-        //     const nextTitleTram = 'Berekening van de CO2 voor tram';
-        //     const nextStateTram = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateTram, nextTitleTram, nextURLTram);
-        //     window.history.replaceState(nextStateTram, nextTitleTram, nextURLTram);
-        // } else if (choosenVehicle === 'walking'){
-        //     const nextURLWalking = 'http://localhost:3000/calculator/walking?walking=walking&distance=' + userDistanceToMuseum;
-        //     const nextTitleWalking = 'Berekening van de CO2 voor lopen';
-        //     const nextStateWalking = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateWalking, nextTitleWalking, nextURLWalking);
-        //     window.history.replaceState(nextStateWalking, nextTitleWalking, nextURLWalking);
-        // }
 
-        console.log(await this.#calculatorRepository.getCarbonEmissionForBus())
+        const chosenVehicle = localStorage.getItem('chosenVehicle');
+
+        if (chosenVehicle === 'car') {
+            console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
+
+
+        } else if (chosenVehicle ==='train'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForTrain());
+
+        } else if (chosenVehicle === 'bike'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForBike());
+
+        } else if (chosenVehicle === 'bus'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
+
+        } else if (chosenVehicle === 'tram'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
+
+        } else if (chosenVehicle === 'walking'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
+
+        }
+
+
+
+
+
+
+        // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
 
     }
 
