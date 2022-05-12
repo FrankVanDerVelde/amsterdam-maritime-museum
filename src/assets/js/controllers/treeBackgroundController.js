@@ -9,8 +9,6 @@ import {calculatorRepository} from "../repositories/calculatorRepository.js";
 
 export class TreeBackgroundController extends Controller {
     // The view that holds the html for the tree background
-
-
     #calculatorRepository;
 
     #treeBackgroundView;
@@ -30,6 +28,9 @@ export class TreeBackgroundController extends Controller {
     #backgroundDivision = [60, 5, 35];
 
     #pixiTreeContainer = new PIXI.Container();
+
+    // Number of trees
+    #treeCount;
     
     constructor() {
         super();
@@ -80,8 +81,6 @@ export class TreeBackgroundController extends Controller {
         // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
 
     }
-
-
 
     #createBasicSprite(spriteObject, sheet) {
         const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
@@ -402,6 +401,9 @@ export class TreeBackgroundController extends Controller {
         //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
         //     updateTrees();
         // });
+
+        totalTrees = Math.round(this.#treeCount.trees.day);
+        updateTrees();
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
