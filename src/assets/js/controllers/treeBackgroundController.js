@@ -47,56 +47,39 @@ export class TreeBackgroundController extends Controller {
         this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
 
         await this.#setUpCanvas();
-        // const userDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum') ? localStorage.getItem('usersDistanceToMuseum') : 22;
-        //
-        // const choosenVehicle = localStorage.getItem('choosenVehicle');
-        //
-        // if (choosenVehicle === 'car') {
-        //
-        //     const nextURLCar = 'http://localhost:3000/calculator/car?car=dieselCar&distance=100';
-        //     const nextTitleCar = 'Berekening van de CO2 voor auto';
-        //     const nextStateCar = {additionalInformation: 'Updated URL with JS'};
-        //
-        //
-        // } else if (choosenVehicle ==='train'){
-        //     const nextURLTrain = 'http://localhost:3000/calculator/train?train=train&distance=' + userDistanceToMuseum;
-        //     const nextTitleTrain = 'Berekening van de CO2 voor trein';
-        //     const nextStateTrain = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateTrain, nextTitleTrain, nextURLTrain);
-        //     window.history.replaceState(nextStateTrain, nextTitleTrain, nextURLTrain);
-        // } else if (choosenVehicle === 'bike'){
-        //     const nextURLBike = 'http://localhost:3000/calculator/bike?bike=bike&distance=' + userDistanceToMuseum;
-        //     const nextTitleBike = 'Berekening van de CO2 voor fiets'
-        //     const nextStateBike = {additionalInformation: 'Updated URL with JS'}
-        //
-        //     window.history.pushState(nextStateBike, nextTitleBike, nextURLBike);
-        //     window.history.replaceState(nextStateBike, nextTitleBike, nextURLBike);
-        // } else if (choosenVehicle === 'bus'){
-        //     const nextURLBus = 'http://localhost:3000/calculator/bus?bus=bus&distance=' + userDistanceToMuseum;
-        //     const nextTitleBus = 'Berekening van de CO2 voor bus';
-        //     const nextStateBus = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateBus, nextTitleBus, nextURLBus);
-        //     window.history.replaceState(nextStateBus, nextTitleBus, nextURLBus);
-        // } else if (choosenVehicle === 'tram'){
-        //     const nextURLTram = 'http://localhost:3000/calculator/tram?tram=tram&distance=' + userDistanceToMuseum;
-        //     const nextTitleTram = 'Berekening van de CO2 voor tram';
-        //     const nextStateTram = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateTram, nextTitleTram, nextURLTram);
-        //     window.history.replaceState(nextStateTram, nextTitleTram, nextURLTram);
-        // } else if (choosenVehicle === 'walking'){
-        //     const nextURLWalking = 'http://localhost:3000/calculator/walking?walking=walking&distance=' + userDistanceToMuseum;
-        //     const nextTitleWalking = 'Berekening van de CO2 voor lopen';
-        //     const nextStateWalking = {additionalInformation: 'Updated URL with JS'};
-        //
-        //     window.history.pushState(nextStateWalking, nextTitleWalking, nextURLWalking);
-        //     window.history.replaceState(nextStateWalking, nextTitleWalking, nextURLWalking);
-        // }
-        this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
-        console.log(this.#treeCount.trees.day)
         await this.#manageTrees();
+        const chosenVehicle = localStorage.getItem('chosenVehicle');
+
+        if (chosenVehicle === 'car') {
+            console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
+
+
+
+
+        } else if (chosenVehicle ==='train'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForTrain());
+
+        } else if (chosenVehicle === 'bike'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForBike());
+
+        } else if (chosenVehicle === 'bus'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
+
+        } else if (chosenVehicle === 'tram'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
+
+        } else if (chosenVehicle === 'walking'){
+            console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
+
+        }
+
+
+
+
+        console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
+
+
+        // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
 
     }
 
@@ -376,6 +359,122 @@ export class TreeBackgroundController extends Controller {
             canvasDiv.style.backgroundImage = getCssValuePrefix() + `linear-gradient(90deg, rgb(118, 193, 118) ${backgroundDivison[0]}%, #368d8d ${backgroundDivison[0]}%, cyan ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1]}%, rgb(192, 245, 252) ${backgroundDivison[0] + backgroundDivison[1] + backgroundDivison[2]}%)`;
         }
         resize();
+    }
+
+    #createBasicSprite(spriteObject, sheet) {
+        const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
+
+        if (!spriteObject.height || spriteObject.height === 'auto') {
+            const sizePercentageOfOriginalImage = (spriteObject.width * 100) / sprite.width;
+            sprite.height = Math.floor((sprite.height * sizePercentageOfOriginalImage) / 100);
+        } else {
+            sprite.height = spriteObject.height;
+        }
+
+        sprite.x = spriteObject.basePosX;
+        sprite.y = spriteObject.basePosY;
+
+        sprite.width = spriteObject.width;
+
+        // If the sprite is going in the opposite direction flip it
+        if (spriteObject.direction && spriteObject.direction == 'left') {
+            sprite.scale.x = -sprite.scale.x;
+        }
+        
+        spriteObject.zIndex && (sprite.zIndex = spriteObject.zIndex);
+        
+        // Sets the sprites anchor to bottom, center
+        sprite.anchor.set(0.5, 1);
+
+        return sprite;
+    }
+
+    #createSideScrollingSprites(spritesArray, sheet) {
+        const createBasicSprite = this.#createBasicSprite;
+        const app = this.#canvasApp;
+        const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
+
+        const spritesObjectArray = [];
+
+        spritesArray.forEach(spriteObject => {
+            const originalSprite = createBasicSprite(spriteObject, sheet);
+            const spriteCopy = createBasicSprite(spriteObject, sheet);
+
+            spritesObjectArray.push({"sprite": originalSprite, "sprite_copy": spriteCopy})
+
+            spriteCopy.visible = false;
+
+            app.stage.addChild(originalSprite);
+            app.stage.addChild(spriteCopy);
+
+            let spriteOneActive = true;
+            let spriteTwoActive = false;
+
+            let speed = spriteObject.speed ? spriteObject.speed : 1;
+
+            app.ticker.add((delta) => {
+                // Note: The sprites x pos is when checking is in the middle of the image
+                const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
+                const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
+                const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
+                let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
+                movementChange = parseFloat(movementChange.toFixed(2));
+                
+                // console.log(canvasDiv.offsetWidth)
+               
+                [originalSprite, spriteCopy].forEach(sprite => {
+                    if (Math.floor(sprite.x) == leavingScreenPos) {
+                        spriteTwoActive = true;
+                    }
+
+                    // When the sprite touches the edge of the screen with it's back
+                    if (Math.floor(sprite.x) == fullyLeftScreenPos) {
+                        spriteOneActive = false;
+                        originalSprite.x = offScreenStartPos;
+                    }
+                });
+
+                [spriteOneActive, spriteTwoActive].forEach(spriteState => {
+                    if (spriteState == true) {
+                        originalSprite.x += movementChange;
+                    }
+                });
+
+                // if (Math.floor(originalSprite.x) == leavingScreenPos) {
+                //     spriteCopy.x = offScreenStartPos;
+                //     spriteCopy.visible = true;
+                //     spriteTwoActive = true;
+                // }
+
+                // if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
+                //     spriteOneActive = false;
+                //     originalSprite.visible = false;
+                // }
+
+                // if (Math.floor(spriteCopy.x) == leavingScreenPos) {
+                //     originalSprite.x = offScreenStartPos;
+                //     originalSprite.visible = true;
+                //     spriteOneActive = true;
+                // }
+
+                // if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
+                //     spriteTwoActive = false;
+                //     spriteCopy.visible = true;
+                // }
+                
+                // if (spriteOneActive == true) {
+                //     originalSprite.x += movementChange;
+                // }
+
+                // if (spriteTwoActive == true) {
+                //     spriteCopy.x += movementChange;
+                // }
+
+            });
+
+        });
+
+        return spritesObjectArray;
     }
 
     async #manageTrees() {

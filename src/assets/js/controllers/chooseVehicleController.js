@@ -6,6 +6,7 @@ import { Controller} from "./controller.js";
 
 export class ChooseVehicleController extends Controller {
     #chooseVehicleView;
+    #chosenVehicle;
 
     constructor() {
         super();
@@ -53,6 +54,10 @@ export class ChooseVehicleController extends Controller {
     #addContinueButtonEventListener() {
         let continueContainer = this.#chooseVehicleView.querySelector('.application-continue-container');
         continueContainer.onclick = this.#handleContinueButtonClicked;
+    }
+
+    #savingChosenVehicle(){
+        
     }
 
     #handleContinueButtonClicked() {

@@ -46,18 +46,6 @@ module.exports = {
           // These colors should be used fairly conservatively throughout your UI to avoid overpowering your primary colors.
           // Use them when you need an element to stand out,
           // or to reinforce things like error states or positive trends with the appropriate semantic color.
-          supporting_pink: {
-              50: '#FFE3EC',
-              100: '#FFB8D2',
-              200: '#FF8CBA',
-              300: '#F364A2',
-              400: '#E8368F',
-              500: '#DA127D',
-              600: '#BC0A6F',
-              700: '#A30664',
-              800: '#870557',
-              900: '#620042',
-          },
           supporting_red: {
               50: '#FFE3E3',
               100: '#FFBDBD',
@@ -93,6 +81,18 @@ module.exports = {
               700: '#099AA4',
               800: '#07818F',
               900: '#05606E',
+          },
+          supporting_orange: {
+              50: '#FFE8D9',
+              100: '#FFD0B5',
+              200: '#FFB088',
+              300: '#FF9466',
+              400: '#F9703E',
+              500: '#F35627',
+              600: '#DE3A11',
+              700: '#C52707',
+              800: '#AD1D07',
+              900: '#841003',
           },
       }
   },
