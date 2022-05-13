@@ -26,7 +26,10 @@ export class ChooseVehicleController extends Controller {
             card.addEventListener('click', function (e) {
                 const active = test.querySelector('.btn_card.active');
 
+
                 console.log(active);
+
+
 
                 if (active) {
                     active.classList.toggle('active');
@@ -35,6 +38,14 @@ export class ChooseVehicleController extends Controller {
                 }
 
                 card.classList.toggle('active');
+
+                const car = test.querySelector('.car');
+                if (car.classList.contains('active')){
+                    test.querySelector('#licensePlate').hidden = false;
+                    console.log("Wooo");
+                }else {
+                    test.querySelector('#licensePlate').hidden = true;
+                }
             })
         })
     }
