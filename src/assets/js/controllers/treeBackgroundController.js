@@ -154,7 +154,7 @@ export class TreeBackgroundController extends Controller {
         let xNegative = 0;
         boatSprites = boatSprites.map(boat => {
             boat.direction = Math.round(Math.random()) ? 'right' : 'left';
-            if (boat.direction == 'right') {
+            if (boat.direction === 'right') {
                 xNegative -= boat.width - 10;
                 boat.basePosX = xNegative;
             } else {
@@ -173,7 +173,7 @@ export class TreeBackgroundController extends Controller {
         const cloudDirection = Math.round(Math.random()) ? 'right' : 'left';
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
-            if (cloudDirection == 'right') {
+            if (cloudDirection === 'right') {
                 xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
                 cloud.basePosX = xNegative;
             } else {
@@ -256,7 +256,7 @@ export class TreeBackgroundController extends Controller {
         sprite.width = spriteObject.width;
 
         // If the sprite is going in the opposite direction flip it
-        if (spriteObject.direction && spriteObject.direction == 'left') {
+        if (spriteObject.direction && spriteObject.direction === 'left') {
             sprite.scale.x = -sprite.scale.x;
         }
         
@@ -293,59 +293,59 @@ export class TreeBackgroundController extends Controller {
 
             app.ticker.add((delta) => {
                 // Note: The sprites x pos is when checking is in the middle of the image
-                const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
-                const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
-                const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
-                let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
+                const leavingScreenPos = spriteObject.direction === 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
+                const fullyLeftScreenPos = spriteObject.direction === 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
+                const offScreenStartPos = spriteObject.direction === 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
+                let movementChange = spriteObject.direction === 'right' ? speed : -(speed);
                 movementChange = parseFloat(movementChange.toFixed(2));
                 
                 // console.log(canvasDiv.offsetWidth)
                
                 [originalSprite, spriteCopy].forEach(sprite => {
-                    if (Math.floor(sprite.x) == leavingScreenPos) {
+                    if (Math.floor(sprite.x) === leavingScreenPos) {
                         spriteTwoActive = true;
                     }
 
                     // When the sprite touches the edge of the screen with it's back
-                    if (Math.floor(sprite.x) == fullyLeftScreenPos) {
+                    if (Math.floor(sprite.x) === fullyLeftScreenPos) {
                         spriteOneActive = false;
                         originalSprite.x = offScreenStartPos;
                     }
                 });
 
                 [spriteOneActive, spriteTwoActive].forEach(spriteState => {
-                    if (spriteState == true) {
+                    if (spriteState === true) {
                         originalSprite.x += movementChange;
                     }
                 });
 
-                // if (Math.floor(originalSprite.x) == leavingScreenPos) {
+                // if (Math.floor(originalSprite.x) === leavingScreenPos) {
                 //     spriteCopy.x = offScreenStartPos;
                 //     spriteCopy.visible = true;
                 //     spriteTwoActive = true;
                 // }
 
-                // if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
+                // if (Math.floor(originalSprite.x) === fullyLeftScreenPos) {
                 //     spriteOneActive = false;
                 //     originalSprite.visible = false;
                 // }
 
-                // if (Math.floor(spriteCopy.x) == leavingScreenPos) {
+                // if (Math.floor(spriteCopy.x) === leavingScreenPos) {
                 //     originalSprite.x = offScreenStartPos;
                 //     originalSprite.visible = true;
                 //     spriteOneActive = true;
                 // }
 
-                // if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
+                // if (Math.floor(spriteCopy.x) === fullyLeftScreenPos) {
                 //     spriteTwoActive = false;
                 //     spriteCopy.visible = true;
                 // }
                 
-                // if (spriteOneActive == true) {
+                // if (spriteOneActive === true) {
                 //     originalSprite.x += movementChange;
                 // }
 
-                // if (spriteTwoActive == true) {
+                // if (spriteTwoActive === true) {
                 //     spriteCopy.x += movementChange;
                 // }
 
@@ -403,8 +403,8 @@ export class TreeBackgroundController extends Controller {
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
-            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
-            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true);
+            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === false);
 
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
@@ -412,32 +412,32 @@ export class TreeBackgroundController extends Controller {
                     if (disabledTrees.length > 0) {
                         disabledTrees[0].spriteReference.visible = true;
                     } else {
-                        if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
+                        if (placementGrid.filter(gridObject => gridObject.spriteReference === null).length != 0) {
                             createTree();
                         } else {
                             break;
                         }
                     }
-                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === false);
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true);
                 }
             } else if (visibleTrees.length > totalTrees) {
                 while (visibleTrees.length > totalTrees) {
                     visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true)
                 }
             }
         }
 
         function createTree() {
             // Check for all the possible empty grid spaces
-            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
+            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference === null);
 
             // Randomly choose a random grid space to use
             const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * emptyGridSpaces.length)];
 
             // Get the index of the selected space in the original array
-            const getIndexOfSelectedSpace = (gridSpace) => gridSpace == targetEmptySpace;
+            const getIndexOfSelectedSpace = (gridSpace) => gridSpace === targetEmptySpace;
             const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
 
             const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
