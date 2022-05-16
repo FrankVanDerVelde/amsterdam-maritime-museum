@@ -1562,7 +1562,6 @@ input:checked + .toggle-bg {
 }
 
 /** Application **/
-
 .primary-button {
   height: -webkit-fit-content;
   height: -moz-fit-content;
@@ -1796,6 +1795,23 @@ input:checked + .toggle-bg {
 .dashboard-card-content-result {
   font-weight: 500;
 }
+
+/* Choose vehicle */
+
+.licensePlate{
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  border-radius: 0.5rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(240 180 41 / var(--tw-bg-opacity));
+  ba
+  padding: 0.5rem;
+  font-weight: 550;
+  --tw-text-opacity: 1;
+  color: rgb(rgb(0 0 0 / 0.1) / var(--tw-text-opacity));
+}
+
 
 /* Activity Indicator */
 
