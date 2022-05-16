@@ -83,10 +83,11 @@ export class ChooseVehicleController extends Controller {
     }
 
     #handleContinueButtonClicked() {
-        if (this.#canContinue()){
-            window.localStorage.setItem('chosenVehicle', this.#vehicle)
-            App.loadController(App.CONTROLLER_CHOOSE_FUEL);
-        }
+        App.loadController(App.CONTROLLER_CHOOSE_FUEL);
+        // if (this.#canContinue()){
+        //     window.localStorage.setItem('chosenVehicle', this.#vehicle)
+        //     App.loadController(App.CONTROLLER_CHOOSE_FUEL);
+        // }
     }
 
     #showsContinueButton(canContinue) {
