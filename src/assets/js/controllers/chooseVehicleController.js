@@ -1,14 +1,12 @@
 /**
  * Controller for the calculator
  */
-import { App } from "../app.js";
-import { Controller} from "./controller.js";
+import {App} from "../app.js";
+import {Controller} from "./controller.js";
 
 export class ChooseVehicleController extends Controller {
-
     #chooseVehicleView;
     #chosenVehicle;
-    #vehicle
 
     constructor() {
         super();
@@ -20,6 +18,7 @@ export class ChooseVehicleController extends Controller {
     async #setupView() {
         this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
         this.#addEventListenersToVehicleOptions();
+        this.#showsContinueButton(false)
     }
 
     #addEventListenersToVehicleOptions() {
@@ -28,21 +27,25 @@ export class ChooseVehicleController extends Controller {
     }
 
     #addEventListenerToVehicleOption(vehicleOption) {
-        vehicleOption.addEventListener('click', _ => {
-            this.#handleVehicleOptionClicked(vehicleOption);
-        });
+        vehicleOption.addEventListener('click', this.#handleVehicleOptionClicked.bind(this, vehicleOption));
     }
 
     #handleVehicleOptionClicked(vehicleOption) {
         this.#removeActiveStateForCurrentlySelectionOption();
         this.#setActiveStateForVehicleOption(vehicleOption);
         this.#checkCurrentlySelectedItemIsCarOption();
+        this.#savingChosenVehicle();
+        this.#showsContinueButton(true)
     }
 
     #removeActiveStateForCurrentlySelectionOption() {
-        const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
+        const activeOption = this.#getActiveOption();
         if (!activeOption) return;
         activeOption.classList.remove('active');
+    }
+
+    #getActiveOption() {
+        return this.#chooseVehicleView.querySelector('.btn_card.active')
     }
 
     #setActiveStateForVehicleOption(vehicleOption) {
@@ -51,54 +54,28 @@ export class ChooseVehicleController extends Controller {
 
     #checkCurrentlySelectedItemIsCarOption() {
         const car = this.#chooseVehicleView.querySelector('.car');
-        if (car.classList.contains('active')) {
-            this.#chooseVehicleView.querySelector('#licensePlate').hidden = false;
-            console.log("Wooo");
-        } else {
-            this.#chooseVehicleView.querySelector('#licensePlate').hidden = true;
-        }
+        this.#chooseVehicleView.querySelector('#licensePlate').hidden = !car.classList.contains('active');
     }
 
     #addContinueButtonEventListener() {
         let continueContainer = this.#chooseVehicleView.querySelector('.application-continue-container');
-        continueContainer.onclick = this.#handleContinueButtonClicked;
+        continueContainer.onclick = this.#handleContinueButtonClicked.bind(this);
     }
 
     #savingChosenVehicle() {
-        this.#chosenVehicle = this.#chooseVehicleView.querySelector(this.#getElementByIdId())
-        switch (this.#chosenVehicle) {
-            case "walk" :
-                this.#vehicle = "walk"
-                break;
-            case "bike" :
-                this.#vehicle = "bike"
-                break;
-            case "car" :
-                this.#vehicle = "car"
-                break;
-            case "bus" :
-                this.#vehicle = "bus"
-                break;
-            case "train" :
-                this.#vehicle = "train"
-                break;
-            case "tram" :
-                this.#vehicle = "tram"
-        }
-        console.log(this.#vehicle)
-        return this.#vehicle;
+        const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
+        this.#chosenVehicle = activeOption.id;
     }
 
     #canContinue() {
-        return (this.#vehicle !== undefined)
+        return (this.#chosenVehicle !== undefined)
     }
 
     #handleContinueButtonClicked() {
-        App.loadController(App.CONTROLLER_CHOOSE_FUEL);
-        // if (this.#canContinue()){
-        //     window.localStorage.setItem('chosenVehicle', this.#vehicle)
-        //     App.loadController(App.CONTROLLER_CHOOSE_FUEL);
-        // }
+        if (this.#canContinue()) {
+            window.localStorage.setItem('chosenVehicle', this.#chosenVehicle)
+            App.loadController(App.CONTROLLER_CHOOSE_FUEL);
+        }
     }
 
     #showsContinueButton(canContinue) {
