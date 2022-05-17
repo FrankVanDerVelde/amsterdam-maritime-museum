@@ -45,8 +45,9 @@ export class TreeBackgroundController extends Controller {
         this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
 
         await this.#setUpCanvas();
-        await this.#manageTrees();
+        
         const chosenVehicle = localStorage.getItem('chosenVehicle');
+        console.log(chosenVehicle);
 
         if (chosenVehicle === 'car') {
             console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
@@ -65,16 +66,15 @@ export class TreeBackgroundController extends Controller {
 
         } else if (chosenVehicle === 'walk'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
-
         }
-
-
-
 
         console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
 
-
         // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
+
+        // Set the amount of trees then manage tree sprites
+        this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
+        await this.#manageTrees();
 
     }
 
@@ -384,19 +384,6 @@ export class TreeBackgroundController extends Controller {
             const max = Math.ceil(canvas.renderer.height / 2.5);
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-
-        // const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
-        // const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
-
-        // verbruikInput.addEventListener("change", function () {
-        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-        //     updateTrees();
-        // });
-
-        // afstandInput.addEventListener("change", function () {
-        //     totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-        //     updateTrees();
-        // });
 
         totalTrees = Math.round(this.#treeCount.trees.day);
         updateTrees();

@@ -15,17 +15,15 @@ export class calculatorRepository{
         this.#typeFuelCar = localStorage.getItem('typeFuelCar');
     }
 
-
     async getCarbonEmissionForCar() {
         return await this.#networkManager.doRequest(`${this.#route}/car?car=` +
             this.#typeFuelCar + `&distance=` + this.#userDistanceToMuseum, "GET");
     }
+
     // async getCarbonEmissionForVehicle(){
     //     return await this.#networkManager.doRequest(`${this.#route}/` + this.#choosenVehicle + `?` +
     //         this.#choosenVehicle + `=` + this.#choosenVehicle + `&distance=` + this.#userDistanceToMuseum, "GET")
     // }
-
-
 
     async getCarbonEmissionForTrain(){
         return await this.#networkManager.doRequest(`${this.#route}/train?train=train&distance=` +
