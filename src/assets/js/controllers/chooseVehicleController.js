@@ -1,10 +1,11 @@
 /**
  * Controller for the calculator
  */
-import {App} from "../app.js";
-import {Controller} from "./controller.js";
+import { App } from "../app.js";
+import { Controller} from "./controller.js";
 
 export class ChooseVehicleController extends Controller {
+
     #chooseVehicleView;
     #chosenVehicle;
     #vehicle
@@ -18,34 +19,44 @@ export class ChooseVehicleController extends Controller {
 
     async #setupView() {
         this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
+        this.#addEventListenersToVehicleOptions();
+    }
 
-        const test = this.#chooseVehicleView;
-        this.#savingChosenVehicle();
-        this.#showsContinueButton(false);
-        console.log(this.#vehicle);
+    #addEventListenersToVehicleOptions() {
+        const vehicleOptions = this.#chooseVehicleView.querySelectorAll('.btn_card');
+        vehicleOptions.forEach(this.#addEventListenerToVehicleOption.bind(this));
+    }
 
-        const buttonCards = test.querySelectorAll('.btn_card');
+    #addEventListenerToVehicleOption(vehicleOption) {
+        vehicleOption.addEventListener('click', _ => {
+            this.#handleVehicleOptionClicked(vehicleOption);
+        });
+    }
 
-        this.#chooseVehicleView.querySelector(".btn_card").addEventListener('click', this.#savingChosenVehicle());
+    #handleVehicleOptionClicked(vehicleOption) {
+        this.#removeActiveStateForCurrentlySelectionOption();
+        this.#setActiveStateForVehicleOption(vehicleOption);
+        this.#checkCurrentlySelectedItemIsCarOption();
+    }
 
-        buttonCards.forEach(card => {
-            card.addEventListener('click', function (e) {
-                const active = test.querySelector('.btn_card.active');
+    #removeActiveStateForCurrentlySelectionOption() {
+        const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
+        if (!activeOption) return;
+        activeOption.classList.remove('active');
+    }
 
-                if (active) {
-                    active.classList.toggle('active');
-                }
+    #setActiveStateForVehicleOption(vehicleOption) {
+        vehicleOption.classList.add('active')
+    }
 
-                card.classList.toggle('active');
-
-                const car = test.querySelector('.car');
-                if (car.classList.contains('active')) {
-                    test.querySelector('#licensePlate').hidden = false;
-                } else {
-                    test.querySelector('#licensePlate').hidden = true;
-                }
-            })
-        })
+    #checkCurrentlySelectedItemIsCarOption() {
+        const car = this.#chooseVehicleView.querySelector('.car');
+        if (car.classList.contains('active')) {
+            this.#chooseVehicleView.querySelector('#licensePlate').hidden = false;
+            console.log("Wooo");
+        } else {
+            this.#chooseVehicleView.querySelector('#licensePlate').hidden = true;
+        }
     }
 
     #addContinueButtonEventListener() {
