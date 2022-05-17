@@ -27,6 +27,7 @@ class DashboardRoute {
         //method for calculating reduced emissions
         this.#getSavedEmissions()
 
+        //method to keep up visitor amount
         this.#createVisitor();
     }
 

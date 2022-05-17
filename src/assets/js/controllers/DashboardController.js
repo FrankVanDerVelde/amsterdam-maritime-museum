@@ -2,10 +2,9 @@ import {App} from "../app.js";
 import {Controller} from "./controller.js";
 import {DashboardRepository} from "../repositories/dashboardRepository.js";
 
-export class DashboardController extends Controller{
+export class DashboardController extends Controller {
     #dashboardView;
     #dashboardRepository
-
 
     constructor() {
         super();
@@ -20,7 +19,6 @@ export class DashboardController extends Controller{
         const weeklySubmission = await this.#dashboardRepository.getWeeklySubmissions();
         const averageEmission = await this.#dashboardRepository.getCO2AveragePerVisitor();
         const averageDistance = await this.#dashboardRepository.getDistanceAveragePerVisitor();
-
 
         this.#dashboardView.querySelector("#totalVisitors").innerHTML = totalVisitor[0].amount_of_visitors;
         this.#dashboardView.querySelector("#weeklySubmissions").innerHTML = weeklySubmission[0].registrations;
