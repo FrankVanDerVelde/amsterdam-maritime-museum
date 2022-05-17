@@ -48,25 +48,6 @@ export class TreeBackgroundController extends Controller {
         
         const chosenVehicle = localStorage.getItem('chosenVehicle');
         console.log(chosenVehicle);
-        //
-        // if (chosenVehicle === 'car') {
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
-
-        // } else if (chosenVehicle ==='train'){
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForTrain());
-        //
-        // } else if (chosenVehicle === 'bike'){
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForBike());
-        //
-        // } else if (chosenVehicle === 'bus'){
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
-        //
-        // } else if (chosenVehicle === 'tram'){
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
-        //
-        // } else if (chosenVehicle === 'walk'){
-        //     console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
-        // }
 
         if (chosenVehicle === 'car') {
             console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
