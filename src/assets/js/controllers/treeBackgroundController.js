@@ -42,38 +42,56 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #setupView() {
-        this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+        const html = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+
+        this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
         
         const chosenVehicle = localStorage.getItem('chosenVehicle');
+
         console.log(chosenVehicle);
+        console.log(localStorage)
+
+        let results;
+        let iconCode;
 
         if (chosenVehicle === 'car') {
             console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
-
+            results = await this.#calculatorRepository.getCarbonEmissionForCar();
+            iconCode = 'fa-car';
         } else if (chosenVehicle ==='train'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForTrain());
-
+            results = await this.#calculatorRepository.getCarbonEmissionForTrain();
+            iconCode = 'fa-train';
         } else if (chosenVehicle === 'bike'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForBike());
-
+            results = await this.#calculatorRepository.getCarbonEmissionForBike();
+            iconCode = 'fa-bicycle';
         } else if (chosenVehicle === 'bus'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
-
+            results = await this.#calculatorRepository.getCarbonEmissionForBus();
+            iconCode = 'fa-bus';
         } else if (chosenVehicle === 'tram'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
-
+            results = await this.#calculatorRepository.getCarbonEmissionForTram();
+            iconCode = 'fa-train-tram';
         } else if (chosenVehicle === 'walk'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
+            results = await this.#calculatorRepository.getCarbonEmissionForWalking();
+            iconCode = 'fa-person-walking';
         }
 
-        console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
-
-        // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
+        console.log(results);
 
         // Set the amount of trees then manage tree sprites
         this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
+
+        // Set values of first travel submissions
+        html.querySelector('#emissions').innerHTML = results.CO2;
+        html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
+        // changing-icon
+
         await this.#manageTrees();
 
     }
