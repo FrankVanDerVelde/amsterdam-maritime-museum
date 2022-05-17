@@ -67,11 +67,7 @@ export class TreeBackgroundController extends Controller {
         } else if (chosenVehicle === 'walk'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
         }
-
-        console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
-
-        // console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
-
+        
         // Set the amount of trees then manage tree sprites
         this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
         await this.#manageTrees();
