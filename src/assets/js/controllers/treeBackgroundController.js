@@ -8,9 +8,9 @@ import {calculatorRepository} from "../repositories/calculatorRepository.js";
 
 
 export class TreeBackgroundController extends Controller {
-    // The view that holds the html for the tree background
     #calculatorRepository;
 
+    // The view that holds the html for the tree background
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
@@ -63,7 +63,7 @@ export class TreeBackgroundController extends Controller {
         } else if (chosenVehicle === 'tram'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
 
-        } else if (chosenVehicle === 'walking'){
+        } else if (chosenVehicle === 'walk'){
             console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
 
         }
