@@ -59,8 +59,6 @@ export class ChooseVehicleController extends Controller {
         }
     }
 
-    #savingChosenVehicle() { }
-
     #addContinueButtonEventListener() {
         let continueContainer = this.#chooseVehicleView.querySelector('.application-continue-container');
         continueContainer.onclick = this.#handleContinueButtonClicked;
