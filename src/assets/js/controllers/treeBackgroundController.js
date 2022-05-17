@@ -56,7 +56,7 @@ export class TreeBackgroundController extends Controller {
         }
 
         // Set the amount of trees then manage tree sprites
-        this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
+        this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForVehicle();
         await this.#manageTrees();
 
     }
