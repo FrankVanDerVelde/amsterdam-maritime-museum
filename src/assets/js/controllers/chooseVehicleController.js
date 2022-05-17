@@ -39,9 +39,13 @@ export class ChooseVehicleController extends Controller {
     }
 
     #removeActiveStateForCurrentlySelectionOption() {
-        const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
+        const activeOption = this.#getActiveOption();
         if (!activeOption) return;
         activeOption.classList.remove('active');
+    }
+
+    #getActiveOption() {
+        return this.#chooseVehicleView.querySelector('.btn_card.active')
     }
 
     #setActiveStateForVehicleOption(vehicleOption) {
@@ -50,11 +54,7 @@ export class ChooseVehicleController extends Controller {
 
     #checkCurrentlySelectedItemIsCarOption() {
         const car = this.#chooseVehicleView.querySelector('.car');
-        if (car.classList.contains('active')) {
-            this.#chooseVehicleView.querySelector('#licensePlate').hidden = false;
-        } else {
-            this.#chooseVehicleView.querySelector('#licensePlate').hidden = true;
-        }
+        this.#chooseVehicleView.querySelector('#licensePlate').hidden = !car.classList.contains('active');
     }
 
     #addContinueButtonEventListener() {
@@ -63,9 +63,7 @@ export class ChooseVehicleController extends Controller {
     }
 
     #savingChosenVehicle() {
-        console.log(this);
         const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
-        console.log(activeOption.id);
         this.#chosenVehicle = activeOption.id;
     }
 
