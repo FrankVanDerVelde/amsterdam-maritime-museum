@@ -80,6 +80,8 @@ export class TreeBackgroundController extends Controller {
             console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
             results = await this.#calculatorRepository.getCarbonEmissionForWalking();
             iconCode = 'fa-person-walking';
+        } else {
+            console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
         }
 
         console.log(results);
