@@ -3,12 +3,12 @@
 		<div class="flex flex-col justify-center items-center text-orange-900 ml-[25px]">
 			<div class="text-[15px]">Jouw Uitstoot</div>
 			<div class="text-[23px]"><span id="emissions"></span><span>G CO2</span></div>
-			<div class="text-[15px]"><span id="distance"></span> KM met de auto<i class="fas changing-icon"></i></div>
+			<div class="text-[15px]"><span id="distance"></span>KM met de <span id="vehicle-name"></span><i
+					id="vehicle-icon"></i></div>
 		</div>
 		<div class="text-supporting_cyan-800 flex flex-col justify-center items-center">
 			<div class="mb-[5px] mt-[-12px]">Suggesties</div>
-			<div class="flex justify-between space-x-6 text-center">
-
+			<div class="flex justify-between space-x-6 text-center" id="vehicle-icons-container">
 				<div
 					class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800">
 					<i class="fa-solid fa-person-walking text-[20px]"></i>
@@ -43,10 +43,7 @@
 							<span class="text-[13px]">52</span>
 						</span>
 					</i>
-
-
 				</div>
-
 			</div>
 		</div>
 		<div class="flex flex-col justify-center items-center text-supporting_cyan-400 text-center mr-[25px]">

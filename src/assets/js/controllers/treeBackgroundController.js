@@ -4,7 +4,7 @@
 
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
-import {calculatorRepository} from "../repositories/calculatorRepository.js";
+import { calculatorRepository } from "../repositories/calculatorRepository.js";
 
 
 export class TreeBackgroundController extends Controller {
@@ -31,14 +31,13 @@ export class TreeBackgroundController extends Controller {
 
     // Number of trees
     #treeCount;
-    
+
     constructor() {
         super();
 
         this.#calculatorRepository = new calculatorRepository();
 
         this.#setupView();
-
     }
 
     async #setupView() {
@@ -47,55 +46,68 @@ export class TreeBackgroundController extends Controller {
         this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
-        
-        const chosenVehicle = localStorage.getItem('chosenVehicle');
 
-        console.log(chosenVehicle);
-        console.log(localStorage)
+        const chosenVehicle = localStorage.getItem('chosenVehicle');
 
         let results;
         let iconCode;
+        let vehicleNameDutch;
+
+        switch (chosenVehicle) {
+            case 'car':
+                iconCode = 'fa-car';
+                vehicleNameDutch = 'auto';
+                break;
+            case 'train':
+                iconCode = 'fa-train';
+                vehicleNameDutch = 'trein';
+                break;
+            case 'bike':
+                iconCode = 'fa-bicycle';
+                vehicleNameDutch = 'fiets';
+                break;
+            case 'bus':
+                iconCode = 'fa-bus';
+                vehicleNameDutch = 'bus';
+                break;
+            case 'tram':
+                iconCode = 'fa-train-tram';
+                vehicleNameDutch = 'tram';
+                break;
+            case 'walk':
+                iconCode = 'fa-person-walking';
+                vehicleNameDutch = 'lopend';
+                break;
+            default:
+            // code block
+        }
 
         if (chosenVehicle === 'car') {
-            console.log(await this.#calculatorRepository.getCarbonEmissionForCar());
             results = await this.#calculatorRepository.getCarbonEmissionForCar();
-            iconCode = 'fa-car';
-        } else if (chosenVehicle ==='train'){
-            console.log(await this.#calculatorRepository.getCarbonEmissionForTrain());
-            results = await this.#calculatorRepository.getCarbonEmissionForTrain();
-            iconCode = 'fa-train';
-        } else if (chosenVehicle === 'bike'){
-            console.log(await this.#calculatorRepository.getCarbonEmissionForBike());
-            results = await this.#calculatorRepository.getCarbonEmissionForBike();
-            iconCode = 'fa-bicycle';
-        } else if (chosenVehicle === 'bus'){
-            console.log(await this.#calculatorRepository.getCarbonEmissionForBus());
-            results = await this.#calculatorRepository.getCarbonEmissionForBus();
-            iconCode = 'fa-bus';
-        } else if (chosenVehicle === 'tram'){
-            console.log(await this.#calculatorRepository.getCarbonEmissionForTram());
-            results = await this.#calculatorRepository.getCarbonEmissionForTram();
-            iconCode = 'fa-train-tram';
-        } else if (chosenVehicle === 'walk'){
-            console.log(await this.#calculatorRepository.getCarbonEmissionForWalking());
-            results = await this.#calculatorRepository.getCarbonEmissionForWalking();
-            iconCode = 'fa-person-walking';
         } else {
-            console.log(await this.#calculatorRepository.getCarbonEmissionForVehicle());
+            results = await this.#calculatorRepository.getCarbonEmissionForVehicle();
         }
 
         console.log(results);
 
         // Set the amount of trees then manage tree sprites
-        this.#treeCount = await this.#calculatorRepository.getCarbonEmissionForBus();
+        this.#treeCount = results.trees;
 
         // Set values of first travel submissions
         html.querySelector('#emissions').innerHTML = results.CO2;
         html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
-        // changing-icon
+        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
+
+        // .removeAttribute("class")
+        const htmlIconElement = html.querySelector('#vehicle-icon');
+        htmlIconElement.classList.add('fa-solid');
+        htmlIconElement.classList.add(iconCode);
 
         await this.#manageTrees();
+    }
 
+    async #vehicleControls() {
+        // vehicle-icons-container
     }
 
     async #setUpCanvas() {
@@ -141,7 +153,7 @@ export class TreeBackgroundController extends Controller {
         canvasDiv.appendChild(app.view);
 
         const canvas = app.view;
-        
+
         this.#pixiTreeContainer.sortableChildren = true;
         app.stage.addChild(this.#pixiTreeContainer);
 
@@ -164,7 +176,7 @@ export class TreeBackgroundController extends Controller {
                     row: y
                 })
             }
-        }  
+        }
 
         const boatSheet = this.#boatSheet;
         const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
@@ -184,7 +196,7 @@ export class TreeBackgroundController extends Controller {
             boat.basePosY = boatArea;
             return boat;
         })
-        
+
         // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
         const cloudSheet = this.#cloudSheet;
         // The canvas area for the sky
@@ -211,19 +223,19 @@ export class TreeBackgroundController extends Controller {
         const boatSpriteReferences = this.#createSideScrollingSprites(boatSprites, boatSheet)
         const cloudSpriteReferences = this.#createSideScrollingSprites(cloudSprites, cloudSheet)
 
-         // update y pos
-            window.addEventListener('resize', () => {
-                // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
-                const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
-                boatSpriteReferences.forEach(boatObject => {
-                    boatObject.sprite.y = newBoatArea;
-                    boatObject.sprite_copy.y = newBoatArea;
-                });
-    
-                // cloudSpriteReferences.forEach(cloud => {
-    
-                // })
+        // update y pos
+        window.addEventListener('resize', () => {
+            // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+            const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+            boatSpriteReferences.forEach(boatObject => {
+                boatObject.sprite.y = newBoatArea;
+                boatObject.sprite_copy.y = newBoatArea;
             });
+
+            // cloudSpriteReferences.forEach(cloud => {
+
+            // })
+        });
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -279,9 +291,9 @@ export class TreeBackgroundController extends Controller {
         if (spriteObject.direction && spriteObject.direction === 'left') {
             sprite.scale.x = -sprite.scale.x;
         }
-        
+
         spriteObject.zIndex && (sprite.zIndex = spriteObject.zIndex);
-        
+
         // Sets the sprites anchor to bottom, center
         sprite.anchor.set(0.5, 1);
 
@@ -299,7 +311,7 @@ export class TreeBackgroundController extends Controller {
             const originalSprite = createBasicSprite(spriteObject, sheet);
             const spriteCopy = createBasicSprite(spriteObject, sheet);
 
-            spritesObjectArray.push({"sprite": originalSprite, "sprite_copy": spriteCopy})
+            spritesObjectArray.push({ "sprite": originalSprite, "sprite_copy": spriteCopy })
 
             spriteCopy.visible = false;
 
@@ -318,9 +330,9 @@ export class TreeBackgroundController extends Controller {
                 const offScreenStartPos = spriteObject.direction === 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
                 let movementChange = spriteObject.direction === 'right' ? speed : -(speed);
                 movementChange = parseFloat(movementChange.toFixed(2));
-                
+
                 // console.log(canvasDiv.offsetWidth)
-               
+
                 [originalSprite, spriteCopy].forEach(sprite => {
                     if (Math.floor(sprite.x) === leavingScreenPos) {
                         spriteTwoActive = true;
@@ -360,7 +372,7 @@ export class TreeBackgroundController extends Controller {
                 //     spriteTwoActive = false;
                 //     spriteCopy.visible = true;
                 // }
-                
+
                 // if (spriteOneActive === true) {
                 //     originalSprite.x += movementChange;
                 // }
@@ -405,7 +417,7 @@ export class TreeBackgroundController extends Controller {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        totalTrees = Math.round(this.#treeCount.trees.day);
+        totalTrees = Math.round(this.#treeCount.day);
         updateTrees();
 
         function updateTrees() {
