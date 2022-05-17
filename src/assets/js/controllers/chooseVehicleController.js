@@ -19,6 +19,7 @@ export class ChooseVehicleController extends Controller {
         this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
         this.#addEventListenersToVehicleOptions();
         this.#showsContinueButton(false)
+        this.#chooseVehicleView.querySelector("#licensePlate").addEventListener('input', this.#capitalizeInput);
     }
 
     #addEventListenersToVehicleOptions() {
@@ -39,13 +40,9 @@ export class ChooseVehicleController extends Controller {
     }
 
     #removeActiveStateForCurrentlySelectionOption() {
-        const activeOption = this.#getActiveOption();
+        const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
         if (!activeOption) return;
         activeOption.classList.remove('active');
-    }
-
-    #getActiveOption() {
-        return this.#chooseVehicleView.querySelector('.btn_card.active')
     }
 
     #setActiveStateForVehicleOption(vehicleOption) {
@@ -54,7 +51,11 @@ export class ChooseVehicleController extends Controller {
 
     #checkCurrentlySelectedItemIsCarOption() {
         const car = this.#chooseVehicleView.querySelector('.car');
-        this.#chooseVehicleView.querySelector('#licensePlate').hidden = !car.classList.contains('active');
+        if (car.classList.contains('active')) {
+            this.#chooseVehicleView.querySelector('#licensePlate').classList.remove("hidden");
+        } else {
+            this.#chooseVehicleView.querySelector('#licensePlate').classList.add("hidden");
+        }
     }
 
     #addContinueButtonEventListener() {
@@ -63,8 +64,14 @@ export class ChooseVehicleController extends Controller {
     }
 
     #savingChosenVehicle() {
+        console.log(this);
         const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
+        console.log(activeOption.id);
         this.#chosenVehicle = activeOption.id;
+    }
+
+    #capitalizeInput(inputBox){
+        inputBox.target.value = inputBox.target.value.toUpperCase();
     }
 
     #canContinue() {
