@@ -209,6 +209,8 @@ export class TreeBackgroundController extends Controller {
         const ySquares = Math.floor(treeAreaHeight / treeDimension)
 
         const treeSheet = this.#treeSheet;
+        const deadTreeSheet = this.#deadTreeSheet;
+
         const treeContainer = this.#pixiTreeContainer;
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
@@ -220,7 +222,7 @@ export class TreeBackgroundController extends Controller {
                 const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
                 const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
 
-                const sprite = createBasicSprite(
+                const tree = createBasicSprite(
                     {
                         width: variableSize,
                         height: variableSize,
@@ -230,14 +232,28 @@ export class TreeBackgroundController extends Controller {
                         zIndex: y
                     }, treeSheet
                 );
+
+                const deadTree = createBasicSprite(
+                    {
+                        width: variableSize,
+                        height: variableSize,
+                        img: `deadtree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                        basePosX: baseXpos + Math.random() * (treeDimension / 2),
+                        basePosY: baseYpos + Math.random() * (treeDimension / 2),
+                        zIndex: y
+                    }, deadTreeSheet
+                );
+
+                deadTree.visible = false;
     
-                treeContainer.addChild(sprite);
+                treeContainer.addChild(tree);
+                treeContainer.addChild(deadTree);
 
                 this.#gridSquares.push({
                     xBaseCoordinate: baseXpos,
                     yBaseCoordinate: baseYpos,
-                    treeSprite: sprite,
-                    spriteReference: null,
+                    treeSprite: tree,
+                    deadTreeSprite: deadTree,
                     row: y
                 })
             }
@@ -369,62 +385,29 @@ export class TreeBackgroundController extends Controller {
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
-            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true);
-            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === false);
-
+            let visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+            let disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
+            
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
-                    // If disabled trees exist enable those first, else create a new one
-                    if (disabledTrees.length > 0) {
-                        disabledTrees[0].spriteReference.visible = true;
-                    } else {
-                        if (placementGrid.filter(gridObject => gridObject.spriteReference === null).length != 0) {
-                            createTree();
-                        } else {
-                            break;
-                        }
-                    }
-                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === false);
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true);
-                }
-            } else if (visibleTrees.length > totalTrees) {
+                const randomPosToToggle = Math.floor(Math.random() * disabledTrees.length);
+                disabledTrees[randomPosToToggle].deadTreeSprite.visible = true;
+                disabledTrees[randomPosToToggle].treeSprite.visible = false;
+
+                visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+                disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
+                console.log(visibleTrees.length, totalTrees);
+                } 
+            } else {
                 while (visibleTrees.length > totalTrees) {
-                    visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible === true)
+                    const randomPosToToggle = Math.floor(Math.random() * visibleTrees.length);
+                    visibleTrees[randomPosToToggle].deadTreeSprite.visible = false;
+                    visibleTrees[randomPosToToggle].treeSprite.visible = true;
+
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+                     disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
                 }
             }
-        }
-
-        function createTree() {
-            // Check for all the possible empty grid spaces
-            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference === null);
-
-            // Randomly choose a random grid space to use
-            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * emptyGridSpaces.length)];
-
-            // Get the index of the selected space in the original array
-            const getIndexOfSelectedSpace = (gridSpace) => gridSpace === targetEmptySpace;
-            const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
-
-            const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
-            const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
-            const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
-
-            const sprite = createBasicSprite(
-                {
-                    width: variableSize,
-                    height: variableSize,
-                    img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
-                    basePosX: targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2),
-                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2),
-                    zIndex: targetEmptySpace.row
-                }, treeSheet
-            );
-
-            treeContainer.addChild(sprite);
-
-            // Add the reference to the sprite to an array
-            placementGrid[gridSpaceIndex].spriteReference = sprite;
         }
     }
 
