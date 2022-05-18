@@ -40,22 +40,22 @@ class CalculatorRoute {
             const electricCarEmission = 0;
 
             switch (req.query.car) {
-                case "benzineCar":
+                case "benzine":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionBenzine, "trees": this.#treeCalculation(distance * co2EmissionBenzine)})
                     break;
-                case "dieselCar":
+                case "diesel":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionDiesel, "trees": this.#treeCalculation(distance * co2EmissionDiesel)})
                     break;
-                case "lpgCar":
+                case "lpg":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionLPG, "trees": this.#treeCalculation(distance * co2EmissionLPG)})
                     break;
-                case "cngLowCar":
+                case "cngLow":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGLow, "trees": this.#treeCalculation(distance * co2EmissionCNGLow)})
                     break;
-                case "cngHighCar":
+                case "cngHigh":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * co2EmissionCNGHigh, "trees": this.#treeCalculation(distance * co2EmissionCNGHigh)})
                     break;
-                case "electricCar":
+                case "electric":
                     res.status(HTTP_OK_CODE).json({"CO2": distance * electricCarEmission, "trees": this.#treeCalculation(distance * electricCarEmission)})
                     break;
                 default:

@@ -12,7 +12,7 @@ export class calculatorRepository{
         this.#networkManager = new NetworkManager();
         this.#userDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum') ? localStorage.getItem('usersDistanceToMuseum') : 22;
         this.#chosenVehicle = localStorage.getItem('chosenVehicle');
-        this.#typeFuelCar = localStorage.getItem('typeFuelCar');
+        this.#typeFuelCar = localStorage.getItem('fuel');
     }
 
     async getCarbonEmissionForCar() {
