@@ -21,11 +21,18 @@ class NSRoute {
                 let thinnedResults = result[0]
                     .filter((station) => { return station.land === "NL" })
                     .map((station) => {
-                        return station /* {
+                        return {
                             code: station.code,
                             stationType: station.stationType,
                             name: station.namen.middel,
-                        } */
+                        }
+                    })
+                    .sort((stationA, stationB) => {
+                        const nameA = stationA.name.toUpperCase();
+                        const nameB = stationB.name.toUpperCase();
+                        if (nameA < nameB) return -1;
+                        if (nameA > nameB) return 1;
+                        return 0; // names must be equal
                     })
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({

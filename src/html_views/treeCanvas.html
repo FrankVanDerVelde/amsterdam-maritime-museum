@@ -1,4 +1,5 @@
 <div class="h-full">
+	<!-- MARK: Nav -->
 	<div class="w-full shadow-md bg-white fixed flex justify-between text-center">
 		<div class="flex flex-col justify-center items-center text-orange-900 ml-[25px]">
 			<div class="text-[15px]">Jouw Uitstoot</div>
@@ -26,24 +27,26 @@
 
 				<div data-vehicle="bus"
 					class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800">
-					<i class="fa-solid fa-bus  text-[20px]"></i>
+					<i class="fa-solid fa-bus text-[20px]"></i>
 				</div>
 
 				<div data-vehicle="train"
 					class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800">
-					<i class="fa-solid fa-train  text-[20px]"></i>
+					<i class="fa-solid fa-train text-[20px]"></i>
 				</div>
 
 				<div data-vehicle="tram"
-					class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800">
-					<i class="fa-solid fa-train-tram  text-[20px] relative">
+					class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800"
+					id="tram-vehicle">
+					<i class="fa-solid fa-train-tram text-[20px] relative">
 						<span
 							class="bg-primary-700 rounded-[25px] text-white flex absolute bottom-[-19px] left-[-12px] p-1">
 							<i class="fa-solid fa-euro-sign mr-[4px] text-[13px]"></i>
-							<span class="text-[13px]">52</span>
+							<span class="text-[13px] ns-price-result-label">52</span>
 						</span>
 					</i>
 				</div>
+
 			</div>
 		</div>
 		<div class="flex flex-col justify-center items-center text-supporting_cyan-400 text-center mr-[25px]">
@@ -51,6 +54,52 @@
 			<div class="text-[23px]"><span id="new-emissions">0</span>G C02</div>
 		</div>
 	</div>
-	
+
+	<!-- MARK: Canvas -->
 	<div class="h-full w-full" id="canvas-box"></div>
+
+	<!-- MARK: NS Dialog -->
+	<div id="ns-dialog" class="bg-neutral-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2rounded rounded-[16px] overflow-hidden hidden">
+		<div>
+			<div class="p-[20px]">
+				<div class="flex justify-between items-center">
+					<p class="font-bold text-[20px]">Treinrit kosten</p>
+					<button id="ns-close-dialog-button">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+
+				<div class="mt-[25px] bg-white rounded rounded-[16px]">
+					<div class="px-[18px] py-[13px] ">
+						<div>
+							<p class="font-medium text-neutral-300">Van</p>
+							<select class="mb-[8px] border-neutral-100 rounded-md active:border-neutral-100" id="stations"></select>
+						</div>
+						<hr class="pb-[8px]">
+						<div>
+							<p class="font-medium text-neutral-300">Naar</p>
+							<p class="font-semibold">Station Amsterdam Centraal</p>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="pt-[8px] flex flex-col">
+					<label for="ns-number-of-persons" class="font-medium text-neutral-500 pb-1.5">Aantal personen</label>
+					<input
+							class="application-textField mb-2"
+							id="ns-number-of-persons"
+							type="number"
+							placeholder="Aantal personen"
+							autocomplete="off"
+							value="1"
+					>
+				</div>
+			</div>
+			<div class="h-[51px] w-full bg-supporting_yellow-400 flex items-center justify-between px-[20px]">
+				<p class="font-bold text-white ns-price-result-label"></p>
+				<button id="ns-done-button" class="justify-self-end bg-white rounded rounded-lg h-[36px] px-3 text-supporting_yellow-500 font-bold">Bereken</button>
+			</div>
+		</div>
+	</div>
 </div>

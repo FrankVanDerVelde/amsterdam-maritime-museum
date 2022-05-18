@@ -10,7 +10,8 @@ export class NSRepository {
     }
 
     async getAllStations() {
-        return await this.#networkManager.doRequest(`${this.#route}/allStations`, 'GET')
+        let result = await this.#networkManager.doRequest(`${this.#route}/allStations`, 'GET')
+        return result.results;
     }
 
     async getTripPrice(fromStation, toStation) {
