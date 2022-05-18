@@ -82,14 +82,19 @@ export class ChooseVehicleController extends Controller {
             let licensePlate = this.#chooseVehicleView.querySelector('#inputLicensePlate');
             try{
                 const data =await this.#chooseVehicleRepository.getVehicleFuel(licensePlate.value);
+
                 window.localStorage.setItem('fuel', data[0].toLowerCase());
-                this.#getElementByIdId('errorContainer').classList.add('hidden')
+                this.#getElementByIdId('successContainer').classList.remove('hidden');
+                this.#getElementByIdId('errorContainer').classList.add('hidden');
+                this.#getElementByIdId('success-title-label').innerHTML = "Success";
+                this.#getElementByIdId('success-description-label').innerHTML = "U mag door naar het volgende scherm";
 
 
             }catch (e){
-                this.#getElementByIdId('errorContainer').classList.remove('hidden')
-                this.#getElementByIdId('title-label').innerHTML = "Er is een fout opgetreden";
-                this.#getElementByIdId('description-label').innerHTML = "We konden geen auto vinden met de kenteken " + licensePlate.value;
+                this.#getElementByIdId('errorContainer').classList.remove('hidden');
+                this.#getElementByIdId('successContainer').classList.add('hidden');
+                this.#getElementByIdId('error-title-label').innerHTML = "Er is een fout opgetreden";
+                this.#getElementByIdId('error-description-label').innerHTML = "We konden geen auto vinden met de kenteken " + licensePlate.value;
             }
         });
 
