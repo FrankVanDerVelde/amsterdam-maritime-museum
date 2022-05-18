@@ -130,3 +130,15 @@
     }
 }
 
+/* tree background page */
+
+#vehicle-icons-container > div.inactive {
+    color: #d3d3d3;
+    border-color: #d3d3d3;
+}
+
+#vehicle-icons-container > div.active {
+    color: rgb(0 78 86);
+    border: 2px solid rgb(0 78 86);
+    font-weight: bold;
+}
