@@ -55,9 +55,9 @@ export class ChooseVehicleController extends Controller {
     #checkCurrentlySelectedItemIsCarOption() {
         const car = this.#chooseVehicleView.querySelector('.car');
         if (car.classList.contains('active')) {
-            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.remove("hidden");
+            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.remove('hidden');
         } else {
-            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.add("hidden");
+            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.add('hidden');
         }
     }
 
@@ -80,8 +80,17 @@ export class ChooseVehicleController extends Controller {
     #vehicleFuel(){
         this.#chooseVehicleView.querySelector("#submitLicensePlate").addEventListener('click', async () => {
             let licensePlate = this.#chooseVehicleView.querySelector('#inputLicensePlate');
-            const data =await this.#chooseVehicleRepository.getVehicleFuel(licensePlate.value);
-            window.localStorage.setItem('fuel', data[0].toLowerCase());
+            try{
+                const data =await this.#chooseVehicleRepository.getVehicleFuel(licensePlate.value);
+                window.localStorage.setItem('fuel', data[0].toLowerCase());
+                this.#getElementByIdId('errorContainer').classList.add('hidden')
+
+
+            }catch (e){
+                this.#getElementByIdId('errorContainer').classList.remove('hidden')
+                this.#getElementByIdId('title-label').innerHTML = "Er is een fout opgetreden";
+                this.#getElementByIdId('description-label').innerHTML = "We konden geen auto vinden met de kenteken " + licensePlate.value;
+            }
         });
 
     }

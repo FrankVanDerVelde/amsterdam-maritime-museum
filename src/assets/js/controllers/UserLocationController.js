@@ -176,7 +176,7 @@ export class UserLocationController extends Controller {
     }
 
     #showNoLocationsFoundError(locationName) {
-        this.#updateErrorDescription(`We konden geen locatie vinden met de naan '${locationName}'`);
+        this.#updateErrorDescription(`We konden geen locatie vinden met de naam '${locationName}'`);
         this.#showsErrorBox(true);
     }
 

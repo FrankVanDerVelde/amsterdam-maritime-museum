@@ -64,10 +64,15 @@
         </div>
     </div>
 
-    <div id="licensePlateContainer" class="justify-self-center hidden pt-[13px]">
+    <div id="licensePlateContainer" class="justify-self-center hidden p -[13px]">
         <p class="text-center" autocapitalize="characters">Kenteken</p>
         <input class="licensePlate" id="inputLicensePlate" type="text" placeholder="XX-XX-XX">
         <button class="primary-button" id="submitLicensePlate">Submit</button>
+    </div>
+
+    <div id="errorContainer" class="p-4 bg-supporting_red-100 rounded rounded-lg border-l border-l-8 border-l-supporting_red-400 pt-[13px] hidden">
+        <p class="font-bold text-supporting_red-500" id="title-label"></p>
+        <p class="text-supporting_red-500" id="description-label"></p>
     </div>
 
     <div class="application-continue-container" id="continue-container">
