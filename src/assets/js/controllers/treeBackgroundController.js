@@ -20,6 +20,8 @@ export class TreeBackgroundController extends Controller {
     #boatSheet;
     // Sprite sheet with the boats
     #cloudSheet;
+    // Sprite sheet with dead trees
+    #deadTreeSheet;
     // This array holds the coordinates of the grid scares and their contents
     #gridSquares = [];
     // The base dimension for trees
@@ -52,9 +54,6 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
 
         const chosenVehicle = localStorage.getItem('chosenVehicle');
-
-        console.log(localStorage)
-        // !localStorage.getItem('chosenFuel') && localStorage.setItem('chosenFuel', 'diesel');
 
         let result;
         let iconCode;
@@ -126,7 +125,8 @@ export class TreeBackgroundController extends Controller {
                     element.classList.add('active');
                     
                     if (chosenVehicle === 'car') {
-                        result = await this.#calculatorRepository.getCarbonEmissionForCar();
+                        // console.log(localStorage.getItem('typeFuelCar'))
+                        // result = this.#networkManager.doRequest(`/calculator/car?car=` +  'diesel' + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     } else {
                         result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle+ `=` +newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     }
@@ -142,10 +142,6 @@ export class TreeBackgroundController extends Controller {
         });
 
         await this.#manageTrees();
-    }
-
-    async #vehicleControls() {
-        // vehicle-icons-container
     }
 
     async #setUpCanvas() {
@@ -186,6 +182,7 @@ export class TreeBackgroundController extends Controller {
         this.#treeSheet = await loadSpriteSheet('treespritesheet');
         this.#boatSheet = await loadSpriteSheet('boatspritesheet');
         this.#cloudSheet = await loadSpriteSheet('cloudsspritesheet');
+        this.#deadTreeSheet = await loadSpriteSheet('deadtreespritesheet');
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
@@ -388,36 +385,6 @@ export class TreeBackgroundController extends Controller {
                         originalSprite.x += movementChange;
                     }
                 });
-
-                // if (Math.floor(originalSprite.x) === leavingScreenPos) {
-                //     spriteCopy.x = offScreenStartPos;
-                //     spriteCopy.visible = true;
-                //     spriteTwoActive = true;
-                // }
-
-                // if (Math.floor(originalSprite.x) === fullyLeftScreenPos) {
-                //     spriteOneActive = false;
-                //     originalSprite.visible = false;
-                // }
-
-                // if (Math.floor(spriteCopy.x) === leavingScreenPos) {
-                //     originalSprite.x = offScreenStartPos;
-                //     originalSprite.visible = true;
-                //     spriteOneActive = true;
-                // }
-
-                // if (Math.floor(spriteCopy.x) === fullyLeftScreenPos) {
-                //     spriteTwoActive = false;
-                //     spriteCopy.visible = true;
-                // }
-
-                // if (spriteOneActive === true) {
-                //     originalSprite.x += movementChange;
-                // }
-
-                // if (spriteTwoActive === true) {
-                //     spriteCopy.x += movementChange;
-                // }
 
             });
 
