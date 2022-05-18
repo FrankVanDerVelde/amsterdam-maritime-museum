@@ -65,6 +65,29 @@
     @apply font-medium
 }
 
+/* Choose vehicle */
+
+.licensePlate{
+    height: 50px;
+    width: 150px;
+    border-radius: 0.5rem;
+    border: 3px solid black;
+    --tw-bg-opacity: 1;
+    @apply bg-supporting_yellow-500;
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 20px;
+    --tw-text-opacity: 1;
+    color: rgb(rgb(0 0 0 / 0.1) / var(--tw-text-opacity));
+}
+
+.licensePlate:focus{
+    border-color: black;
+    box-shadow: none;
+    outline: none;
+}
+
 /* Activity Indicator */
 
 .lds-ring {
@@ -107,3 +130,15 @@
     }
 }
 
+/* tree background page */
+
+#vehicle-icons-container > div.inactive {
+    color: #d3d3d3;
+    border-color: #d3d3d3;
+}
+
+#vehicle-icons-container > div.active {
+    color: rgb(0 78 86);
+    border: 2px solid rgb(0 78 86);
+    font-weight: bold;
+}

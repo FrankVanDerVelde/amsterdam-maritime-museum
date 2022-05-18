@@ -1,0 +1,63 @@
+{"frames": {
+
+"deadtree0.png":
+{
+	"frame": {"x":0,"y":0,"w":378,"h":616},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":378,"h":616},
+	"sourceSize": {"w":378,"h":616}
+},
+"deadtree1.png":
+{
+	"frame": {"x":378,"y":0,"w":561,"h":665},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":561,"h":665},
+	"sourceSize": {"w":561,"h":665}
+},
+"deadtree2.png":
+{
+	"frame": {"x":0,"y":665,"w":389,"h":665},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":389,"h":665},
+	"sourceSize": {"w":389,"h":665}
+},
+"deadtree3.png":
+{
+	"frame": {"x":389,"y":665,"w":438,"h":665},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":438,"h":665},
+	"sourceSize": {"w":438,"h":665}
+},
+"deadtree4.png":
+{
+	"frame": {"x":0,"y":1330,"w":567,"h":665},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":567,"h":665},
+	"sourceSize": {"w":567,"h":665}
+},
+"deadtree5.png":
+{
+	"frame": {"x":567,"y":1330,"w":438,"h":665},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":438,"h":665},
+	"sourceSize": {"w":438,"h":665}
+}},
+"animations": {
+	"deadtree": ["deadtree0.png","deadtree1.png","deadtree2.png","deadtree3.png","deadtree4.png","deadtree5.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "deadtreespritesheet.png",
+	"format": "RGBA8888",
+	"size": {"w":1005,"h":1995},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:b152d99ccc677277041fab5b695b86b5:704685f048a830f105f2d1da5efb15f9:0e333accf17d876e6e26cf7dee0154d3$"
+}
+}

@@ -4,9 +4,15 @@
 
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
+import { calculatorRepository } from "../repositories/calculatorRepository.js";
+import { NetworkManager } from "../framework/utils/networkManager.js";
 
+import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
+import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
 
 export class TreeBackgroundController extends Controller {
+    #calculatorRepository;
+
     // The view that holds the html for the tree background
 
     #treeBackgroundView;
@@ -18,6 +24,8 @@ export class TreeBackgroundController extends Controller {
     #boatSheet;
     // Sprite sheet with the boats
     #cloudSheet;
+    // Sprite sheet with dead trees
+    #deadTreeSheet;
     // This array holds the coordinates of the grid scares and their contents
     #gridSquares = [];
     // The base dimension for trees
@@ -26,144 +34,125 @@ export class TreeBackgroundController extends Controller {
     #backgroundDivision = [60, 5, 35];
 
     #pixiTreeContainer = new PIXI.Container();
-    
+
+    #nsDialogWorker = new NSDialogWorker();
+
+    // Number of trees
+    #treeCount;
+
+    #networkManager;
+
     constructor() {
         super();
 
-        this.#setupView();
+        this.#calculatorRepository = new calculatorRepository();
+
+        // this.#setupView().then();
+
+        this.#networkManager = new NetworkManager();
+
+        this.#setupView().then();
     }
 
     async #setupView() {
-        this.#treeBackgroundView = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+        const html = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+        this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
-        await this.#manageTrees();
+        this.#setupNSPopup();
 
+        const chosenVehicle = localStorage.getItem('chosenVehicle');
 
+        let result;
+        let iconCode;
+        let vehicleNameDutch;
 
+        switch (chosenVehicle) {
+            case 'car':
+                iconCode = 'fa-car';
+                vehicleNameDutch = 'auto';
+                break;
+            case 'train':
+                iconCode = 'fa-train';
+                vehicleNameDutch = 'trein';
+                break;
+            case 'bike':
+                iconCode = 'fa-bicycle';
+                vehicleNameDutch = 'fiets';
+                break;
+            case 'bus':
+                iconCode = 'fa-bus';
+                vehicleNameDutch = 'bus';
+                break;
+            case 'tram':
+                iconCode = 'fa-train-tram';
+                vehicleNameDutch = 'tram';
+                break;
+            case 'walk':
+                iconCode = 'fa-person-walking';
+                vehicleNameDutch = 'lopend';
+                break;
+            default:
+            // code block
+        }
 
-        const carbonEmission = localStorage.getItem('usersDistanceToMuseum');
-        console.log(carbonEmission);
-        document.querySelector(".carbonEmissionView").innerHTML = carbonEmission;
-
-
-
-    }
-
-    #createBasicSprite(spriteObject, sheet) {
-        const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
-
-        if (!spriteObject.height || spriteObject.height === 'auto') {
-            const sizePercentageOfOriginalImage = (spriteObject.width * 100) / sprite.width;
-            sprite.height = Math.floor((sprite.height * sizePercentageOfOriginalImage) / 100);
+        if (chosenVehicle === 'car') {
+            result = await this.#calculatorRepository.getCarbonEmissionForCar();
         } else {
-            sprite.height = spriteObject.height;
+            result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
         }
 
-        sprite.x = spriteObject.basePosX;
-        sprite.y = spriteObject.basePosY;
+        console.log(result);
 
-        sprite.width = spriteObject.width;
+        // Set the amount of trees then manage tree sprites
+        this.#treeCount = result.trees;
 
-        // If the sprite is going in the opposite direction flip it
-        if (spriteObject.direction && spriteObject.direction == 'left') {
-            sprite.scale.x = -sprite.scale.x;
-        }
-        
-        spriteObject.zIndex && (sprite.zIndex = spriteObject.zIndex);
+        // Set values of first travel submissions
+        html.querySelector('#emissions').innerHTML = Math.round(result.CO2);
+        html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
+        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
 
-        // Sets the sprites anchor to bottom, center
-        sprite.anchor.set(0.5, 1);
+        // .removeAttribute("class")
+        const htmlIconElement = html.querySelector('#vehicle-icon');
+        htmlIconElement.classList.add('fa-solid');
+        htmlIconElement.classList.add(iconCode);
 
-        return sprite;
-    }
+        // The on click that will handle thew new emissions
+        html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
+            const newVehicle = element.dataset.vehicle;
 
-    #createSideScrollingSprites(spritesArray, sheet) {
-        const createBasicSprite = this.#createBasicSprite;
-        const app = this.#canvasApp;
-        const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
+            if (chosenVehicle !== newVehicle) {
+                element.addEventListener('click', async () => {
+                    let result;
 
-        const spritesObjectArray = [];
+                    // See if an element is active and if so remove active
+                    const currentActive = html.querySelector('#vehicle-icons-container > div.active');
+                    currentActive && currentActive.classList.remove('active');
 
-        spritesArray.forEach(spriteObject => {
-            const originalSprite = createBasicSprite(spriteObject, sheet);
-            const spriteCopy = createBasicSprite(spriteObject, sheet);
+                    // Apply active to clicked element
+                    element.classList.add('active');
 
-            spritesObjectArray.push({"sprite": originalSprite, "sprite_copy": spriteCopy})
+                    if (chosenVehicle === 'car') {
+                        // console.log(localStorage.getItem('typeFuelCar'))
+                        // result = this.#networkManager.doRequest(`/calculator/car?car=` +  'diesel' + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                    } else {
+                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                    }
 
-            spriteCopy.visible = false;
+                    this.#treeCount = result.trees;
 
-            app.stage.addChild(originalSprite);
-            app.stage.addChild(spriteCopy);
+                    html.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
 
-            let spriteOneActive = true;
-            let spriteTwoActive = false;
-
-            let speed = spriteObject.speed ? spriteObject.speed : 1;
-
-            app.ticker.add((delta) => {
-                // Note: The sprites x pos is when checking is in the middle of the image
-                const leavingScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth - originalSprite.width / 2 : originalSprite.width / 2;
-                const fullyLeftScreenPos = spriteObject.direction == 'right' ? canvasDiv.offsetWidth + originalSprite.width / 2 : -(originalSprite.width / 2);
-                const offScreenStartPos = spriteObject.direction == 'right' ? -spriteObject.width : canvasDiv.offsetWidth + spriteObject.width;
-                let movementChange = spriteObject.direction == 'right' ? speed : -(speed);
-                movementChange = parseFloat(movementChange.toFixed(2));
-                
-                // console.log(canvasDiv.offsetWidth)
-               
-                // [originalSprite, spriteCopy].forEach(sprite => {
-                //     if (Math.floor(sprite.x) == leavingScreenPos) {
-                //         spriteTwoActive = true;
-                //     }
-
-                //     // When the sprite touches the edge of the screen with it's back
-                //     if (Math.floor(sprite.x) == fullyLeftScreenPos) {
-                //         spriteOneActive = false;
-                //         originalSprite.x = offScreenStartPos;
-                //     }
-                // });
-
-                // [spriteOneActive, spriteTwoActive].forEach(spriteState => {
-                //     if (spriteState == true) {
-                //         originalSprite.x += movementChange;
-                //     }
-                // });
-
-                if (Math.floor(originalSprite.x) == leavingScreenPos) {
-                    spriteCopy.x = offScreenStartPos;
-                    spriteCopy.visible = true;
-                    spriteTwoActive = true;
-                }
-
-                if (Math.floor(originalSprite.x) == fullyLeftScreenPos) {
-                    spriteOneActive = false;
-                    originalSprite.visible = false;
-                }
-
-                if (Math.floor(spriteCopy.x) == leavingScreenPos) {
-                    originalSprite.x = offScreenStartPos;
-                    originalSprite.visible = true;
-                    spriteOneActive = true;
-                }
-
-                if (Math.floor(spriteCopy.x) == fullyLeftScreenPos) {
-                    spriteTwoActive = false;
-                    spriteCopy.visible = true;
-                }
-                
-                if (spriteOneActive == true) {
-                    originalSprite.x += movementChange;
-                }
-
-                if (spriteTwoActive == true) {
-                    spriteCopy.x += movementChange;
-                }
-
-            });
+                    // Run tree management to update
+                    await this.#manageTrees();
+                });
+            } else {
+                element.classList.add('inactive');
+            }
 
         });
 
-        return spritesObjectArray;
+        await this.#manageTrees();
     }
 
     async #setUpCanvas() {
@@ -204,12 +193,13 @@ export class TreeBackgroundController extends Controller {
         this.#treeSheet = await loadSpriteSheet('treespritesheet');
         this.#boatSheet = await loadSpriteSheet('boatspritesheet');
         this.#cloudSheet = await loadSpriteSheet('cloudsspritesheet');
+        this.#deadTreeSheet = await loadSpriteSheet('deadtreespritesheet');
 
         // Append the canvas to the chosen div with the pixi app settings
         canvasDiv.appendChild(app.view);
 
         const canvas = app.view;
-        
+
         this.#pixiTreeContainer.sortableChildren = true;
         app.stage.addChild(this.#pixiTreeContainer);
 
@@ -223,16 +213,56 @@ export class TreeBackgroundController extends Controller {
         const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
         const ySquares = Math.floor(treeAreaHeight / treeDimension)
 
+        const treeSheet = this.#treeSheet;
+        const deadTreeSheet = this.#deadTreeSheet;
+
+        const treeContainer = this.#pixiTreeContainer;
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
+                const uniqueTreeAssets = 5;
+                const baseXpos = x * treeDimension + (treeDimension / 2);
+                const baseYpos = y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight);
+
+                const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+                const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
+
+                const tree = createBasicSprite(
+                    {
+                        width: variableSize,
+                        height: variableSize,
+                        img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                        basePosX: baseXpos + Math.random() * (treeDimension / 2),
+                        basePosY: baseYpos + Math.random() * (treeDimension / 2),
+                        zIndex: y
+                    }, treeSheet
+                );
+
+                const deadTree = createBasicSprite(
+                    {
+                        width: variableSize,
+                        height: variableSize,
+                        img: `deadtree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                        basePosX: baseXpos + Math.random() * (treeDimension / 2),
+                        basePosY: baseYpos + Math.random() * (treeDimension / 2),
+                        zIndex: y
+                    }, deadTreeSheet
+                );
+
+                deadTree.visible = false;
+
+                treeContainer.addChild(tree);
+                treeContainer.addChild(deadTree);
+
                 this.#gridSquares.push({
-                    xBaseCoordinate: x * treeDimension + (treeDimension / 2),
-                    yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
-                    spriteReference: null,
+                    xBaseCoordinate: baseXpos,
+                    yBaseCoordinate: baseYpos,
+                    treeSprite: tree,
+                    deadTreeSprite: deadTree,
                     row: y
                 })
             }
-        }  
+        }
 
         const boatSheet = this.#boatSheet;
         const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
@@ -242,7 +272,7 @@ export class TreeBackgroundController extends Controller {
         let xNegative = 0;
         boatSprites = boatSprites.map(boat => {
             boat.direction = Math.round(Math.random()) ? 'right' : 'left';
-            if (boat.direction == 'right') {
+            if (boat.direction === 'right') {
                 xNegative -= boat.width - 10;
                 boat.basePosX = xNegative;
             } else {
@@ -252,7 +282,7 @@ export class TreeBackgroundController extends Controller {
             boat.basePosY = boatArea;
             return boat;
         })
-        
+
         // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
         const cloudSheet = this.#cloudSheet;
         // The canvas area for the sky
@@ -261,7 +291,7 @@ export class TreeBackgroundController extends Controller {
         const cloudDirection = Math.round(Math.random()) ? 'right' : 'left';
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
-            if (cloudDirection == 'right') {
+            if (cloudDirection === 'right') {
                 xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
                 cloud.basePosX = xNegative;
             } else {
@@ -276,22 +306,22 @@ export class TreeBackgroundController extends Controller {
             return cloud;
         })
 
-        const boatSpriteReferences = this.#createSideScrollingSprites(boatSprites, boatSheet)
-        const cloudSpriteReferences = this.#createSideScrollingSprites(cloudSprites, cloudSheet)
+        const boatSpriteReferences = createSideScrollingSprites(boatSprites, boatSheet, app, canvasDiv.offsetWidth);
+        const cloudSpriteReferences = createSideScrollingSprites(cloudSprites, cloudSheet, app, canvasDiv.offsetWidth);
 
-         // update y pos
-            window.addEventListener('resize', () => {
-                // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
-                const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
-                boatSpriteReferences.forEach(boatObject => {
-                    boatObject.sprite.y = newBoatArea;
-                    boatObject.sprite_copy.y = newBoatArea;
-                });
-    
-                // cloudSpriteReferences.forEach(cloud => {
-    
-                // })
+        // update y pos
+        window.addEventListener('resize', () => {
+            // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+            const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
+            boatSpriteReferences.forEach(boatObject => {
+                boatObject.sprite.y = newBoatArea;
+                boatObject.sprite_copy.y = newBoatArea;
             });
+
+            // cloudSpriteReferences.forEach(cloud => {
+
+            // })
+        });
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
@@ -343,8 +373,6 @@ export class TreeBackgroundController extends Controller {
 
         const treeContainer = this.#pixiTreeContainer;
 
-        const createBasicSprite = this.#createBasicSprite;
-
         function getRandomX() {
             const min = Math.floor(0);
             const max = Math.ceil(canvas.renderer.width / 2.5) + offSet;
@@ -357,79 +385,38 @@ export class TreeBackgroundController extends Controller {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        const verbruikInput = this.#treeBackgroundView.querySelector("#verbruik");
-        const afstandInput = this.#treeBackgroundView.querySelector("#afstand");
-
-        verbruikInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
-
-        afstandInput.addEventListener("change", function () {
-            totalTrees = parseInt(verbruikInput.value) + parseInt(afstandInput.value);
-            updateTrees();
-        });
+        totalTrees = Math.round(this.#treeCount.day);
+        updateTrees();
 
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
-            let visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
-            let disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
+            let visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+            let disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
 
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
-                    // If disabled trees exist enable those first, else create a new one
-                    if (disabledTrees.length > 0) {
-                        disabledTrees[0].spriteReference.visible = true;
-                    } else {
-                        if (placementGrid.filter(gridObject => gridObject.spriteReference == null).length != 0) {
-                            createTree();
-                        } else {
-                            break;
-                        }
-                    }
-                    disabledTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == false);
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true);
+                    const randomPosToToggle = Math.floor(Math.random() * disabledTrees.length);
+                    disabledTrees[randomPosToToggle].deadTreeSprite.visible = true;
+                    disabledTrees[randomPosToToggle].treeSprite.visible = false;
+
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
                 }
-            } else if (visibleTrees.length > totalTrees) {
+            } else {
                 while (visibleTrees.length > totalTrees) {
-                    visibleTrees[Math.floor(Math.random() * visibleTrees.length)].spriteReference.visible = false;
-                    visibleTrees = placementGrid.filter(gridObject => gridObject.spriteReference != null && gridObject.spriteReference.visible == true)
+                    const randomPosToToggle = Math.floor(Math.random() * visibleTrees.length);
+                    visibleTrees[randomPosToToggle].deadTreeSprite.visible = false;
+                    visibleTrees[randomPosToToggle].treeSprite.visible = true;
+
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
                 }
             }
         }
+    }
 
-        function createTree() {
-            // Check for all the possible empty grid spaces
-            const emptyGridSpaces = placementGrid.filter(gridObject => gridObject.spriteReference == null);
-
-            // Randomly choose a random grid space to use
-            const targetEmptySpace = emptyGridSpaces[Math.floor(Math.random() * emptyGridSpaces.length)];
-
-            // Get the index of the selected space in the original array
-            const getIndexOfSelectedSpace = (gridSpace) => gridSpace == targetEmptySpace;
-            const gridSpaceIndex = placementGrid.findIndex(getIndexOfSelectedSpace);
-
-            const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
-            const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
-            const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
-
-            const sprite = createBasicSprite(
-                {
-                    width: variableSize,
-                    height: variableSize,
-                    img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
-                    basePosX: targetEmptySpace.xBaseCoordinate + Math.random() * (treeDimension / 2),
-                    basePosY: targetEmptySpace.yBaseCoordinate + Math.random() * (treeDimension / 2),
-                    zIndex: targetEmptySpace.row
-                }, treeSheet
-            );
-
-            treeContainer.addChild(sprite);
-
-            // Add the reference to the sprite to an array
-            placementGrid[gridSpaceIndex].spriteReference = sprite;
-
-
-        }
+    #setupNSPopup() {
+        this.#nsDialogWorker.setView(this.#treeBackgroundView)
+        this.#nsDialogWorker.setup();
     }
 }

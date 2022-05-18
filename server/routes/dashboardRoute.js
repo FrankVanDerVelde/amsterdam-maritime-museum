@@ -27,6 +27,7 @@ class DashboardRoute {
         //method for calculating reduced emissions
         this.#getSavedEmissions()
 
+        //method to keep up visitor amount
         this.#createVisitor();
     }
 
@@ -87,7 +88,7 @@ class DashboardRoute {
         this.#app.get("/dashboard/getDistanceAveragePerVisitor", async (req, res) => {
             try {
                 const data = await this.#databaseHelper.handleQuery({
-                    query: "SELECT ROUND(SUM(distance)/COUNT(id), 2) AS 'average_distance_travelled' FROM pad_svm_5_dev.submissions;",
+                    query: "SELECT ROUND(AVG(distance), 2) AS 'average_distance_travelled' FROM pad_svm_5_dev.submissions;",
                 });
 
                 //just give all data back as json, could also be empty
@@ -102,7 +103,7 @@ class DashboardRoute {
         this.#app.get("/dashboard/getSavedEmissions", async (req, res) => {
             try {
                 const data = await this.#databaseHelper.handleQuery({
-                    query: "SELECT (Sum(original_CO2)/Count(id)) - (Sum(final_CO2)/Count(id)) AS 'saved_emissions' FROM pad_svm_5_dev.submissions;",
+                    query: "SELECT ROUND(AVG(original_CO2)) - ROUND(AVG(final_CO2)) AS 'saved_emissions' FROM pad_svm_5_dev.submissions;",
                 });
 
                 //just give all data back as json, could also be empty

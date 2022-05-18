@@ -1,7 +1,8 @@
 import {Controller} from "./controller.js";
 import {MapRepository} from "../repositories/mapRepository.js";
 import {DashboardRepository} from "../repositories/dashboardRepository.js";
-import {debounce} from "../utils/debounce.js";
+import {
+    debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
 
@@ -176,7 +177,7 @@ export class UserLocationController extends Controller {
     }
 
     #showNoLocationsFoundError(locationName) {
-        this.#updateErrorDescription(`We konden geen locatie vinden met de naan '${locationName}'`);
+        this.#updateErrorDescription(`We konden geen locatie vinden met de naam '${locationName}'`);
         this.#showsErrorBox(true);
     }
 
