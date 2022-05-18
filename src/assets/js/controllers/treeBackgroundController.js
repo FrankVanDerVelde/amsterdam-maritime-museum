@@ -94,7 +94,7 @@ export class TreeBackgroundController extends Controller {
         this.#treeCount = results.trees;
 
         // Set values of first travel submissions
-        html.querySelector('#emissions').innerHTML = results.CO2;
+        html.querySelector('#emissions').innerHTML = Math.round(results.CO2);
         html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
         html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
 
@@ -102,6 +102,34 @@ export class TreeBackgroundController extends Controller {
         const htmlIconElement = html.querySelector('#vehicle-icon');
         htmlIconElement.classList.add('fa-solid');
         htmlIconElement.classList.add(iconCode);
+
+        html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
+            element.addEventListener('click', () => {
+                switch (element.dataset.vehicle) {
+                    case 'car':
+                        console.log('car')
+                        break;
+                    case 'train':
+                        console.log('train')
+                        break;
+                    case 'bike':
+                        console.log('bike')
+                        break;
+                    case 'bus':
+                        console.log('bus')
+                        break;
+                    case 'tram':
+                        console.log('tram')
+                        break;
+                    case 'walk':
+                        console.log('walk')
+                        break;
+                    default:
+                    // code block
+                }
+            });
+            
+        });
 
         await this.#manageTrees();
     }
