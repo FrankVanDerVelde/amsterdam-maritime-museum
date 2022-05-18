@@ -3,10 +3,12 @@
  */
 import {App} from "../app.js";
 import {Controller} from "./controller.js";
+import {chooseVehicleRepository} from "../repositories/chooseVehicleRepository.js";
 
 export class ChooseVehicleController extends Controller {
     #chooseVehicleView;
     #chosenVehicle;
+    #chooseVehicleRepository = new chooseVehicleRepository();
 
     constructor() {
         super();
@@ -19,7 +21,8 @@ export class ChooseVehicleController extends Controller {
         this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
         this.#addEventListenersToVehicleOptions();
         this.#showsContinueButton(false)
-        this.#chooseVehicleView.querySelector("#licensePlate").addEventListener('input', this.#capitalizeInput);
+        this.#chooseVehicleView.querySelector("#licensePlateContainer").addEventListener('input', this.#capitalizeInput);
+        await this.#vehicleFuel();
     }
 
     #addEventListenersToVehicleOptions() {
@@ -52,9 +55,9 @@ export class ChooseVehicleController extends Controller {
     #checkCurrentlySelectedItemIsCarOption() {
         const car = this.#chooseVehicleView.querySelector('.car');
         if (car.classList.contains('active')) {
-            this.#chooseVehicleView.querySelector('#licensePlate').classList.remove("hidden");
+            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.remove('hidden');
         } else {
-            this.#chooseVehicleView.querySelector('#licensePlate').classList.add("hidden");
+            this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.add('hidden');
         }
     }
 
@@ -72,6 +75,29 @@ export class ChooseVehicleController extends Controller {
 
     #capitalizeInput(inputBox){
         inputBox.target.value = inputBox.target.value.toUpperCase();
+    }
+
+    #vehicleFuel(){
+        this.#chooseVehicleView.querySelector("#submitLicensePlate").addEventListener('click', async () => {
+            let licensePlate = this.#chooseVehicleView.querySelector('#inputLicensePlate');
+            try{
+                const data =await this.#chooseVehicleRepository.getVehicleFuel(licensePlate.value);
+
+                window.localStorage.setItem('fuel', data[0].toLowerCase());
+                this.#getElementByIdId('successContainer').classList.remove('hidden');
+                this.#getElementByIdId('errorContainer').classList.add('hidden');
+                this.#getElementByIdId('success-title-label').innerHTML = "Success";
+                this.#getElementByIdId('success-description-label').innerHTML = "U mag door naar het volgende scherm";
+
+
+            }catch (e){
+                this.#getElementByIdId('errorContainer').classList.remove('hidden');
+                this.#getElementByIdId('successContainer').classList.add('hidden');
+                this.#getElementByIdId('error-title-label').innerHTML = "Er is een fout opgetreden";
+                this.#getElementByIdId('error-description-label').innerHTML = "We konden geen auto vinden met de kenteken " + licensePlate.value;
+            }
+        });
+
     }
 
     #canContinue() {
