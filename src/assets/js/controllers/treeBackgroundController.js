@@ -5,7 +5,8 @@
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
 import { calculatorRepository } from "../repositories/calculatorRepository.js";
-import {NetworkManager} from "../framework/utils/networkManager.js";
+import { NSRepository } from "../repositories/NSRepository.js";
+
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
@@ -29,34 +30,28 @@ export class TreeBackgroundController extends Controller {
 
     #pixiTreeContainer = new PIXI.Container();
 
+    #nsRepo = new NSRepository();
+
     // Number of trees
     #treeCount;
-
-    #networkManager;
 
     constructor() {
         super();
 
         this.#calculatorRepository = new calculatorRepository();
 
-        this.#networkManager = new NetworkManager();
-
-        this.#setupView();
+        this.#setupView().then();
     }
 
     async #setupView() {
         const html = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
-
         this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
 
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
-        console.log(localStorage)
-        // !localStorage.getItem('chosenFuel') && localStorage.setItem('chosenFuel', 'diesel');
-
-        let result;
+        let results;
         let iconCode;
         let vehicleNameDutch;
 
@@ -90,18 +85,18 @@ export class TreeBackgroundController extends Controller {
         }
 
         if (chosenVehicle === 'car') {
-            result = await this.#calculatorRepository.getCarbonEmissionForCar();
+            results = await this.#calculatorRepository.getCarbonEmissionForCar();
         } else {
-            result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
+            results = await this.#calculatorRepository.getCarbonEmissionForVehicle();
         }
 
-        console.log(result);
+        console.log(results);
 
         // Set the amount of trees then manage tree sprites
-        this.#treeCount = result.trees;
+        this.#treeCount = results.trees;
 
         // Set values of first travel submissions
-        html.querySelector('#emissions').innerHTML = Math.round(result.CO2);
+        html.querySelector('#emissions').innerHTML = Math.round(results.CO2);
         html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
         html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
 
@@ -110,35 +105,32 @@ export class TreeBackgroundController extends Controller {
         htmlIconElement.classList.add('fa-solid');
         htmlIconElement.classList.add(iconCode);
 
-        // The on click that will handle thew new emissions
         html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
-            const newVehicle = element.dataset.vehicle;
-
-            if (chosenVehicle !== newVehicle) {
-                element.addEventListener('click', async () => {
-                    let result;
-                    
-                    // See if an element is active and if so remove active
-                    const currentActive = html.querySelector('#vehicle-icons-container > div.active');
-                    currentActive && currentActive.classList.remove('active');
-    
-                    // Apply active to clicked element
-                    element.classList.add('active');
-                    
-                    if (chosenVehicle === 'car') {
-                        result = await this.#calculatorRepository.getCarbonEmissionForCar();
-                    } else {
-                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle+ `=` +newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
-                    }
-    
-                    this.#treeCount = result.trees;
-    
-                    html.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
-                });
-            } else {
-                element.classList.add('inactive');
-            }
-
+            element.addEventListener('click', () => {
+                switch (element.dataset.vehicle) {
+                    case 'car':
+                        console.log('car')
+                        break;
+                    case 'train':
+                        console.log('train')
+                        break;
+                    case 'bike':
+                        console.log('bike')
+                        break;
+                    case 'bus':
+                        console.log('bus')
+                        break;
+                    case 'tram':
+                        console.log('tram')
+                        break;
+                    case 'walk':
+                        console.log('walk')
+                        break;
+                    default:
+                    // code block
+                }
+            });
+            
         });
 
         await this.#manageTrees();
@@ -520,4 +512,13 @@ export class TreeBackgroundController extends Controller {
 
         }
     }
+
+    #setupNSPopup() {
+        this.#showStations().then();
+    }
+
+    async #showStations() {
+
+    }
+
 }

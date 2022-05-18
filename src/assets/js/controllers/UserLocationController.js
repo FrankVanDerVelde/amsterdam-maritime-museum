@@ -1,7 +1,8 @@
 import {Controller} from "./controller.js";
 import {MapRepository} from "../repositories/mapRepository.js";
 import {DashboardRepository} from "../repositories/dashboardRepository.js";
-import {debounce} from "../utils/debounce.js";
+import {
+    debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
 
