@@ -6,8 +6,9 @@ import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
 import { calculatorRepository } from "../repositories/calculatorRepository.js";
 import {NetworkManager} from "../framework/utils/networkManager.js";
-import { NSRepository } from "../repositories/NSRepository.js";
+
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
+import {NSDialogWorker} from "../Workers/NSDialogWorker.js";
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
@@ -33,7 +34,7 @@ export class TreeBackgroundController extends Controller {
 
     #pixiTreeContainer = new PIXI.Container();
 
-    #nsRepo = new NSRepository();
+    #nsDialogWorker = new NSDialogWorker();
 
     // Number of trees
     #treeCount;
@@ -49,12 +50,11 @@ export class TreeBackgroundController extends Controller {
 
         this.#networkManager = new NetworkManager();
 
-        this.#setupView();
+        this.#setupView().then();
     }
 
     async #setupView() {
         const html = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
-
         this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
@@ -430,47 +430,7 @@ export class TreeBackgroundController extends Controller {
     }
 
     #setupNSPopup() {
-        this.#showStationList().then();
-
-        this.#treeBackgroundView
-            .querySelector('#ns-done-button')
-            .onclick = this.#calculateTripButtonClicked.bind(this);
-
-        this.#treeBackgroundView
-            .querySelector('#tram-vehicle')
-            .onclick = this.#toggleNSDialog.bind(this);
-
-        this.#treeBackgroundView
-            .querySelector('#ns-close-dialog-button')
-            .onclick = this.#toggleNSDialog.bind(this);
-    }
-
-    async #showStationList() {
-        let stationsSelect = this.#treeBackgroundView.querySelector('#stations');
-        let stations = await this.#nsRepo.getAllStations();
-        await stations.forEach( station => {
-            let opt = document.createElement('option');
-            opt.value = String(station.code);
-            opt.innerHTML = String(station.name);
-            stationsSelect.appendChild(opt);
-        })
-    }
-
-    async #calculateTripButtonClicked() {
-        let amountOfPeople = Number(this.#treeBackgroundView.querySelector('#ns-number-of-persons').value);
-        let stationCode = this.#treeBackgroundView.querySelector('#stations').value;
-
-        let results = await this.#nsRepo.getTripPrice(stationCode, "ASD")
-        this.#displayPrice(await results.results.priceInEuro * amountOfPeople)
-    }
-
-    #displayPrice(price) {
-        this.#treeBackgroundView.querySelectorAll('.ns-price-result-label').forEach((label) => {
-            label.innerHTML = `€${price}`
-        })
-    }
-
-    #toggleNSDialog() {
-        this.#treeBackgroundView.querySelector('#ns-dialog').classList.toggle('hidden');
+        this.#nsDialogWorker.setView(this.#treeBackgroundView)
+        this.#nsDialogWorker.setup();
     }
 }
