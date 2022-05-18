@@ -5,8 +5,8 @@
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
 import { calculatorRepository } from "../repositories/calculatorRepository.js";
+import {NetworkManager} from "../framework/utils/networkManager.js";
 import { NSRepository } from "../repositories/NSRepository.js";
-
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
@@ -37,16 +37,23 @@ export class TreeBackgroundController extends Controller {
     // Number of trees
     #treeCount;
 
+    #networkManager;
+
     constructor() {
         super();
 
         this.#calculatorRepository = new calculatorRepository();
 
-        this.#setupView().then();
+        // this.#setupView().then();
+
+        this.#networkManager = new NetworkManager();
+
+        this.#setupView();
     }
 
     async #setupView() {
         const html = await super.loadHtmlIntoContent("html_views/treeCanvas.html");
+
         this.#treeBackgroundView = html;
 
         await this.#setUpCanvas();
@@ -87,18 +94,18 @@ export class TreeBackgroundController extends Controller {
         }
 
         if (chosenVehicle === 'car') {
-            results = await this.#calculatorRepository.getCarbonEmissionForCar();
+            result = await this.#calculatorRepository.getCarbonEmissionForCar();
         } else {
-            results = await this.#calculatorRepository.getCarbonEmissionForVehicle();
+            result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
         }
 
-        console.log(results);
+        console.log(result);
 
         // Set the amount of trees then manage tree sprites
-        this.#treeCount = results.trees;
+        this.#treeCount = result.trees;
 
         // Set values of first travel submissions
-        html.querySelector('#emissions').innerHTML = Math.round(results.CO2);
+        html.querySelector('#emissions').innerHTML = Math.round(result.CO2);
         html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
         html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
 
@@ -107,6 +114,7 @@ export class TreeBackgroundController extends Controller {
         htmlIconElement.classList.add('fa-solid');
         htmlIconElement.classList.add(iconCode);
 
+        // The on click that will handle thew new emissions
         html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
             const newVehicle = element.dataset.vehicle;
 
