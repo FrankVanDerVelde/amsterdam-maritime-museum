@@ -11,7 +11,7 @@ class ChooseVehicleRoute {
     }
 
     #getVehicleFuel() {
-        this.#app.get("/choose-vehicle/getVehicleFuel:licensePlate", async (req, res) => {
+        this.#app.get("/choose_vehicle/getVehicleFuel/:licensePlate", async (req, res) => {
             const instance = axios.create({baseURL: 'https://api.overheid.io'})
 
             try {
@@ -22,11 +22,11 @@ class ChooseVehicleRoute {
                 let fuelTypes = []
 
                 for (const fuelType of data.data.brandstof) {
-                    console.log(fuelType);
+                    // console.log(fuelType);
                     fuelTypes.push(fuelType.brandstof_omschrijving)
                 }
 
-                console.log(fuelTypes);
+                // console.log(fuelTypes);
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json(fuelTypes);
             } catch (e) {

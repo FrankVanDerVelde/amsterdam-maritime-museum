@@ -5,12 +5,11 @@ export class chooseVehicleRepository{
     #networkManager
 
     constructor() {
-        this.#route = "/choose-vehicle"
+        this.#route = "/choose_vehicle"
         this.#networkManager = new NetworkManager();
     }
 
     async getVehicleFuel(licensePlate){
-        return await  this.#networkManager.doRequest(`${this.#route}/getVehicleFuel:licensePlate=${licensePlate}`,
-            "GET")
+        return await this.#networkManager.doRequest(`${this.#route}/getVehicleFuel/${licensePlate}`, "GET")
     }
 }
