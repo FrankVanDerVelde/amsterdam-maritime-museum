@@ -208,11 +208,35 @@ export class TreeBackgroundController extends Controller {
         const xSquares = Math.floor(canvasDiv.offsetWidth / treeDimension)
         const ySquares = Math.floor(treeAreaHeight / treeDimension)
 
+        const treeSheet = this.#treeSheet;
+        const treeContainer = this.#pixiTreeContainer;
         for (let x = 0; x < xSquares; x++) {
             for (let y = 0; y < ySquares; y++) {
+                const uniqueTreeAssets = 5;
+                const baseXpos = x * treeDimension + (treeDimension / 2);
+                const baseYpos = y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight);
+
+                const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+                const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
+
+                const sprite = createBasicSprite(
+                    {
+                        width: variableSize,
+                        height: variableSize,
+                        img: `tree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
+                        basePosX: baseXpos + Math.random() * (treeDimension / 2),
+                        basePosY: baseYpos + Math.random() * (treeDimension / 2),
+                        zIndex: y
+                    }, treeSheet
+                );
+    
+                treeContainer.addChild(sprite);
+
                 this.#gridSquares.push({
-                    xBaseCoordinate: x * treeDimension + (treeDimension / 2),
-                    yBaseCoordinate: y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight),
+                    xBaseCoordinate: baseXpos,
+                    yBaseCoordinate: baseYpos,
+                    treeSprite: sprite,
                     spriteReference: null,
                     row: y
                 })
@@ -401,8 +425,6 @@ export class TreeBackgroundController extends Controller {
 
             // Add the reference to the sprite to an array
             placementGrid[gridSpaceIndex].spriteReference = sprite;
-
-
         }
     }
 
