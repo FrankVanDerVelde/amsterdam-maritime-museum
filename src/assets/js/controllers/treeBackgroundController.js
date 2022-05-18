@@ -5,10 +5,10 @@
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
 import { calculatorRepository } from "../repositories/calculatorRepository.js";
-import {NetworkManager} from "../framework/utils/networkManager.js";
+import { NetworkManager } from "../framework/utils/networkManager.js";
 
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
-import {NSDialogWorker} from "../Workers/NSDialogWorker.js";
+import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
@@ -123,24 +123,27 @@ export class TreeBackgroundController extends Controller {
             if (chosenVehicle !== newVehicle) {
                 element.addEventListener('click', async () => {
                     let result;
-                    
+
                     // See if an element is active and if so remove active
                     const currentActive = html.querySelector('#vehicle-icons-container > div.active');
                     currentActive && currentActive.classList.remove('active');
-    
+
                     // Apply active to clicked element
                     element.classList.add('active');
-                    
+
                     if (chosenVehicle === 'car') {
                         // console.log(localStorage.getItem('typeFuelCar'))
                         // result = this.#networkManager.doRequest(`/calculator/car?car=` +  'diesel' + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     } else {
-                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle+ `=` +newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     }
-    
+
                     this.#treeCount = result.trees;
-    
+
                     html.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
+
+                    // Run tree management to update
+                    await this.#manageTrees();
                 });
             } else {
                 element.classList.add('inactive');
@@ -246,7 +249,7 @@ export class TreeBackgroundController extends Controller {
                 );
 
                 deadTree.visible = false;
-    
+
                 treeContainer.addChild(tree);
                 treeContainer.addChild(deadTree);
 
@@ -388,17 +391,16 @@ export class TreeBackgroundController extends Controller {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
             let visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
             let disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
-            
+
             if (visibleTrees.length < totalTrees) {
                 while (visibleTrees.length < totalTrees) {
-                const randomPosToToggle = Math.floor(Math.random() * disabledTrees.length);
-                disabledTrees[randomPosToToggle].deadTreeSprite.visible = true;
-                disabledTrees[randomPosToToggle].treeSprite.visible = false;
+                    const randomPosToToggle = Math.floor(Math.random() * disabledTrees.length);
+                    disabledTrees[randomPosToToggle].deadTreeSprite.visible = true;
+                    disabledTrees[randomPosToToggle].treeSprite.visible = false;
 
-                visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
-                disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
-                console.log(visibleTrees.length, totalTrees);
-                } 
+                    visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
+                }
             } else {
                 while (visibleTrees.length > totalTrees) {
                     const randomPosToToggle = Math.floor(Math.random() * visibleTrees.length);
@@ -406,7 +408,7 @@ export class TreeBackgroundController extends Controller {
                     visibleTrees[randomPosToToggle].treeSprite.visible = true;
 
                     visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
-                     disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
+                    disabledTrees = placementGrid.filter(gridObject => gridObject.treeSprite.visible === true);
                 }
             }
         }
