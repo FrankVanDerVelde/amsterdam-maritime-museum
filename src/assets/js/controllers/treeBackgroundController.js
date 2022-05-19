@@ -134,9 +134,9 @@ export class TreeBackgroundController extends Controller {
                     element.classList.add('active');
                     
                     if (newVehicle === 'car') {
-                        result = await this.#calculatorRepository.getCarbonEmissionForCar();
+                        result = await this.#networkManager.doRequest(`/calculator/car?car=` +  (localStorage.getItem('fuel') ? localStorage.getItem('fuel') : 'diesel') + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     } else {
-                        result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
+                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     }
 
                     this.#treeCount = result.trees;
