@@ -14,6 +14,7 @@ export class TreeBackgroundController extends Controller {
     #calculatorRepository;
 
     // The view that holds the html for the tree background
+
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
