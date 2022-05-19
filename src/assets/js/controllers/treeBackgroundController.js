@@ -92,7 +92,7 @@ export class TreeBackgroundController extends Controller {
                 vehicleNameDutch = 'lopend';
                 break;
             default:
-            // code block
+                break;
         }
 
         if (chosenVehicle === 'car') {
@@ -415,7 +415,7 @@ export class TreeBackgroundController extends Controller {
     }
 
     #setupNSPopup() {
-        this.#nsDialogWorker.setView(this.#treeBackgroundView)
+        this.#nsDialogWorker.setView(this.#treeBackgroundView);
         this.#nsDialogWorker.setup();
     }
 }
