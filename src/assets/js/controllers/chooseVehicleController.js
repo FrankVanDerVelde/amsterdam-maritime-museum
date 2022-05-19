@@ -9,6 +9,7 @@ export class ChooseVehicleController extends Controller {
     #chooseVehicleView;
     #chosenVehicle;
     #chooseVehicleRepository = new chooseVehicleRepository();
+    #isChoseVehicleCar;
 
     constructor() {
         super();
@@ -18,6 +19,7 @@ export class ChooseVehicleController extends Controller {
     }
 
     async #setupView() {
+        window.localStorage.removeItem('fuel');
         this.#chooseVehicleView = await super.loadHtmlIntoContent("html_views/chooseVehicle.html");
         this.#addEventListenersToVehicleOptions();
         this.#showsContinueButton(false)
@@ -56,8 +58,10 @@ export class ChooseVehicleController extends Controller {
         const car = this.#chooseVehicleView.querySelector('.car');
         if (car.classList.contains('active')) {
             this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.remove('hidden');
+            this.#isChoseVehicleCar = true;
         } else {
             this.#chooseVehicleView.querySelector('#licensePlateContainer').classList.add('hidden');
+            this.#isChoseVehicleCar = false;
         }
     }
 
@@ -89,19 +93,25 @@ export class ChooseVehicleController extends Controller {
                 this.#getElementByIdId('success-title-label').innerHTML = "Success";
                 this.#getElementByIdId('success-description-label').innerHTML = "U mag door naar het volgende scherm";
 
-
             }catch (e){
                 this.#getElementByIdId('errorContainer').classList.remove('hidden');
                 this.#getElementByIdId('successContainer').classList.add('hidden');
                 this.#getElementByIdId('error-title-label').innerHTML = "Er is een fout opgetreden";
                 this.#getElementByIdId('error-description-label').innerHTML = "We konden geen auto vinden met de kenteken " + licensePlate.value;
+                window.localStorage.removeItem('fuel');
             }
         });
 
     }
 
     #canContinue() {
-        return (this.#chosenVehicle !== undefined)
+        if (this.#getElementByIdId('successContainer').classList.contains('hidden') === false){
+            return true;
+        }else if (this.#isChoseVehicleCar === true) {
+            return false;
+        }
+
+        return (this.#chosenVehicle !== undefined);
     }
 
     #handleContinueButtonClicked() {
