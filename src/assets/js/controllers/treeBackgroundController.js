@@ -123,6 +123,7 @@ export class TreeBackgroundController extends Controller {
             if (chosenVehicle !== newVehicle) {
                 element.addEventListener('click', async () => {
                     let result;
+                    let chosenFuel = localStorage.getItem('fuel');
 
                     // See if an element is active and if so remove active
                     const currentActive = html.querySelector('#vehicle-icons-container > div.active');
@@ -130,12 +131,11 @@ export class TreeBackgroundController extends Controller {
 
                     // Apply active to clicked element
                     element.classList.add('active');
-
-                    if (chosenVehicle === 'car') {
-                        // console.log(localStorage.getItem('typeFuelCar'))
-                        // result = this.#networkManager.doRequest(`/calculator/car?car=` +  'diesel' + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                    
+                    if (newVehicle === 'car') {
+                        result = await this.#calculatorRepository.getCarbonEmissionForCar();
                     } else {
-                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                        result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
                     }
 
                     this.#treeCount = result.trees;
