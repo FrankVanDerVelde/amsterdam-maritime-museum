@@ -53,7 +53,7 @@ export class NSDialogWorker {
 
     #displayPrice(price) {
         this.#parentView.querySelectorAll('.ns-price-result-label').forEach((label) => {
-            label.innerHTML = `€${price}`
+            label.innerHTML = `€${price.toLocaleString()}`
         })
     }
 
