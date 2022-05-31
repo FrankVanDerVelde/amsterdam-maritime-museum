@@ -14,7 +14,7 @@ class NSRoute {
     }
 
     #getAllStation() {
-        this.#app.get("/ns/allStations/", async (req, res) => {
+        this.#app.post("/ns/allStations/", async (req, res) => {
             try {
                 let result = await Promise.all([this.#ns.getAllStations()])
 
@@ -56,6 +56,7 @@ class NSRoute {
                     toStation: 'ASD',
                 });
 
+                console.log(result);
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({
                     firstCtxRecon: result[0].ctxRecon,
                     resultsCount: result.length,
@@ -71,10 +72,15 @@ class NSRoute {
     }
 
     #getTripPrice() {
-        this.#app.get("/ns/tripPrice/:ctxRecon", async (req, res) => {
+        this.#app.post("/ns/tripPrice", async (req, res) => {
             try {
+                const stationCode = req.params.stationCode
+                const AMSCentralStationCode = 8400058
+                const now = new Date().toISOString();
+                const recon = `/arnu|fromStation=${stationCode}|toStation=${AMSCentralStationCode}|plannedFromTime=${now}|yearCard=false|excludeHighSpeedTrains=false|searchForAccessibleTrip=false`
+                console.log(req.body.ctxRecon);
                 let result = await this.#ns.getTrip({
-                    ctxRecon: req.params.ctxRecon,
+                    ctxRecon: req.body.ctxRecon,
                     travelRequestType: "DEFAULT",
                     discount: "NO_DISCOUNT",
                     travelClass: "2"
@@ -88,21 +94,18 @@ class NSRoute {
                             (fare.product === "OVCHIPKAART_ENKELE_REIS")
                                 &&
                             (fare.discountType === "NO_DISCOUNT")
-                        )
+                        );
                     })
                     .map((fare) => {
-                        return {
-                            priceInEuro: Number(fare.priceInCents) / 100.0
-                        }
-                    })[0]
+                        return { priceInEuro: Number(fare.priceInCents) / 100.0 };
+                    })[0];
 
-                res.status(this.#errorCodes.HTTP_OK_CODE).json({
-                        results: fares
-                });
+                res.status(this.#errorCodes.HTTP_OK_CODE).json({results: fares});
             } catch(e) {
                 console.error(e);
                 res.status(this.#errorCodes.BAD_REQUEST_CODE).json({
-                    error: String(e)
+                    error: String(e),
+                    inputCtxRecon: req.body,
                 });
             }
         });
