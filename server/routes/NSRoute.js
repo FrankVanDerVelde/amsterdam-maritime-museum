@@ -14,7 +14,7 @@ class NSRoute {
     }
 
     #getAllStation() {
-        this.#app.post("/ns/allStations/", async (req, res) => {
+        this.#app.get("/ns/allStations", async (req, res) => {
             try {
                 let result = await Promise.all([this.#ns.getAllStations()])
 
@@ -26,14 +26,13 @@ class NSRoute {
                             stationType: station.stationType,
                             name: station.namen.middel,
                         }
-                    })
-                    .sort((stationA, stationB) => {
+                    }).sort((stationA, stationB) => {
                         const nameA = stationA.name.toUpperCase();
                         const nameB = stationB.name.toUpperCase();
                         if (nameA < nameB) return -1;
                         if (nameA > nameB) return 1;
                         return 0; // names must be equal
-                    })
+                    });
 
                 res.status(this.#errorCodes.HTTP_OK_CODE).json({
                     results: thinnedResults
@@ -46,6 +45,7 @@ class NSRoute {
             }
         });
     }
+
 
     #getTripCtxRecon() {
         this.#app.get("/ns/ctxRecon/:fromStation", async (req, res) => {

@@ -17,8 +17,9 @@ export class NSRepository {
     async getTripPrice(fromStation, toStation) {
         const ctxReconResult = await this.#getCtxRecon(fromStation);
         return await this.#networkManager.doRequest(
-            `${this.#route}/tripPrice/${ctxReconResult.firstCtxRecon}`,
-            "GET"
+            `${this.#route}/tripPrice`,
+            "POST",
+            { ctxRecon: ctxReconResult.firstCtxRecon }
         );
     }
 
