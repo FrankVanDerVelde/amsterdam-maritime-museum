@@ -66,8 +66,11 @@ class CalculatorRoute {
 
     #getCO2ForTrain(){
         this.#app.get("/calculator/train", (req, res) =>{
+            const carbonEmissionTrainPassenger = 35.1;
+            let distance = req.query.distance;
+
             if (req.query.train === "train"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
+                res.status(HTTP_OK_CODE).json({"CO2" : distance * carbonEmissionTrainPassenger, "trees": this.#treeCalculation(distance * carbonEmissionTrainPassenger)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
@@ -101,8 +104,11 @@ class CalculatorRoute {
 
     #getCO2forTram(){
         this.#app.get("/calculator/tram", (req, res) =>{
+            const carbonEmissionTramPassenger = 66;
+            let distance = req.query.distance;
+
             if (req.query.tram === "tram"){
-                res.status(HTTP_OK_CODE).json({"CO2" : 0, "trees": this.#treeCalculation(0)})
+                res.status(HTTP_OK_CODE).json({"CO2" : distance * carbonEmissionTramPassenger, "trees": this.#treeCalculation(distance * carbonEmissionTramPassenger)})
             } else {
                 res.status(BAD_REQUEST_CODE).json({"Message:":"Invalid Query Param"})
             }
