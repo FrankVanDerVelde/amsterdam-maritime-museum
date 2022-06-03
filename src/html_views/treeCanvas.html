@@ -2,14 +2,15 @@
 	<!-- MARK: Nav -->
 	<div class="flex w-100 justify-center">
 		<div class="fixed w-11/12 m-3 rounded-xl w-100 h-24 shadow-md bg-white fixed grid grid-cols-3 grid-flow-col justify-items-stretch text-center justify-items mx-3">
+			<!-- MARK: Emission results -->
 			<div class="flex justify-center items-center justify-self-start ml-3">
 				<div class="flex gap-2 items-center">
-					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2">
+					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer">
 						<i class="fa-solid fa-road"></i>
 						50.02 KM
 					</div>
 					<i class="fa-solid fa-chevron-right text-neutral-500"></i>
-					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2">
+					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer">
 						Fiets
 					</div>
 					<i class="fa-solid fa-equals text-neutral-500 font-bold"></i>
@@ -23,41 +24,39 @@
 				</div>
 			</div>
 
-			<div class="text-supporting_cyan-800 flex flex-col justify-start justify-self-center items-center self-center w-full">
+			<!-- MARK: Suggestions -->
+			<div class="text-primary-500 flex flex-col justify-start justify-self-center items-center self-center w-full">
+				<div class="mb-[5px] mt-[-12px] font-semibold text-sm">SUGGESTIES</div>
 
-				<div class="mb-[5px] mt-[-12px]">Suggesties</div>
 				<div class="flex justify-between space-x-6 text-center" id="vehicle-icons-container">
-					<div data-vehicle="walk"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600">
-						<i class="fa-solid fa-person-walking text-[20px]"></i>
+
+					<div data-vehicle="walk" class="vehicle-suggestion-option-active">
+						<i class="fa-solid fa-person-walking text-[20px] text-white"></i>
 					</div>
 
-					<div data-vehicle="bike"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600">
-						<i class="fa-solid fa-bicycle text-[20px]"></i>
+					<div data-vehicle="bike" class="vehicle-suggestion-option-inactive">
+						<i class="fa-solid fa-bicycle"></i>
 					</div>
 
 					<div data-vehicle="car"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600">
+						 class="vehicle-suggestion-option-inactive">
 						<i class="fa-solid fa-car  text-[20px]"></i>
 					</div>
 
-					<div data-vehicle="bus"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600">
+					<div data-vehicle="bus" class="vehicle-suggestion-option-inactive">
 						<i class="fa-solid fa-bus text-[20px]"></i>
 					</div>
 
 					<div data-vehicle="tram"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600">
+						 class="vehicle-suggestion-option-inactive">
 						<i class="fa-solid fa-train-tram text-[20px]"></i>
 					</div>
 
 					<div data-vehicle="train"
-						 class="h-[32px] w-[32px] flex justify-center items-center rounded border border-supporting_cyan-800 hover:text-supporting_cyan-600 hover:border-supporting_cyan-600"
+						 class="vehicle-suggestion-option-inactive"
 						 id="tram-vehicle">
 						<i class="fa-solid fa-train text-[20px] relative">
-						<span
-								class="bg-primary-700 rounded-[25px] text-white flex absolute bottom-[-20px] left-[-2px] p-1">
+						<span class="bg-primary-700 rounded-[25px] text-white flex absolute bottom-[-20px] left-[-2px] p-1">
 							<i class="fa-solid fa-euro-sign mr-[4px] text-[13px]"></i>
 							<!-- <span class="text-[13px] ns-price-result-label"></span> -->
 						</span>
@@ -66,12 +65,21 @@
 
 				</div>
 			</div>
-			<div class="flex justify-self-end items-center mr-[25px] gap-3">
-				<div class="flex flex-col justify-center items-center text-supporting_cyan-400 text-center">
-					<div class="text-[23px]"><span id="new-emissions">0</span>G C02</div>
-					<div class="text-[15px]">Nieuwe Uitstoot</div>
+
+			<!-- MARK: New results and restart -->
+			<div class="grid justify-self-end grid-cols-2 items-center mr-[25px] gap-3 w-3/4">
+				<div class="flex justify-center items-center justify-self-start ml-3">
+					<div class="flex gap-2 items-center">
+						<div data-vehicle="walk" class="vehicle-suggestion-option-active">
+							<i class="fa-solid fa-person-walking text-[20px] text-white"></i>
+						</div>
+						<i class="fa-solid fa-equals text-neutral-500 font-bold"></i>
+						<div class="text-neutral-500 rounded">
+							<div class="font-bold"><span id="new-emissions"></span><span>G CO2</span></div>
+						</div>
+					</div>
 				</div>
-				<div>
+				<div id="restart-container" class="hover:bg-neutral-50 flex flex-col justify-self-end justify-center p-3 rounded text-neutral-500 cursor-pointer">
 					<i class="fa-solid fa-arrow-rotate-right"></i>
 					<p>Opnieuw</p>
 				</div>
@@ -88,7 +96,7 @@
 			<div class="p-[20px]">
 				<div class="flex justify-between items-center">
 					<p class="font-bold text-[20px]">Treinrit kosten</p>
-					<button id="ns-close-dialog-button">
+					<button id="ns-close-dialog-button" class="hover:bg-neutral-100 w-6 h-6 rounded">
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
@@ -122,7 +130,7 @@
 			</div>
 			<div class="h-[51px] w-full bg-supporting_yellow-400 flex items-center justify-between px-[20px]">
 				<p class="font-bold text-white ns-price-result-label"></p>
-				<button id="ns-done-button" class="justify-self-end bg-white rounded rounded-lg h-[36px] px-3 text-supporting_yellow-500 font-bold">Bereken</button>
+				<button id="ns-done-button" class="justify-self-end bg-white hover:opacity-80 rounded rounded-lg h-[36px] px-3 text-supporting_yellow-500 font-bold">Bereken</button>
 			</div>
 		</div>
 	</div>

@@ -27,57 +27,55 @@
     </div>
 
     <div class="btn_card_container flex justify-between items-center flex-wrap">
-        <div id="walk" class="btn_card walk bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="walk" class="btn_card walk choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-person-walking text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Lopend</span>
+                <i class="fa-solid fa-person-walking choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Lopend</span>
             </div>
         </div>
 
-        <div id="bike" class="btn_card bike bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="bike" class="btn_card bike choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-bicycle icon text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Fiets</span>
+                <i class="fa-solid fa-bicycle choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Fiets</span>
             </div>
         </div>
 
-        <div id="car" class="btn_card car bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="car" class="btn_card car choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-car icon text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Auto</span>
+                <i class="fa-solid fa-car choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Auto</span>
             </div>
         </div>
 
-        <div id="bus" class="btn_card bus bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="bus" class="btn_card bus choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-bus icon text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Bus</span>
+                <i class="fa-solid fa-bus choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Bus</span>
             </div>
         </div>
 
-        <div id="train" class="btn_card train bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="train" class="btn_card train choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-train icon text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Trein</span>
+                <i class="fa-solid fa-train choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Trein</span>
             </div>
         </div>
 
-        <div id="tram" class="btn_card tram bg-gray-100 h-24 flex justify-center items-center cursor-pointer">
+        <div id="tram" class="btn_card tram choose-vehicle-option">
             <div class="flex flex-col">
-                <i class="fa-solid fa-train-tram icon text-4xl text-blue-700 text-center"></i>
-                <span class="card_title text-blue-700">Tram</span>
+                <i class="fa-solid fa-train-tram choose-vehicle-option-icon"></i>
+                <span class="choose-vehicle-option-title">Tram</span>
             </div>
         </div>
     </div>
 
     <div id="licensePlateContainer" class="flex flex-col items-center justify-center hidden p -[13px] space-y-3">
-        <p class="text-center" autocapitalize="characters">Kenteken</p>
+        <p class="text-center font-medium text-xl text-primary-500" autocapitalize="characters">Kenteken</p>
         <input class="licensePlate" id="inputLicensePlate" type="text" placeholder="XX-XX-XX">
-        <button class="primary-button" id="submitLicensePlate">Submit</button>
+        <button class="primary-button" id="submitLicensePlate">Bepaal brandstof type</button>
     </div>
 </div>
-
-    
 
     <div id="successContainer" class="p-4 bg-supporting_cyan-200 rounded rounded-lg border-l border-l-8 border-l-supporting_cyan-400 mt-[13px] hidden">
         <p class="font-bold text-supporting_cyan-800" id="success-title-label"></p>

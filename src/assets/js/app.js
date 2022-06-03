@@ -54,7 +54,7 @@ export class App {
         switch (name) {
             case App.CONTROLLER_TREE_BACKGROUND:
                 App.setCurrentController(name);
-                new TreeBackgroundController();
+                new TreeBackgroundController(this);
                 break;
 
             case App.CONTROLLER_USER_LOCATION:

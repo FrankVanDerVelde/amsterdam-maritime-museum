@@ -9,6 +9,7 @@ import { NetworkManager } from "../framework/utils/networkManager.js";
 
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
 import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
+import {ResultNavbarWorker} from "../Workers/ResultNavbarWorker.js";
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
@@ -37,14 +38,19 @@ export class TreeBackgroundController extends Controller {
 
     #nsDialogWorker = new NSDialogWorker();
 
+    #resultNavbarWorker = new ResultNavbarWorker();
+
     // Number of trees
     #treeCount;
 
     #networkManager;
 
-    constructor() {
+    #app;
+
+    constructor(app) {
         super();
 
+        this.#app = app;
         this.#calculatorRepository = new calculatorRepository();
 
         // this.#setupView().then();
@@ -60,6 +66,8 @@ export class TreeBackgroundController extends Controller {
 
         await this.#setUpCanvas();
         this.#setupNSPopup();
+
+        this.#resultNavbarWorker.setup(this.#app);
 
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
@@ -124,7 +132,7 @@ export class TreeBackgroundController extends Controller {
             if (chosenVehicle !== newVehicle) {
                 element.addEventListener('click', async () => {
                     let result;
-                    let chosenFuel = localStorage.getItem('fuel');
+                    let chosenFuel = localStorage.getItem('fuel') ?? 'diesel';
 
                     // See if an element is active and if so remove active
                     const currentActive = html.querySelector('#vehicle-icons-container > div.active');
@@ -134,7 +142,7 @@ export class TreeBackgroundController extends Controller {
                     element.classList.add('active');
                     
                     if (newVehicle === 'car') {
-                        result = await this.#networkManager.doRequest(`/calculator/car?car=` +  (localStorage.getItem('fuel') ? localStorage.getItem('fuel') : 'diesel') + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
+                        result = await this.#networkManager.doRequest(`/calculator/car?car=${chosenFuel}&distance=${localStorage.getItem('usersDistanceToMuseum')}`, "GET");
                     } else {
                         result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
                     }
