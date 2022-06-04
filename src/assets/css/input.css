@@ -149,25 +149,33 @@
 
 /* tree background page */
 
-#vehicle-icons-container > div.inactive {
-    color: #d3d3d3;
-    border-color: #d3d3d3;
-}
+/*#vehicle-icons-container > div.inactive {*/
+/*    color: #d3d3d3;*/
+/*    border-color: #d3d3d3;*/
+/*}*/
 
-#vehicle-icons-container > div.active {
-    color: rgb(0 78 86);
-    border: 2px solid rgb(0 78 86);
-    font-weight: bold;
-}
+/*#vehicle-icons-container > div.active {*/
+/*    color: rgb(0 78 86);*/
+/*    border: 2px solid rgb(0 78 86);*/
+/*    font-weight: bold;*/
+/*}*/
 
 .vehicle-suggestion-option {
-   @apply h-[32px] w-[32px] flex justify-center items-center rounded
+    @apply h-[32px] w-[32px] flex justify-center items-center rounded;
 }
 
-.vehicle-suggestion-option-active {
-    @apply vehicle-suggestion-option hover:text-primary-500 bg-primary-500
+.vehicle-suggestion-option.active {
+    @apply hover:text-primary-500 bg-primary-500;
 }
 
-.vehicle-suggestion-option-inactive {
-    @apply vehicle-suggestion-option hover:text-primary-500 border border-neutral-100 text-[18px] text-neutral-400
+.vehicle-suggestion-option.active i {
+    @apply text-white;
 }
+
+.vehicle-suggestion-option.inactive {
+    @apply hover:text-primary-500 border border-neutral-100 text-[18px] text-neutral-400;
+}
+
+/*.vehicle-suggestion-option .active {*/
+/*    @apply vehicle-suggestion-option hover:text-primary-500 bg-primary-500*/
+/*}*/

@@ -67,37 +67,31 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
         this.#setupNSPopup();
 
-        this.#resultNavbarWorker.setup(this.#app);
+        this.#resultNavbarWorker.setup(this.#app, this.#treeBackgroundView);
 
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
         let result;
-        let iconCode;
+        const iconCode = this.#getFontAwesomeIconForVehicle(chosenVehicle);
         let vehicleNameDutch;
 
         switch (chosenVehicle) {
             case 'car':
-                iconCode = 'fa-car';
                 vehicleNameDutch = 'auto';
                 break;
             case 'train':
-                iconCode = 'fa-train';
                 vehicleNameDutch = 'trein';
                 break;
             case 'bike':
-                iconCode = 'fa-bicycle';
                 vehicleNameDutch = 'fiets';
                 break;
             case 'bus':
-                iconCode = 'fa-bus';
                 vehicleNameDutch = 'bus';
                 break;
             case 'tram':
-                iconCode = 'fa-train-tram';
                 vehicleNameDutch = 'tram';
                 break;
             case 'walk':
-                iconCode = 'fa-person-walking';
                 vehicleNameDutch = 'lopend';
                 break;
             default:
@@ -117,50 +111,76 @@ export class TreeBackgroundController extends Controller {
 
         // Set values of first travel submissions
         html.querySelector('#emissions').innerHTML = Math.round(result.CO2);
-        html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
-        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
+        html.querySelector('#distance').innerText = `${localStorage.getItem('usersDistanceToMuseum')} KM`;
+        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch.capitalize();
 
-        // .removeAttribute("class")
-        const htmlIconElement = html.querySelector('#vehicle-icon');
-        htmlIconElement.classList.add('fa-solid');
-        htmlIconElement.classList.add(iconCode);
+        // Set vehicle icon
+        html.querySelector('#vehicle-icon').setAttribute("class", `fa-solid ${iconCode}`);
 
         // The on click that will handle thew new emissions
-        html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
-            const newVehicle = element.dataset.vehicle;
-
-            if (chosenVehicle !== newVehicle) {
-                element.addEventListener('click', async () => {
-                    let result;
-                    let chosenFuel = localStorage.getItem('fuel') ?? 'diesel';
-
-                    // See if an element is active and if so remove active
-                    const currentActive = html.querySelector('#vehicle-icons-container > div.active');
-                    currentActive && currentActive.classList.remove('active');
-
-                    // Apply active to clicked element
-                    element.classList.add('active');
-                    
-                    if (newVehicle === 'car') {
-                        result = await this.#networkManager.doRequest(`/calculator/car?car=${chosenFuel}&distance=${localStorage.getItem('usersDistanceToMuseum')}`, "GET");
-                    } else {
-                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
-                    }
-
-                    this.#treeCount = result.trees;
-
-                    html.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
-
-                    // Run tree management to update
-                    await this.#manageTrees();
-                });
-            } else {
-                element.classList.add('inactive');
-            }
-
-        });
-
+        console.log(this.#treeBackgroundView.querySelectorAll('.vehicle-suggestion-option'));
+        this.#treeBackgroundView.querySelectorAll('.vehicle-suggestion-option').forEach(option => {
+            console.log(option);
+            const newVehicle = option.dataset.vehicle;
+            option.onclick = this.#handleVehicleSuggestionClicked.bind(this, option, newVehicle);
+        })
         await this.#manageTrees();
+    }
+
+    #getFontAwesomeIconForVehicle(chosenVehicle) {
+        switch (chosenVehicle) {
+            case 'car':
+                return 'fa-car'
+            case 'train':
+                return 'fa-train'
+            case 'bike':
+                return 'fa-bicycle';
+            case 'bus':
+                return 'fa-bus';
+            case 'tram':
+                return 'fa-train-tram';
+            case 'walk':
+                return 'fa-person-walking';
+        }
+    }
+
+    async #handleVehicleSuggestionClicked(element, newVehicle) {
+        console.log(element, newVehicle);
+
+        this.#unselectVehicleOption();
+        element.classList.add('active');
+
+        let result;
+        let chosenFuel = localStorage.getItem('fuel') ?? 'diesel';
+        let usersDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum');
+
+        switch (newVehicle) {
+            case 'car':
+                result = await this.#networkManager.doRequest(`/calculator/car?car=${chosenFuel}&distance=${usersDistanceToMuseum}`, "GET");
+                break;
+            case 'train':
+                this.#nsDialogWorker.showNSDialog();
+            default: // train option should fallthrough
+                result = await this.#networkManager.doRequest(`/calculator/${newVehicle}?${newVehicle}=${newVehicle}&distance=${usersDistanceToMuseum}`, "GET");
+        }
+
+        this.#treeCount = result.trees;
+
+        this.#treeBackgroundView.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
+
+        const iconCode = this.#getFontAwesomeIconForVehicle(newVehicle);
+        this.#treeBackgroundView.querySelector('#new-chosen-vehicle').setAttribute("class", `fa-solid ${iconCode}`);
+
+        // Run tree management to update
+        await this.#manageTrees();
+    }
+
+    #unselectVehicleOption() {
+        this.#getCurrentlySelectedSuggestedVehicle()?.classList.remove('active');
+    }
+
+    #getCurrentlySelectedSuggestedVehicle() {
+        return this.#treeBackgroundView.querySelector('.active');
     }
 
     async #setUpCanvas() {
@@ -189,8 +209,9 @@ export class TreeBackgroundController extends Controller {
             const loaderPromise = new Promise(function (myResolve, myReject) {
                 try {
                     PIXI.Loader.shared.add(link).load(myResolve);
-                } catch {
+                } catch (e) {
                     console.log(`Error while loading spritesheet: ${spritesheetname}`);
+                    console.error(e);
                     myReject();
                 }
             })

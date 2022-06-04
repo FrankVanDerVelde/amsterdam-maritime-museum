@@ -5,16 +5,19 @@
 			<!-- MARK: Emission results -->
 			<div class="flex justify-center items-center justify-self-start ml-3">
 				<div class="flex gap-2 items-center">
-					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer">
+					<div id="distance-breadcrumb-container"
+						 class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer flex items-center gap-3">
 						<i class="fa-solid fa-road"></i>
-						50.02 KM
+						<p id="distance"></p>
 					</div>
 					<i class="fa-solid fa-chevron-right text-neutral-500"></i>
-					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer">
-						Fiets
+					<div id="vehicle-breadcrumb-container"
+						 class="text-neutral-500 hover:bg-neutral-100 rounded p-2 hover:underline cursor-pointer flex items-center gap-3">
+						<i id="vehicle-icon"></i>
+						<p id="vehicle-name"></p>
 					</div>
 					<i class="fa-solid fa-equals text-neutral-500 font-bold"></i>
-					<div class="text-neutral-500 hover:bg-neutral-100 rounded p-2">
+					<div class="text-neutral-500">
 						<div class="font-bold"><span id="emissions"></span><span>G CO2</span></div>
 					</div>
 				</div>
@@ -30,31 +33,31 @@
 
 				<div class="flex justify-between space-x-6 text-center" id="vehicle-icons-container">
 
-					<div data-vehicle="walk" class="vehicle-suggestion-option-active">
-						<i class="fa-solid fa-person-walking text-[20px] text-white"></i>
+					<div data-vehicle="walk" class="vehicle-suggestion-option inactive">
+						<i class="fa-solid fa-person-walking"></i>
 					</div>
 
-					<div data-vehicle="bike" class="vehicle-suggestion-option-inactive">
+					<div data-vehicle="bike" class="vehicle-suggestion-option inactive">
 						<i class="fa-solid fa-bicycle"></i>
 					</div>
 
 					<div data-vehicle="car"
-						 class="vehicle-suggestion-option-inactive">
-						<i class="fa-solid fa-car  text-[20px]"></i>
+						 class="vehicle-suggestion-option inactive">
+						<i class="fa-solid fa-car text-[20px]"></i>
 					</div>
 
-					<div data-vehicle="bus" class="vehicle-suggestion-option-inactive">
+					<div data-vehicle="bus" class="vehicle-suggestion-option inactive">
 						<i class="fa-solid fa-bus text-[20px]"></i>
 					</div>
 
 					<div data-vehicle="tram"
-						 class="vehicle-suggestion-option-inactive">
+						 class="vehicle-suggestion-option inactive">
 						<i class="fa-solid fa-train-tram text-[20px]"></i>
 					</div>
 
 					<div data-vehicle="train"
-						 class="vehicle-suggestion-option-inactive"
-						 id="tram-vehicle">
+						 class="vehicle-suggestion-option inactive"
+						 id="train-vehicle">
 						<i class="fa-solid fa-train text-[20px] relative">
 						<span class="bg-primary-700 rounded-[25px] text-white flex absolute bottom-[-20px] left-[-2px] p-1">
 							<i class="fa-solid fa-euro-sign mr-[4px] text-[13px]"></i>
@@ -70,8 +73,9 @@
 			<div class="grid justify-self-end grid-cols-2 items-center mr-[25px] gap-3 w-3/4">
 				<div class="flex justify-center items-center justify-self-start ml-3">
 					<div class="flex gap-2 items-center">
-						<div data-vehicle="walk" class="vehicle-suggestion-option-active">
-							<i class="fa-solid fa-person-walking text-[20px] text-white"></i>
+						<div data-vehicle="tram"
+							 class="h-[32px] w-[32px] flex justify-center text-white items-center rounded bg-primary-500">
+							<i id="new-chosen-vehicle" class="fa-solid fa-train-tram"></i>
 						</div>
 						<i class="fa-solid fa-equals text-neutral-500 font-bold"></i>
 						<div class="text-neutral-500 rounded">

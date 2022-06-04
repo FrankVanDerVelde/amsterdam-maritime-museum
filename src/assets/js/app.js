@@ -13,6 +13,7 @@ import { UserLocationController } from "./controllers/UserLocationController.js"
 import { DashboardController } from "./controllers/DashboardController.js";
 import { ChooseVehicleController } from "./controllers/chooseVehicleController.js";
 import { ChooseFuelController } from "./controllers/chooseFuelController.js";
+import {ObjectPropertyDefiner} from "./utils/ObjectPropertyDefiner.js";
 
 
 export class App {
@@ -27,12 +28,15 @@ export class App {
     static CONTROLLER_CHOOSE_VEHICLE = "choose-vehicle";
     static CONTROLLER_CHOOSE_FUEL = "choose-fuel";
 
+    #objectPropertyDefiner = new ObjectPropertyDefiner();
+
     constructor() {
         //Always load the navigation
 
         //Attempt to load the controller from the URL, if it fails, fall back to the welcome controller.
         App.loadControllerFromUrl(App.CONTROLLER_USER_LOCATION);
         this.#addEventListenerForDashboardButton();
+        this.#objectPropertyDefiner.defineObjectProperties();
     }
 
     /**
