@@ -68,7 +68,6 @@ export class TreeBackgroundController extends Controller {
         this.#setupNSPopup();
 
         this.#resultNavbarWorker.setup(this.#app, this.#treeBackgroundView);
-
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
         let result;
@@ -170,6 +169,7 @@ export class TreeBackgroundController extends Controller {
 
         const iconCode = this.#getFontAwesomeIconForVehicle(newVehicle);
         this.#treeBackgroundView.querySelector('#new-chosen-vehicle').setAttribute("class", `fa-solid ${iconCode}`);
+        this.#treeBackgroundView.querySelector('#new-result-container').classList.remove('hidden');
 
         // Run tree management to update
         await this.#manageTrees();
