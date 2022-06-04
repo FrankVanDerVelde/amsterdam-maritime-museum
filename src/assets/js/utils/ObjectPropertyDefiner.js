@@ -2,7 +2,6 @@ export class ObjectPropertyDefiner {
 
     defineObjectProperties() {
         this.#defineStringCapitalize();
-        this.#defineClassListSwitch();
     }
 
     #defineStringCapitalize() {
@@ -11,15 +10,6 @@ export class ObjectPropertyDefiner {
                 return this.charAt(0).toUpperCase() + this.slice(1);
             },
             enumerable: false
-        });
-    }
-
-    #defineClassListSwitch() {
-        Object.defineProperty(DOMTokenList.prototype, 'switch', {
-            value: function(oldClass, newClass) {
-                this.remove(oldClass);
-                this.add(newClass);
-            },
         });
     }
 }
