@@ -252,9 +252,9 @@ export class TreeBackgroundController extends Controller {
                 const baseXpos = x * treeDimension + (treeDimension / 2);
                 const baseYpos = y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight);
 
-                const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
-                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
-                const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
+                // const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 40));
+                const variableSize = Math.floor(Math.random() * (max - treeDimension + 1)) + treeDimension;
 
                 const tree = createBasicSprite(
                     {
