@@ -188,6 +188,7 @@ export class TreeBackgroundController extends Controller {
 
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
+        const navBar = this.#treeBackgroundView.querySelector('#nav-bar')
 
         this.#treeBackgroundView.parentElement.classList.add('tree-app');
 
@@ -252,9 +253,9 @@ export class TreeBackgroundController extends Controller {
                 const baseXpos = x * treeDimension + (treeDimension / 2);
                 const baseYpos = y * treeDimension + (treeDimension - 1 / 3) + (canvasDiv.offsetHeight - treeAreaHeight);
 
-                // const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
-                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 40));
-                const variableSize = Math.floor(Math.random() * (max - treeDimension + 1)) + treeDimension;
+                const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
+                const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+                const variableSize = Math.floor(Math.random() * (max - treeDimension + 1)) + min;
 
                 const tree = createBasicSprite(
                     {
@@ -267,10 +268,13 @@ export class TreeBackgroundController extends Controller {
                     }, treeSheet
                 );
 
+                const deadTreeMax = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+                const deadTreevariableSize = Math.floor(Math.random() * (deadTreeMax - treeDimension + 1)) + treeDimension;
+
                 const deadTree = createBasicSprite(
                     {
-                        width: variableSize,
-                        height: variableSize,
+                        width: deadTreevariableSize,
+                        height: deadTreevariableSize,
                         img: `deadtree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
                         basePosX: baseXpos + Math.random() * (treeDimension / 2),
                         basePosY: baseYpos + Math.random() * (treeDimension / 2),
@@ -321,14 +325,14 @@ export class TreeBackgroundController extends Controller {
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
             if (cloudDirection === 'right') {
-                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 5)));
                 cloud.basePosX = xNegative;
             } else {
-                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 5)));
                 cloud.basePosX = xPositive;
             }
-            // Minimum height will be 10% of available height
-            const minYPos = cloudArea * 0.25;
+            // Minimum height will be 25% of available height and half of the navbar height
+            const minYPos = (cloudArea * 0.25) + (navBar.offsetHeight);
             const maxYPos = cloudArea / 2;
             // Maximum height will be a third of the available space
             cloud.basePosY = Math.random() * (maxYPos - minYPos) + minYPos;
