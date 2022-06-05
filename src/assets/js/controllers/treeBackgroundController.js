@@ -8,6 +8,7 @@ import { calculatorRepository } from "../repositories/calculatorRepository.js";
 import { NetworkManager } from "../framework/utils/networkManager.js";
 
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
+import { getCssValuePrefix } from "../modules/gradientPrefix.js";
 import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
 import {ResultNavbarWorker} from "../Workers/ResultNavbarWorker.js";
 
@@ -359,27 +360,7 @@ export class TreeBackgroundController extends Controller {
         // Resize ability for canvas
         window.addEventListener('resize', resize);
 
-        function getCssValuePrefix() {
-            var rtrnVal = ''; //default to standard syntax
-            var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
-
-            // Create a temporary DOM object for testing
-            var dom = document.createElement('div');
-
-            for (var i = 0; i < prefixes.length; i++) {
-                // Attempt to set the style
-                dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
-
-                // Detect if the style was successfully set
-                if (dom.style.background) {
-                    rtrnVal = prefixes[i];
-                }
-            }
-
-            dom = null;
-
-            return rtrnVal;
-        }
+        
 
         function resize() {
             // Resize canvas
