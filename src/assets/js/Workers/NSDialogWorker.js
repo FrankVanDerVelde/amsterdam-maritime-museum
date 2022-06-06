@@ -32,7 +32,6 @@ export class NSDialogWorker {
         this.#getNSDialog().classList.add('hidden');
     }
 
-
     async #showStationList() {
         let stationsSelect = this.#parentView.querySelector('#stations');
         let stations = await this.#nsRepo.getAllStations();

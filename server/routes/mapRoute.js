@@ -14,6 +14,13 @@ class MapRoute {
         this.#getPlaces();
     }
 
+    /**
+     * This function registers an endpoint with Express to get The distance from re requested coordinates to the
+     * Scheepsvaart museum in kilometers.
+     *
+     * @param {string} coordinates like: long,lat (param in request URL)
+     * @return Array with JSON objects with stations only in The Netherlands
+     */
     #getDistanceForCoordinates() {
         this.#app.get("/map/distance_for_coordinates/:coordinates", async (req, res) => {
             try {
@@ -32,6 +39,12 @@ class MapRoute {
         });
     }
 
+    /**
+     * This function registers an endpoint with Express to get the distance for a place name.
+     *
+     * @param {string} locationName a location.
+     * @return {json} an json object with the place name and distance.
+     */
     #getDistanceForLocationName() {
         this.#app.get("/map/distance_for_city/:locationName", async (req, res) => {
             try {
@@ -53,6 +66,12 @@ class MapRoute {
         })
     }
 
+    /**
+     * This function registers an endpoint with Express to get places suggestions.
+     *
+     * @param {string} locationName a location to get suggestions for.
+     * @return {Array} an array json object with the place name and distance.
+     */
     #getPlaces() {
         this.#app.get("/map/places/:locationName", async (req, res) => {
             try {
