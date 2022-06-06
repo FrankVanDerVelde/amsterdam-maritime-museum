@@ -4,19 +4,17 @@
 
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
-import { calculatorRepository } from "../repositories/calculatorRepository.js";
-import { NetworkManager } from "../framework/utils/networkManager.js";
-
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
+
+import { calculatorRepository } from "../repositories/calculatorRepository.js";
 import { getCssValuePrefix } from "../modules/gradientPrefix.js";
 import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
-import {ResultNavbarWorker} from "../Workers/ResultNavbarWorker.js";
+import { ResultNavbarWorker } from "../Workers/ResultNavbarWorker.js";
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
 
     // The view that holds the html for the tree background
-
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
@@ -54,10 +52,6 @@ export class TreeBackgroundController extends Controller {
         this.#app = app;
         this.#calculatorRepository = new calculatorRepository();
 
-        // this.#setupView().then();
-
-        this.#networkManager = new NetworkManager();
-
         this.#setupView().then();
     }
 
@@ -94,15 +88,9 @@ export class TreeBackgroundController extends Controller {
             case 'walk':
                 vehicleNameDutch = 'lopend';
                 break;
-            default:
-                break;
         }
 
-        if (chosenVehicle === 'car') {
-            result = await this.#calculatorRepository.getCarbonEmissionForCar();
-        } else {
-            result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
-        }
+        result = await this.#calculatorRepository.getEmission();
 
         console.log(result);
 
@@ -145,24 +133,14 @@ export class TreeBackgroundController extends Controller {
     }
 
     async #handleVehicleSuggestionClicked(element, newVehicle) {
-        console.log(element, newVehicle);
-
         this.#unselectVehicleOption();
         element.classList.add('active');
 
-        let result;
         let chosenFuel = localStorage.getItem('fuel') ?? 'diesel';
-        let usersDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum');
+        let usersDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum'); 
 
-        switch (newVehicle) {
-            case 'car':
-                result = await this.#networkManager.doRequest(`/calculator/car?car=${chosenFuel}&distance=${usersDistanceToMuseum}`, "GET");
-                break;
-            case 'train':
-                this.#nsDialogWorker.showNSDialog();
-            default: // train option should fallthrough
-                result = await this.#networkManager.doRequest(`/calculator/${newVehicle}?${newVehicle}=${newVehicle}&distance=${usersDistanceToMuseum}`, "GET");
-        }
+        let result = await this.#calculatorRepository.getEmission(newVehicle,usersDistanceToMuseum, chosenFuel);
+        newVehicle === 'train' && this.#nsDialogWorker.showNSDialog();
 
         this.#treeCount = result.trees;
 
