@@ -67,25 +67,42 @@
 
 /* Choose vehicle */
 
-.licensePlate{
-    height: 50px;
-    width: 150px;
-    border-radius: 0.5rem;
-    border: 3px solid black;
-    --tw-bg-opacity: 1;
-    @apply bg-supporting_yellow-500;
-    padding: 0.5rem;
-    text-align: center;
-    font-weight: 600;
-    font-size: 20px;
-    --tw-text-opacity: 1;
-    color: rgb(rgb(0 0 0 / 0.1) / var(--tw-text-opacity));
+.licensePlate {
+    @apply bg-supporting_yellow-500 h-[50px] w-[150px] border border-black border-[3px] rounded rounded-lg text-center;
+    @apply font-bold text-xl text-black p-3 placeholder-supporting_yellow-100;
 }
 
 .licensePlate:focus{
     border-color: black;
     box-shadow: none;
     outline: none;
+}
+
+.btn_card {
+    width: 300px;
+    border-radius: 40px;
+    flex-basis: 30%;
+    margin-bottom: 1em;
+}
+
+.card_title {
+    @apply top-[70px] left-[130px];
+}
+
+.btn_card.active {
+    @apply border-[5px] border-[#2251AF];
+}
+
+.choose-vehicle-option {
+    @apply bg-gray-100 h-24 flex justify-center items-center cursor-pointer;
+}
+
+.choose-vehicle-option-icon {
+    @apply text-4xl text-blue-700 text-center;
+}
+
+.choose-vehicle-option-title {
+    @apply card_title text-blue-700;
 }
 
 /* Activity Indicator */
@@ -132,13 +149,33 @@
 
 /* tree background page */
 
-#vehicle-icons-container > div.inactive {
-    color: #d3d3d3;
-    border-color: #d3d3d3;
+/*#vehicle-icons-container > div.inactive {*/
+/*    color: #d3d3d3;*/
+/*    border-color: #d3d3d3;*/
+/*}*/
+
+/*#vehicle-icons-container > div.active {*/
+/*    color: rgb(0 78 86);*/
+/*    border: 2px solid rgb(0 78 86);*/
+/*    font-weight: bold;*/
+/*}*/
+
+.vehicle-suggestion-option {
+    @apply h-[32px] w-[32px] flex justify-center items-center rounded;
 }
 
-#vehicle-icons-container > div.active {
-    color: rgb(0 78 86);
-    border: 2px solid rgb(0 78 86);
-    font-weight: bold;
+.vehicle-suggestion-option.active {
+    @apply hover:text-primary-500 bg-primary-500;
 }
+
+.vehicle-suggestion-option.active i {
+    @apply text-white;
+}
+
+.vehicle-suggestion-option.inactive {
+    @apply hover:text-primary-500 border border-neutral-100 text-[18px] text-neutral-400;
+}
+
+/*.vehicle-suggestion-option .active {*/
+/*    @apply vehicle-suggestion-option hover:text-primary-500 bg-primary-500*/
+/*}*/

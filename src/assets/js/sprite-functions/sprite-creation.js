@@ -1,3 +1,11 @@
+/** @function
+ * @name createBasicSprite 
+ * 
+ * Creates a simple sprite from the sprite sheet using the values supplied
+ * @param {json} - Takes a json object with the sprite values
+ * @param {object} - Takes a sprite sprite sheet object
+ * 
+ * */
 export function createBasicSprite(spriteObject, sheet) {
     const sprite = PIXI.Sprite.from(sheet.textures[spriteObject.img]);
 
@@ -26,6 +34,16 @@ export function createBasicSprite(spriteObject, sheet) {
     return sprite;
 }
 
+/** @function
+ * @name createSideScrollingSprites 
+ * 
+ * Creates a sprite that scrolls from one side of the screen to the other and then loops
+ * @param {array} - An array of sprites to make side scrollers for
+ * @param {object} - Takes a sprite sprite sheet object
+ * @param {object} - The canvas app object
+ * @param {int} - The width of the canvas
+ * 
+ * */
 export function createSideScrollingSprites(spritesArray, sheet, canvasApp, canvasWidth) {
     const spritesObjectArray = [];
 
@@ -52,8 +70,6 @@ export function createSideScrollingSprites(spritesArray, sheet, canvasApp, canva
             const offScreenStartPos = spriteObject.direction === 'right' ? -spriteObject.width : canvasWidth + spriteObject.width;
             let movementChange = spriteObject.direction === 'right' ? speed : -(speed);
             movementChange = parseFloat(movementChange.toFixed(2));
-
-            // console.log(canvasDiv.offsetWidth)
 
             [originalSprite, spriteCopy].forEach(sprite => {
                 if (Math.floor(sprite.x) === leavingScreenPos) {

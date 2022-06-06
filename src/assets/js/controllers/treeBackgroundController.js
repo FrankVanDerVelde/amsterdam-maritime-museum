@@ -1,20 +1,22 @@
 /**
  * Controller for the calculator
+ * 
+ * @author Frank van der Velde
  */
 
 import { Controller } from "./controller.js";
 import decorative_sprites from "../../json/decorative-sprites.js"
-import { calculatorRepository } from "../repositories/calculatorRepository.js";
-import { NetworkManager } from "../framework/utils/networkManager.js";
-
 import { createBasicSprite, createSideScrollingSprites } from "../sprite-functions/sprite-creation.js";
+
+import { calculatorRepository } from "../repositories/calculatorRepository.js";
+import { getCssValuePrefix } from "../modules/gradientPrefix.js";
 import { NSDialogWorker } from "../Workers/NSDialogWorker.js";
+import { ResultNavbarWorker } from "../Workers/ResultNavbarWorker.js";
 
 export class TreeBackgroundController extends Controller {
     #calculatorRepository;
 
     // The view that holds the html for the tree background
-
     #treeBackgroundView;
     // The canvas app 
     #canvasApp;
@@ -37,19 +39,18 @@ export class TreeBackgroundController extends Controller {
 
     #nsDialogWorker = new NSDialogWorker();
 
+    #resultNavbarWorker = new ResultNavbarWorker();
+
     // Number of trees
     #treeCount;
 
-    #networkManager;
+    #app;
 
-    constructor() {
+    constructor(app) {
         super();
 
+        this.#app = app;
         this.#calculatorRepository = new calculatorRepository();
-
-        // this.#setupView().then();
-
-        this.#networkManager = new NetworkManager();
 
         this.#setupView().then();
     }
@@ -61,98 +62,100 @@ export class TreeBackgroundController extends Controller {
         await this.#setUpCanvas();
         this.#setupNSPopup();
 
+        this.#resultNavbarWorker.setup(this.#app, this.#treeBackgroundView);
         const chosenVehicle = localStorage.getItem('chosenVehicle');
 
         let result;
-        let iconCode;
+        const iconCode = this.#getFontAwesomeIconForVehicle(chosenVehicle);
         let vehicleNameDutch;
 
         switch (chosenVehicle) {
             case 'car':
-                iconCode = 'fa-car';
                 vehicleNameDutch = 'auto';
                 break;
             case 'train':
-                iconCode = 'fa-train';
                 vehicleNameDutch = 'trein';
                 break;
             case 'bike':
-                iconCode = 'fa-bicycle';
                 vehicleNameDutch = 'fiets';
                 break;
             case 'bus':
-                iconCode = 'fa-bus';
                 vehicleNameDutch = 'bus';
                 break;
             case 'tram':
-                iconCode = 'fa-train-tram';
                 vehicleNameDutch = 'tram';
                 break;
             case 'walk':
-                iconCode = 'fa-person-walking';
                 vehicleNameDutch = 'lopend';
                 break;
-            default:
-                break;
         }
 
-        if (chosenVehicle === 'car') {
-            result = await this.#calculatorRepository.getCarbonEmissionForCar();
-        } else {
-            result = await this.#calculatorRepository.getCarbonEmissionForVehicle();
-        }
-
-        console.log(result);
+        result = await this.#calculatorRepository.getEmission();
 
         // Set the amount of trees then manage tree sprites
         this.#treeCount = result.trees;
 
         // Set values of first travel submissions
         html.querySelector('#emissions').innerHTML = Math.round(result.CO2);
-        html.querySelector('#distance').innerHTML = localStorage.getItem('usersDistanceToMuseum');
-        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch;
+        html.querySelector('#distance').innerText = `${localStorage.getItem('usersDistanceToMuseum')} KM`;
+        html.querySelector('#vehicle-name').innerHTML = vehicleNameDutch.capitalize();
 
-        // .removeAttribute("class")
-        const htmlIconElement = html.querySelector('#vehicle-icon');
-        htmlIconElement.classList.add('fa-solid');
-        htmlIconElement.classList.add(iconCode);
+        // Set vehicle icon
+        html.querySelector('#vehicle-icon').setAttribute("class", `fa-solid ${iconCode}`);
 
         // The on click that will handle thew new emissions
-        html.querySelectorAll('#vehicle-icons-container > div').forEach(element => {
-            const newVehicle = element.dataset.vehicle;
-
-            if (chosenVehicle !== newVehicle) {
-                element.addEventListener('click', async () => {
-                    let result;
-                    let chosenFuel = localStorage.getItem('fuel');
-
-                    // See if an element is active and if so remove active
-                    const currentActive = html.querySelector('#vehicle-icons-container > div.active');
-                    currentActive && currentActive.classList.remove('active');
-
-                    // Apply active to clicked element
-                    element.classList.add('active');
-                    
-                    if (newVehicle === 'car') {
-                        result = await this.#networkManager.doRequest(`/calculator/car?car=` +  (localStorage.getItem('fuel') ? localStorage.getItem('fuel') : 'diesel') + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
-                    } else {
-                        result = await this.#networkManager.doRequest(`/calculator/` + newVehicle + `?` + newVehicle + `=` + newVehicle + `&distance=` + localStorage.getItem('usersDistanceToMuseum'), "GET");
-                    }
-
-                    this.#treeCount = result.trees;
-
-                    html.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
-
-                    // Run tree management to update
-                    await this.#manageTrees();
-                });
-            } else {
-                element.classList.add('inactive');
-            }
-
-        });
-
+        this.#treeBackgroundView.querySelectorAll('.vehicle-suggestion-option').forEach(option => {
+            const newVehicle = option.dataset.vehicle;
+            option.onclick = this.#handleVehicleSuggestionClicked.bind(this, option, newVehicle);
+        })
         await this.#manageTrees();
+    }
+
+    #getFontAwesomeIconForVehicle(chosenVehicle) {
+        switch (chosenVehicle) {
+            case 'car':
+                return 'fa-car'
+            case 'train':
+                return 'fa-train'
+            case 'bike':
+                return 'fa-bicycle';
+            case 'bus':
+                return 'fa-bus';
+            case 'tram':
+                return 'fa-train-tram';
+            case 'walk':
+                return 'fa-person-walking';
+        }
+    }
+
+    async #handleVehicleSuggestionClicked(element, newVehicle) {
+        this.#unselectVehicleOption();
+        element.classList.add('active');
+
+        let chosenFuel = localStorage.getItem('fuel') ?? 'diesel';
+        let usersDistanceToMuseum = localStorage.getItem('usersDistanceToMuseum'); 
+
+        let result = await this.#calculatorRepository.getEmission(newVehicle,usersDistanceToMuseum, chosenFuel);
+        newVehicle === 'train' && this.#nsDialogWorker.showNSDialog();
+
+        this.#treeCount = result.trees;
+
+        this.#treeBackgroundView.querySelector('#new-emissions').innerHTML = Math.round(result.CO2);
+
+        const iconCode = this.#getFontAwesomeIconForVehicle(newVehicle);
+        this.#treeBackgroundView.querySelector('#new-chosen-vehicle').setAttribute("class", `fa-solid ${iconCode}`);
+        this.#treeBackgroundView.querySelector('#new-result-container').classList.remove('hidden');
+
+        // Run tree management to update
+        await this.#manageTrees();
+    }
+
+    #unselectVehicleOption() {
+        this.#getCurrentlySelectedSuggestedVehicle()?.classList.remove('active');
+    }
+
+    #getCurrentlySelectedSuggestedVehicle() {
+        return this.#treeBackgroundView.querySelector('.active');
     }
 
     async #setUpCanvas() {
@@ -160,6 +163,7 @@ export class TreeBackgroundController extends Controller {
 
         // Get the div that will hold the canvas
         const canvasDiv = this.#treeBackgroundView.querySelector("#canvas-box");
+        const navBar = this.#treeBackgroundView.querySelector('#nav-bar')
 
         this.#treeBackgroundView.parentElement.classList.add('tree-app');
 
@@ -181,8 +185,9 @@ export class TreeBackgroundController extends Controller {
             const loaderPromise = new Promise(function (myResolve, myReject) {
                 try {
                     PIXI.Loader.shared.add(link).load(myResolve);
-                } catch {
+                } catch (e) {
                     console.log(`Error while loading spritesheet: ${spritesheetname}`);
+                    console.error(e);
                     myReject();
                 }
             })
@@ -203,8 +208,6 @@ export class TreeBackgroundController extends Controller {
         this.#pixiTreeContainer.sortableChildren = true;
         app.stage.addChild(this.#pixiTreeContainer);
 
-        // canvas.width = canvasDiv.offsetWidth;
-        // canvas.height = canvasDiv.offsetHeight;
         const treeDimension = this.#baseTreeDimension;
 
         // Get the height of the tree area
@@ -225,7 +228,7 @@ export class TreeBackgroundController extends Controller {
 
                 const min = Math.floor(treeDimension - ((treeDimension / 100) * 30));
                 const max = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
-                const variableSize = Math.floor(Math.random() * (max - min + 1)) + min;
+                const variableSize = Math.floor(Math.random() * (max - treeDimension + 1)) + min;
 
                 const tree = createBasicSprite(
                     {
@@ -238,10 +241,13 @@ export class TreeBackgroundController extends Controller {
                     }, treeSheet
                 );
 
+                const deadTreeMax = Math.ceil(treeDimension + ((treeDimension / 100) * 30));
+                const deadTreevariableSize = Math.floor(Math.random() * (deadTreeMax - treeDimension + 1)) + treeDimension;
+
                 const deadTree = createBasicSprite(
                     {
-                        width: variableSize,
-                        height: variableSize,
+                        width: deadTreevariableSize,
+                        height: deadTreevariableSize,
                         img: `deadtree${Math.floor(Math.random() * (uniqueTreeAssets - 1))}.png`,
                         basePosX: baseXpos + Math.random() * (treeDimension / 2),
                         basePosY: baseYpos + Math.random() * (treeDimension / 2),
@@ -283,7 +289,6 @@ export class TreeBackgroundController extends Controller {
             return boat;
         })
 
-        // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
         const cloudSheet = this.#cloudSheet;
         // The canvas area for the sky
         const cloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
@@ -292,14 +297,14 @@ export class TreeBackgroundController extends Controller {
         cloudSprites = cloudSprites.map(cloud => {
             cloud.direction = cloudDirection;
             if (cloudDirection === 'right') {
-                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                xNegative -= cloud.width - -(Math.random() * (canvas.offsetWidth / (cloudSprites.length * 5)));
                 cloud.basePosX = xNegative;
             } else {
-                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 2)));
+                xPositive += cloud.width + 10 + (Math.random() * (canvas.offsetWidth / (cloudSprites.length * 5)));
                 cloud.basePosX = xPositive;
             }
-            // Minimum height will be 10% of available height
-            const minYPos = cloudArea * 0.25;
+            // Minimum height will be 25% of available height and half of the navbar height
+            const minYPos = (cloudArea * 0.25) + (navBar.offsetHeight);
             const maxYPos = cloudArea / 2;
             // Maximum height will be a third of the available space
             cloud.basePosY = Math.random() * (maxYPos - minYPos) + minYPos;
@@ -311,42 +316,24 @@ export class TreeBackgroundController extends Controller {
 
         // update y pos
         window.addEventListener('resize', () => {
-            // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+            const newCloudArea = canvasDiv.offsetHeight * (backgroundDivison[2] / 100);
+            const minYPos = (newCloudArea * 0.25) + (navBar.offsetHeight);
+            const maxYPos = newCloudArea / 2;
+
             const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
             boatSpriteReferences.forEach(boatObject => {
                 boatObject.sprite.y = newBoatArea;
                 boatObject.sprite_copy.y = newBoatArea;
             });
 
-            // cloudSpriteReferences.forEach(cloud => {
-
-            // })
+            cloudSpriteReferences.forEach(cloudObject => {
+                cloudObject.sprite.y = Math.random() * (maxYPos - minYPos) + minYPos;;
+                cloudObject.sprite_copy.y = Math.random() * (maxYPos - minYPos) + minYPos;;
+            })
         });
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
-
-        function getCssValuePrefix() {
-            var rtrnVal = ''; //default to standard syntax
-            var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
-
-            // Create a temporary DOM object for testing
-            var dom = document.createElement('div');
-
-            for (var i = 0; i < prefixes.length; i++) {
-                // Attempt to set the style
-                dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
-
-                // Detect if the style was successfully set
-                if (dom.style.background) {
-                    rtrnVal = prefixes[i];
-                }
-            }
-
-            dom = null;
-
-            return rtrnVal;
-        }
 
         function resize() {
             // Resize canvas
@@ -360,18 +347,13 @@ export class TreeBackgroundController extends Controller {
 
     async #manageTrees() {
         const canvas = this.#canvasApp;
-        const treeSheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
         const placementGrid = this.#gridSquares;
-        // amount of unique trees in the assets folder
-        const uniqueTreeAssets = 5;
         // The offset from the edges of the screen in pixels
         const offSet = treeDimension / 2;
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
         // The array that hold all the tree sprites
-
-        const treeContainer = this.#pixiTreeContainer;
 
         function getRandomX() {
             const min = Math.floor(0);
@@ -388,6 +370,12 @@ export class TreeBackgroundController extends Controller {
         totalTrees = Math.round(this.#treeCount.day);
         updateTrees();
 
+        /** @function
+         * @name updateTrees 
+         * 
+         * Updates the visible trees by using the array of trees and the number of trees to be shown
+         * 
+         * */
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
             let visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);

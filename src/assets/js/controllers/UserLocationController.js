@@ -1,27 +1,22 @@
 import {Controller} from "./controller.js";
 import {MapRepository} from "../repositories/mapRepository.js";
-import {DashboardRepository} from "../repositories/dashboardRepository.js";
-import {
-    debounce} from "../utils/debounce.js";
+import {debounce} from "../utils/debounce.js";
 
 export class UserLocationController extends Controller {
 
     #app;
     #userLocationView;
     #mapRepository;
-    #dashboardRepository;
     #usersDistanceToMuseum;
 
     constructor(app) {
         super();
         this.#app = app;
         this.#mapRepository = new MapRepository();
-        this.#dashboardRepository = new DashboardRepository();
         this.#setupView().then();
     }
 
     async #setupView() {
-        this.#createVisitorIfNeeded().then();
         this.#userLocationView = await super.loadHtmlIntoContent("html_views/UserLocation.html");
 
         this.#showsSearchResultsContainer(false);
@@ -33,13 +28,6 @@ export class UserLocationController extends Controller {
         this.#watchForLocationTextFieldChanges();
         this.#getCurrentLocationButton().addEventListener('click', () => { this.#getLocation(); })
         this.#getContinueContainer().addEventListener('click', () => { this.#handleContinueButtonClicked(); })
-    }
-
-    async #createVisitorIfNeeded() {
-        if (localStorage.getItem('visitorId') !== null)
-            return;
-        let result = await this.#dashboardRepository.createVisitor()
-        localStorage.setItem('visitorId', result.insertId);
     }
 
     #watchForLocationTextFieldChanges() {

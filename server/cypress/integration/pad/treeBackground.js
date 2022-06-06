@@ -7,10 +7,8 @@ describe("Login",  () => {
         cy.visit("http://localhost:8080/#tree-background");
     });
 
+    // Succesfull creation of canvas
     it("Existing canvas", () => {
-        
-        cy.get(".tree-canvas-container").should("exist");
-        cy.get("#canvas-box").should("exist");
         cy.get("canvas").should("exist");
     });
 });
