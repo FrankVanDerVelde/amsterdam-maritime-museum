@@ -1,3 +1,9 @@
+/** @function
+ * @name getCssValuePrefix 
+ * 
+ * Returns the appropriate prefixes for a css gradient
+ * 
+ * */
 export function getCssValuePrefix() {
     var rtrnVal = ''; //default to standard syntax
     var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];

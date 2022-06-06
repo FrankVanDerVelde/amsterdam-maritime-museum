@@ -1,5 +1,7 @@
 /**
  * Controller for the calculator
+ * 
+ * @author Frank van der Velde
  */
 
 import { Controller } from "./controller.js";
@@ -90,8 +92,6 @@ export class TreeBackgroundController extends Controller {
 
         result = await this.#calculatorRepository.getEmission();
 
-        console.log(result);
-
         // Set the amount of trees then manage tree sprites
         this.#treeCount = result.trees;
 
@@ -104,9 +104,7 @@ export class TreeBackgroundController extends Controller {
         html.querySelector('#vehicle-icon').setAttribute("class", `fa-solid ${iconCode}`);
 
         // The on click that will handle thew new emissions
-        console.log(this.#treeBackgroundView.querySelectorAll('.vehicle-suggestion-option'));
         this.#treeBackgroundView.querySelectorAll('.vehicle-suggestion-option').forEach(option => {
-            console.log(option);
             const newVehicle = option.dataset.vehicle;
             option.onclick = this.#handleVehicleSuggestionClicked.bind(this, option, newVehicle);
         })
@@ -210,8 +208,6 @@ export class TreeBackgroundController extends Controller {
         this.#pixiTreeContainer.sortableChildren = true;
         app.stage.addChild(this.#pixiTreeContainer);
 
-        // canvas.width = canvasDiv.offsetWidth;
-        // canvas.height = canvasDiv.offsetHeight;
         const treeDimension = this.#baseTreeDimension;
 
         // Get the height of the tree area
@@ -293,7 +289,6 @@ export class TreeBackgroundController extends Controller {
             return boat;
         })
 
-        // const boatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
         const cloudSheet = this.#cloudSheet;
         // The canvas area for the sky
         const cloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
@@ -319,23 +314,21 @@ export class TreeBackgroundController extends Controller {
         const boatSpriteReferences = createSideScrollingSprites(boatSprites, boatSheet, app, canvasDiv.offsetWidth);
         const cloudSpriteReferences = createSideScrollingSprites(cloudSprites, cloudSheet, app, canvasDiv.offsetWidth);
 
-        console.log(boatSpriteReferences)
-
         // update y pos
         window.addEventListener('resize', () => {
-            console.log('resizing')
-            const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+            const newCloudArea = canvasDiv.offsetHeight * (backgroundDivison[2] / 100);
+            const minYPos = (newCloudArea * 0.25) + (navBar.offsetHeight);
+            const maxYPos = newCloudArea / 2;
+
             const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
             boatSpriteReferences.forEach(boatObject => {
-                console.log(newBoatArea)
                 boatObject.sprite.y = newBoatArea;
                 boatObject.sprite_copy.y = newBoatArea;
             });
 
             cloudSpriteReferences.forEach(cloudObject => {
-                console.log(newCloudArea)
-                cloudObject.sprite.y = newCloudArea;
-                cloudObject.sprite_copy.y = newCloudArea;
+                cloudObject.sprite.y = Math.random() * (maxYPos - minYPos) + minYPos;;
+                cloudObject.sprite_copy.y = Math.random() * (maxYPos - minYPos) + minYPos;;
             })
         });
 
