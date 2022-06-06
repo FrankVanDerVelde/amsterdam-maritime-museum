@@ -24,7 +24,6 @@ export class calculatorRepository{
  * @param {number} [d=sessionDistance] - Takes a distance string defaults to distance in session
  * @param {String} [d=sessionFuel] -  Takes a fuel string defaults to fuel in session
  * */
-
     async getEmission(vehicle = this.#chosenVehicle, distance = this.#userDistanceToMuseum, fuel = this.#typeFuelCar) {
         if (vehicle === 'car') {
             return await this.#networkManager.doRequest(`${this.#route}/car?car=` + fuel + `&distance=` + distance, "GET");

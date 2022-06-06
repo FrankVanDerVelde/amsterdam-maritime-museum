@@ -42,8 +42,6 @@ export class TreeBackgroundController extends Controller {
     // Number of trees
     #treeCount;
 
-    #networkManager;
-
     #app;
 
     constructor(app) {
@@ -321,24 +319,28 @@ export class TreeBackgroundController extends Controller {
         const boatSpriteReferences = createSideScrollingSprites(boatSprites, boatSheet, app, canvasDiv.offsetWidth);
         const cloudSpriteReferences = createSideScrollingSprites(cloudSprites, cloudSheet, app, canvasDiv.offsetWidth);
 
+        console.log(boatSpriteReferences)
+
         // update y pos
         window.addEventListener('resize', () => {
-            // const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
+            console.log('resizing')
+            const newCloudArea = canvasDiv.offsetHeight * backgroundDivison[2] / 100;
             const newBoatArea = (canvasDiv.offsetHeight * (backgroundDivison[2] + (backgroundDivison[1] / 2))) / 100;
             boatSpriteReferences.forEach(boatObject => {
+                console.log(newBoatArea)
                 boatObject.sprite.y = newBoatArea;
                 boatObject.sprite_copy.y = newBoatArea;
             });
 
-            // cloudSpriteReferences.forEach(cloud => {
-
-            // })
+            cloudSpriteReferences.forEach(cloudObject => {
+                console.log(newCloudArea)
+                cloudObject.sprite.y = newCloudArea;
+                cloudObject.sprite_copy.y = newCloudArea;
+            })
         });
 
         // Resize ability for canvas
         window.addEventListener('resize', resize);
-
-        
 
         function resize() {
             // Resize canvas
@@ -352,18 +354,13 @@ export class TreeBackgroundController extends Controller {
 
     async #manageTrees() {
         const canvas = this.#canvasApp;
-        const treeSheet = this.#treeSheet;
         const treeDimension = this.#baseTreeDimension;
         const placementGrid = this.#gridSquares;
-        // amount of unique trees in the assets folder
-        const uniqueTreeAssets = 5;
         // The offset from the edges of the screen in pixels
         const offSet = treeDimension / 2;
         // Total amount of tree's that should be on the screen
         let totalTrees = 0;
         // The array that hold all the tree sprites
-
-        const treeContainer = this.#pixiTreeContainer;
 
         function getRandomX() {
             const min = Math.floor(0);
@@ -380,6 +377,12 @@ export class TreeBackgroundController extends Controller {
         totalTrees = Math.round(this.#treeCount.day);
         updateTrees();
 
+        /** @function
+         * @name updateTrees 
+         * 
+         * Updates the visible trees by using the array of trees and the number of trees to be shown
+         * 
+         * */
         function updateTrees() {
             // Filter for visible sprites by checking grid spaces without a sprite reference and then ones with visible sprites
             let visibleTrees = placementGrid.filter(gridObject => gridObject.deadTreeSprite.visible === true);
