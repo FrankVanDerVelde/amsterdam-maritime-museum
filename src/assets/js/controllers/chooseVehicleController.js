@@ -71,9 +71,7 @@ export class ChooseVehicleController extends Controller {
     }
 
     #savingChosenVehicle() {
-        console.log(this);
         const activeOption = this.#chooseVehicleView.querySelector('.btn_card.active');
-        console.log(activeOption.id);
         this.#chosenVehicle = activeOption.id;
     }
 

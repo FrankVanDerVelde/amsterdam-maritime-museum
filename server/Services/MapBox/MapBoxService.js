@@ -2,9 +2,9 @@ const axios = require("axios").default;
 
 class MapBoxService {
 
-    #baseURL = "https://api.mapbox.com"
+    #baseURL = "https://api.mapbox.com";
     #token = "pk.eyJ1IjoibWFydGlqbnZkd2FsIiwiYSI6ImNsMG1uaThlbDA3Y24zY3BhMnBpZDhmNTQifQ.rIhK3UbqvbOp8iZtqXLVdw";
-    #accesTokenAndLanguageQueryParameters = `access_token=${this.#token}&language=nl`
+    #accesTokenAndLanguageQueryParameters = `access_token=${this.#token}&language=nl`;
     #locationMuseum = "4.91511,52.37138";
 
     async getDistanceInMeters(coordinates, profile) {

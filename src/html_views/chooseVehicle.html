@@ -1,7 +1,6 @@
 <div class="flex flex-col h-full">
 <div class="application-CO2-header-container">
     <p class="application-CO2-header-title">Bereken je CO2 uitstoot om naar ons te reizen</p>
-    <button id="sign-in-button" class="primary-button">Dashboard</button>
 </div>
 
 
@@ -70,23 +69,22 @@
         </div>
     </div>
 
-    <div id="licensePlateContainer" class="flex flex-col items-center justify-center hidden p -[13px] space-y-3">
+    <div id="licensePlateContainer" class="flex flex-col items-center justify-center p -[13px] hidden space-y-3">
         <p class="text-center font-medium text-xl text-primary-500" autocapitalize="characters">Kenteken</p>
         <input class="licensePlate" id="inputLicensePlate" type="text" placeholder="XX-XX-XX">
         <button class="primary-button" id="submitLicensePlate">Bepaal brandstof type</button>
+
+        <div id="successContainer" class="p-4 bg-supporting_cyan-200 rounded rounded-lg border-l border-l-8 border-l-supporting_cyan-400 mt-[13px] hidden">
+            <p class="font-bold text-supporting_cyan-800" id="success-title-label"></p>
+            <p class="text-supporting_cyan-800" id="success-description-label"></p>
+        </div>
+
+        <div id="errorContainer" class="p-4 bg-supporting_red-100 rounded rounded-lg border-l border-l-8 border-l-supporting_red-400 mt-[13px] hidden">
+            <p class="font-bold text-supporting_red-500" id="error-title-label"></p>
+            <p class="text-supporting_red-500" id="error-description-label"></p>
+        </div>
     </div>
 </div>
-
-    <div id="successContainer" class="p-4 bg-supporting_cyan-200 rounded rounded-lg border-l border-l-8 border-l-supporting_cyan-400 mt-[13px] hidden">
-        <p class="font-bold text-supporting_cyan-800" id="success-title-label"></p>
-        <p class="text-supporting_cyan-800" id="success-description-label"></p>
-    </div>
-
-    <div id="errorContainer" class="p-4 bg-supporting_red-100 rounded rounded-lg border-l border-l-8 border-l-supporting_red-400 mt-[13px] hidden">
-        <p class="font-bold text-supporting_red-500" id="error-title-label"></p>
-        <p class="text-supporting_red-500" id="error-description-label"></p>
-    </div>
-
     <div class="application-continue-container" id="continue-container">
         <div class="application-continue-icon">
             <i class="fa-solid fa-caret-right"></i>
