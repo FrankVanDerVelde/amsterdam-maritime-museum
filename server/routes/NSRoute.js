@@ -13,6 +13,10 @@ class NSRoute {
         this.#getTripPrice();
     }
 
+    /**
+     * This function registers an endpoint with Express to get all the stations in The Netherlands.
+     * @return Array with JSON objects with stations only in The Netherlands
+     */
     #getAllStation() {
         this.#app.get("/ns/allStations", async (req, res) => {
             try {
@@ -46,7 +50,11 @@ class NSRoute {
         });
     }
 
-
+    /**
+     * This function registers an endpoint with Express to get The CTXRecon of a trip
+     * @param {string} fromStation station code where the travel starts from (param in request)
+     * @return CTXRecon string, which is like a query string, to get a specific trip.
+     */
     #getTripCtxRecon() {
         this.#app.get("/ns/ctxRecon/:fromStation", async (req, res) => {
             try {
@@ -71,14 +79,16 @@ class NSRoute {
         });
     }
 
+    /**
+     * This function registers an endpoint with Express to get the trip price. It defaults to a single second-class trip
+     * without any discount.
+     *
+     * @param {string} ctxRecon the CTXRecon which the trip is identified by  (param in body)
+     * @return JSON object containing trip price in euro.
+     */
     #getTripPrice() {
         this.#app.post("/ns/tripPrice", async (req, res) => {
             try {
-                const stationCode = req.params.stationCode
-                const AMSCentralStationCode = 8400058
-                const now = new Date().toISOString();
-                const recon = `/arnu|fromStation=${stationCode}|toStation=${AMSCentralStationCode}|plannedFromTime=${now}|yearCard=false|excludeHighSpeedTrains=false|searchForAccessibleTrip=false`
-                console.log(req.body.ctxRecon);
                 let result = await this.#ns.getTrip({
                     ctxRecon: req.body.ctxRecon,
                     travelRequestType: "DEFAULT",

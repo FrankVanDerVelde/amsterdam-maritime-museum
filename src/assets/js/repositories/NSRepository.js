@@ -10,11 +10,11 @@ export class NSRepository {
     }
 
     async getAllStations() {
-        let result = await this.#networkManager.doRequest(`${this.#route}/allStations`, 'GET')
+        let result = await this.#networkManager.doRequest(`${this.#route}/allStations`, 'GET');
         return result.results;
     }
 
-    async getTripPrice(fromStation, toStation) {
+    async getTripPrice(fromStation) {
         const ctxReconResult = await this.#getCtxRecon(fromStation);
         return await this.#networkManager.doRequest(
             `${this.#route}/tripPrice`,
@@ -24,7 +24,7 @@ export class NSRepository {
     }
 
     /** Privates **/
-    async #getCtxRecon(fromStation, toStation) {
-        return await this.#networkManager.doRequest(`${this.#route}/ctxRecon/${fromStation}`, 'GET')
+    async #getCtxRecon(fromStation) {
+        return await this.#networkManager.doRequest(`${this.#route}/ctxRecon/${fromStation}`, 'GET');
     }
 }
