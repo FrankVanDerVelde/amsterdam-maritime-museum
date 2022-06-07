@@ -1,3 +1,5 @@
+import "cypress-localstorage-commands";
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,3 +25,9 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('setSession', () => {
+    cy.setLocalStorage('fuel', 'benzine');
+    cy.setLocalStorage('chosenVehicle', 'car');
+    cy.setLocalStorage('usersDistanceToMuseum', 15);
+});

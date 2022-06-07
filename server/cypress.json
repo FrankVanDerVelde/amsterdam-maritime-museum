@@ -1,4 +1,7 @@
 {
   "integrationFolder": "cypress/integration/pad",
-  "video": false
+  "video": false,
+  "env": {
+    "EXTERNAL_API": "https://jsonplaceholder.typicode.com/"
+  }
 }
