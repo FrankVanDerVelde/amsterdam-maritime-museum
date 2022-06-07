@@ -20,12 +20,16 @@ export class NSDialogWorker {
             .onclick = this.#calculateTripButtonClicked.bind(this);
 
         this.#parentView
-            .querySelector('#tram-vehicle')
-            .onclick = this.#toggleNSDialog.bind(this);
-
-        this.#parentView
             .querySelector('#ns-close-dialog-button')
-            .onclick = this.#toggleNSDialog.bind(this);
+            .addEventListener('click', this.#hideNSDialog.bind(this));
+    }
+
+    showNSDialog() {
+        this.#getNSDialog().classList.remove('hidden');
+    }
+
+    #hideNSDialog() {
+        this.#getNSDialog().classList.add('hidden');
     }
 
     async #showStationList() {
@@ -57,7 +61,7 @@ export class NSDialogWorker {
         })
     }
 
-    #toggleNSDialog() {
-        this.#parentView.querySelector('#ns-dialog').classList.toggle('hidden');
+    #getNSDialog() {
+       return this.#parentView.querySelector('#ns-dialog')
     }
 }
