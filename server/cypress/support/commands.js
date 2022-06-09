@@ -29,5 +29,5 @@ import "cypress-localstorage-commands";
 Cypress.Commands.add('setSession', () => {
     cy.setLocalStorage('fuel', 'benzine');
     cy.setLocalStorage('chosenVehicle', 'car');
-    cy.setLocalStorage('usersDistanceToMuseum', 15);
+    cy.setLocalStorage('usersDistanceToMuseum', 20);
 });

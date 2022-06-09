@@ -20,7 +20,13 @@ describe("Login",  () => {
       });
 
     // Succesfull creation of canvas
-    it("Existing canvas", () => {
+    it("Should exist canvas", () => {
         cy.get("canvas").should("exist");
+    });
+
+    it('Change vehicle to train', () => {
+      cy.wait(1500);
+      cy.get('#train-vehicle').click();
+      cy.get('#ns-done-button').click()
     });
 });
