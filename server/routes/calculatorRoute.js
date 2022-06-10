@@ -19,7 +19,7 @@ class CalculatorRoute {
         this.#getCO2forWalking()
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission of cars in gram for each type of fuel.
      */
     #getCO2forCar() {
@@ -67,7 +67,7 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission for trains, the returned value is a average amount of train passengers.
      */
     #getCO2ForTrain(){
@@ -83,7 +83,7 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission for bikes.
      */
     #getCO2forBike(){
@@ -96,7 +96,7 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission for busses, the returned value is a average of bus passengers.
      */
     #getCO2forBus(){
@@ -114,7 +114,7 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission for trams, the returned value is a average of tram passengers.
      */
     #getCO2forTram(){
@@ -130,7 +130,7 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the carbon emission of walking.
      */
     #getCO2forWalking(){
@@ -143,11 +143,11 @@ class CalculatorRoute {
         })
     }
 
-    /**
+       /** @function
      * This function returns the amount of trees wich are needed to compensate the returned carbon emission value
      * in a day/month/year.
-     * @param co2User
-     * @returns {{month: number, year: number, day: number}}
+     * @param co2User - emission of user
+     * @returns {{month: number, year: number, day: number}} - Amount of trees needed to compensate
      */
     #treeCalculation(co2User){
 
