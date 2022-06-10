@@ -13,7 +13,7 @@ class NSRoute {
         this.#getTripPrice();
     }
 
-    /**
+    /** @function
      * This function registers an endpoint with Express to get all the stations in The Netherlands.
      * @return Array with JSON objects with stations only in The Netherlands
      */
@@ -50,7 +50,7 @@ class NSRoute {
         });
     }
 
-    /**
+    /** @function
      * This function registers an endpoint with Express to get The CTXRecon of a trip
      * @param {string} fromStation station code where the travel starts from (param in request)
      * @return CTXRecon string, which is like a query string, to get a specific trip.
@@ -79,7 +79,7 @@ class NSRoute {
         });
     }
 
-    /**
+    /** @function
      * This function registers an endpoint with Express to get the trip price. It defaults to a single second-class trip
      * without any discount.
      *
