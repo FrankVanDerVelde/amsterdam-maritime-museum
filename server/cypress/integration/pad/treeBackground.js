@@ -5,8 +5,8 @@ describe("Login",  () => {
     before(() => {
         cy.setSession();
         cy.saveLocalStorage();
-      });
-    
+    });
+
     beforeEach(() => {
         //Go to the specified URL
         cy.restoreLocalStorage();
@@ -17,16 +17,40 @@ describe("Login",  () => {
         cy.getLocalStorage("fuel").should("exist");
         cy.getLocalStorage("chosenVehicle").should("exist");
         cy.getLocalStorage("usersDistanceToMuseum").should("exist");
-      });
+    });
 
     // Succesfull creation of canvas
-    it("Should exist canvas", () => {
+    it("Existing canvas", () => {
         cy.get("canvas").should("exist");
     });
 
-    it('Change vehicle to train', () => {
-      cy.wait(1500);
-      cy.get('#train-vehicle').click();
-      cy.get('#ns-done-button').click()
+    // NS Dialog
+    it("Check has loaded stations", () => {
+        cy.wait(1000); // it's still busy loading the canvas, give it some time.
+        cy.get('#train-vehicle')
+            .click();
+        cy.get('#stations')
+            .select('Alkmaar')
+            .should('have.value', 'AMR');
+    });
+
+    it("Check price calculation", () => {
+        cy.wait(1000); // it's still busy loading the canvas, give it some time.
+
+        cy.get('#train-vehicle')
+            .click();
+        cy.get('#stations')
+            .select('Alkmaar')
+        cy.get('#ns-number-of-persons')
+            .clear()
+            .type('2');
+        cy.get('#ns-done-button')
+            .click();
+
+        cy.wait(4000); // NS API Can actually be quite slow sometimes.
+
+        cy.get('.ns-price-result-label')
+            .first()
+            .should('contain.text', '€');
     });
 });
