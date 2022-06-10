@@ -19,6 +19,9 @@ class CalculatorRoute {
         this.#getCO2forWalking()
     }
 
+    /**
+     * This function returns the carbon emission of cars in gram for each type of fuel.
+     */
     #getCO2forCar() {
         this.#app.get("/calculator/car", (req, res) => {
             //This is the amount of co2 emission for Diesel per kilometer in gram
@@ -64,6 +67,9 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the carbon emission for trains, the returned value is a average amount of train passengers.
+     */
     #getCO2ForTrain(){
         this.#app.get("/calculator/train", (req, res) =>{
             const carbonEmissionTrainPassenger = 35.1;
@@ -77,6 +83,9 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the carbon emission for bikes.
+     */
     #getCO2forBike(){
         this.#app.get("/calculator/bike", (req, res) =>{
             if (req.query.bike === "bike"){
@@ -87,6 +96,9 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the carbon emission for busses, the returned value is a average of bus passengers.
+     */
     #getCO2forBus(){
         this.#app.get("/calculator/bus", (req, res) =>{
             //The average CO2 emission of a traveller from public transport is 116 gram per kilometer
@@ -102,6 +114,9 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the carbon emission for trams, the returned value is a average of tram passengers.
+     */
     #getCO2forTram(){
         this.#app.get("/calculator/tram", (req, res) =>{
             const carbonEmissionTramPassenger = 66;
@@ -115,6 +130,9 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the carbon emission of walking.
+     */
     #getCO2forWalking(){
         this.#app.get("/calculator/walk", (req, res) =>{
             if (req.query.walk === "walk"){
@@ -125,6 +143,12 @@ class CalculatorRoute {
         })
     }
 
+    /**
+     * This function returns the amount of trees which are needed to compensate the returned carbon emission value
+     * in a day/month/year.
+     * @param co2User
+     * @returns {{month: number, year: number, day: number}}
+     */
     #treeCalculation(co2User){
 
         const co2UserInKilo = co2User / 1000;
@@ -138,7 +162,6 @@ class CalculatorRoute {
             "month": co2TreesMonth,
             "day": co2TreesDay
         }
-
     }
 }
 
